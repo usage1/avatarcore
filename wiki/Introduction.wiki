@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Avatar Core is a framework for defining and viewing avatar characters.  Currently, it is implemented with Flash and ActionScript.
+Avatar Core is an open source, client-side framework for defining and viewing avatar characters.  Currently, it is implemented with Flash and ActionScript.
 
 == Goals == 
 
