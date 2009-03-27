@@ -1,0 +1,9 @@
+#summary An introduction to the Avatar Core framework.
+
+= Introduction =
+
+Avatar Core is a framework for defining and viewing avatar characters.  Currently, it is implemented with Flash and ActionScript.
+
+== Goals == 
+
+The primary goal of Avatar Core was to make a simple, yet feature-rich framework for avatar creation and presentation that could be easily updated or changed with no or minimal interaction with source code.  As such, individual avatar characters, as well as the possible combinations that make up their characteristics, can be defined entirely in XML and loaded into an Avatar application (viewer or editor) at runtime.
