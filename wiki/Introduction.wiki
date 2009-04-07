@@ -1,9 +1,76 @@
 #summary An introduction to the Avatar Core framework.
 
-= Introduction =
-
 Avatar Core is an open source, client-side framework for defining and viewing avatar characters.  Currently, it is implemented with Flash and ActionScript.
 
 == Goals == 
 
 The primary goal of Avatar Core was to make a simple, yet feature-rich framework for avatar creation and presentation that could be easily updated or changed with no or minimal interaction with source code.  As such, individual avatar characters, as well as the possible combinations that make up their characteristics, can be defined entirely in XML and loaded into an Avatar application (viewer or editor) at runtime.
+
+== Basic Design == 
+
+The avatar core framework is divided into 3 primary components: a library (Library), an avatar definition (Avatar), and avatar art (AvatarArt). 
+
+Libraries define features (FeatureDefinition) that avatars can use.  Libraries can contain any number of features which in turn can contain any number of visual variations (ArtGroup, Art) specific to each feature.  In addition to the visual assets used by features, libraries also define how those assets are displayed.  This includes initial position, size and rotation (Transform), as well as their limitations (Constraint), and even what possible variations of color can be applied (Color). In essence, libraries define what an avatar editor presents to the user as the available options for their custom avatar. 
+
+Avatars define the actual avatar themselves - what a user selected from a library for their avatar.  Avatar objects are comprised of their own "features" (Feature) which simply reference different feature variations in whatever library is associated with that avatar and as well as provide any additional position, size, rotation, and/or color that is applied to it if necessary.
+
+Avatar art provides the visual representation of the avatar.  Avatar art objects reference avatars to create visual objects (ArtSprite) for each feature variation depending on the assets defined for that feature in the library.  Both the feature defined in the avatar as well as its definition in the library contribute to the resulting visual appearance.
+
+<img src="http://www.myavatareditor.com/avatarcore/images/basic_uml_diagram.jpg" title="Basic UML Diagram" alt="Basic UML Diagram" />
+
+Library and Avatar objects can be defined in XML.
+
+{{{
+<?xml version="1.0" encoding="utf-8" ?>
+<definitions xmlns="com.myavatareditor.avatarcore.data">
+	
+	<libraries>
+		<Library>
+			
+			<FeatureDefinition name="Nose">
+				<artSet zIndex="2">
+					<ArtGroup name="Round">
+						<Art src="NoseStandard" />
+					</ArtGroup>
+					
+					<ArtGroup name="Piggy">
+						<Art src="NoseUp" />
+					</ArtGroup>
+					
+					<ArtGroup name="Rigid">
+						<Art src="NoseRigid" />
+					</ArtGroup>
+				</artSet>
+			</FeatureDefinition>
+			
+			<FeatureDefinition name="Mouth">
+				<artSet zIndex="1">
+					<ArtGroup name="Straight">
+						<Art src="MouthFlat" />
+					</ArtGroup>
+					
+					<ArtGroup name="Grin">
+						<Art src="MouthGrin" />
+					</ArtGroup>
+				</artSet>
+			</FeatureDefinition>
+		</Library>
+	</libraries>
+	
+	<avatars>
+		<Avatar>
+			<name>MyAvatar</name>
+			<creator>senocular</creator>
+			
+			<Feature name="Nose">
+				<artName>Round</artName>
+			</Feature>
+			
+			<Feature name="Mouth">
+				<artName>Kissy</artName>
+			</Feature>
+		</Avatar>
+	</avatars>
+	
+</definitions>
+}}}
