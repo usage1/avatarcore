@@ -1,0 +1,38 @@
+﻿= Release Notes =
+
+Current version: 0.0.2.  This is the second (alpha) release of the Avatar Core framework.
+
+The current release improves on the API design as well as extends the XML capabilities of the framework.
+
+
+== Changes ==
+
+0.0.2 (April 14, 2009)
+
+- Renamed MirrorArtSprite to MirroredArtSprite
+- Art objects now replace ArtGroup objects completely.  Art requiring multiple art assets would consist of one Art instance containing multiple other Art instances.
+- Updated Art constructor to include a src parameter
+- Added a thumbnail property to the Art class. This would be used by editors to present selections to the user
+- Updated Rect with constructor parameters that mirror flash.geom.Rectangle
+- Added constructor parameters to Constraint
+- Fixed bug where new features added to avatar weren't being updated to use that avatar's library
+- Avatar.addFeature and similar APIs have been removed in favor of sticking with the inherited collection APIs of the same type.  These methods are overridden as necessary to provide feature events.
+- Feature.transform is now null by default
+- Added additional default properties into FeatureDefinition
+- FeatureDefinition.transform renamed to defaultTransform
+- Added FeatureDefinitionEvent
+- Library now dispatches FeatureDefinitionEvent events for definition addition, removal and changes
+- Changes in libraries (invoking events) are recognized by Avatars allowing them to update automatically as needed
+- Moved XMLDefinitionParse out of avatarcore.data.xml package into just avatarcore.xml
+- XMLDefinitionParser now creates instances for null objects where xml nodes attempt to define values
+- Added XMLDefinitionWriter for writing XML from objects
+- Added IXMLWritable interface for defining properties related to writing XML 
+- Removed term "Collection" from ICollection API
+- Added getItemsByType method in ICollection
+- Added Viewport class for containing avatar graphics and capturing graphics as bitmaps
+- Converted most class member variables to accessor methods
+- More documentation within source code
+
+0.0.1 (March 27, 2009)
+
+- First release
