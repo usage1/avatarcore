@@ -1,0 +1,88 @@
+#summary Simple code samples to get you started with the framework.
+
+Using Avatar Core is fairly simple. Most of the hard work has already been done for you.  All you need to do is create the necessary objects and make the right connections.  Though the frameworks was specifically designed to work with XML, it is not required. In fact the XML maps directly to definitions in code.
+
+
+== Simple Code Example ==
+
+The following example represents the minimal amount of code necessary for Avatar Core to produce visible results.  It assumes an image exists in the relative file location of "assets/star.png".
+
+{{{
+import com.myavatareditor.avatarcore.data.*;
+import com.myavatareditor.avatarcore.display.*;
+
+var feature:Feature = new Feature();
+feature.art = new Art("assets/star.png");
+
+var avatar:Avatar = new Avatar();
+avatar.addItem(feature);
+
+var avatarView:AvatarArt = new AvatarArt(avatar);
+addChild(avatarView);
+}}}
+
+Lines 1 and 2 include the necessary imports for the objects being used from the framework.  Line 4 creates a new Feature object which describes a characteristic of an avatar character.  The following line specifies what art that characteristic displays when seen visually.  Here, that is a star PNG file.  Line 7 and 8 create an Avatar instance to represent the complete avatar data and adds the feature just created as a characteristic.  Finally, the graphic representation of the avatar is created in line 10 as an AvatarArt instance which is added to the display list on line 11.  This object reads all of the features within the avatar in which it is associated and displays the linked art graphics as needed.
+
+This particular example strays from the common use case of the Avatar Core framework because it doesn't use a library. Libraries represent a pool of available feature definitions (with art) from which avatars and their features can link to by name.  Here, an Art object was associated directly with the Feature instance which is an alternative approach that can be used if a library is unattainable.
+
+The following is the same example from above but using a Library.
+
+{{{
+import com.myavatareditor.avatarcore.data.*;
+import com.myavatareditor.avatarcore.display.*;
+
+var art:Art = new Art("assets/star.png");
+art.name = "star";
+
+var definition:FeatureDefinition = new FeatureDefinition();
+definition.name = "example";
+definition.artSet.addItem(art);
+
+var library:Library = new Library();
+library.addItem(definition);
+
+var feature:Feature = new Feature();
+feature.name = "example";
+feature.artName = "star";
+
+var avatar:Avatar = new Avatar(library);
+avatar.addItem(feature);
+
+var avatarView:AvatarArt = new AvatarArt(avatar);
+addChild(avatarView);
+}}}
+
+With the introduction of a library, things have gotten a bit more complicated.  One thing to notice is, however, that libraries are defined much like avatars are but instead of containing Feature instances, libraries contain FeatureDefinition instances (though do so within an artSet object).  One of the big differences here is that connections with a feature and its definition/art are made through names.  The feature `name` property links it to the feature definition of the same name and the feature `artName` property links it to the Art object within the definition's artSet with a `name` of the same value. 
+
+As with the sample before it, this also does not demonstrate a common use case.  Typically, library and avatar data is defined in XML.  When parsed, that XML will provide for you Avatar and Library objects with the necessary, pre-defined FeatureDefinition and Feature objects all ready contained within preventing you from having to generate them in code.  At that point it just becomes a matter of connecting avatars with a libraries and drawing them on the screen.
+
+Below is the same as the last example above but using XML. Though inline in this example, this XML would be loaded from a server at runtime.
+
+{{{
+var definitions:XML = <definitions xmlns="com.myavatareditor.avatarcore.data">
+	<Avatar>
+		<Feature name="example">
+			<artName>star</artName>
+		</Feature>
+	</Avatar>
+	<Library>
+		<FeatureDefinition name="example">
+			<artSet>
+				<Art name="star" src="assets/star.png" />
+			</artSet>
+		</FeatureDefinition>
+	</Library>
+</definitions>;
+}}}
+{{{
+var parser:XMLDefinitionParser = new XMLDefinitionParser();
+var avatar:Avatar = parser.parse(definitions.elements()[0]) as Avatar;
+avatar.library = parser.parse(definitions.elements()[1]) as Library;
+
+var avatarView:AvatarArt = new AvatarArt(avatar);
+addChild(avatarView);
+}}}
+
+Here, the generic XMLDefinitionParser parser class was used to convert the XML into its respective Avatar and Library instances.  Once the avatar was coupled with the library, it could be drawn on the screen with the AvatarArt object.
+
+The code above represents most of what is necessary to work with the Avatar Core framework - at least for displaying avatars.  As you begin editing avatar characters, there are additional APIs to work with.
