@@ -19,14 +19,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data.xml {
+package com.myavatareditor.avatarcore.xml {
 	
+	import com.myavatareditor.avatarcore.data.Collection;
 	import com.myavatareditor.avatarcore.data.ICollection;
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
+	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-	
 	
 	/**
 	 * A generic XML parser for parsing XML into an object of
@@ -44,29 +45,48 @@ package com.myavatareditor.avatarcore.data.xml {
 	public class XMLDefinitionParser {
 		
 		private var lookup:Object;
-		private var lookupAttribute:String = "name";
+		private var definitionLookup:Object = { };
 		
 		public function XMLDefinitionParser() {
 			
 		}
 		
 		/**
-		 * Parses the content of an XML node into an object. It is
-		 * assumed that the target object has the properties to 
+		 * Parses the content of an XML node into an existing object.
+		 * It is assumed that the target object has the properties to 
 		 * facilitate the properties defined in XML or is of the type
 		 * ICollection to be able to store non-property definitions
 		 * within an internal list in the object.
 		 * @param	node The XML to parse.
 		 * @param	target The object to parse the XML definition into.
 		 */
-		public function parse(node:XML, target:Object):void {
+		public function parseInto(node:XML, target:Object):void {
 			lookup = {};
-			parseNode(node, target);
+			parseNodeInto(node, target);
 			lookup = null;
 		}
 		
-		private function parseNode(node:XML, target:Object):void {
+		/**
+		 * Parses the content of an XML node into an object and returns it.
+		 * It is assumed that the created object has the properties to 
+		 * facilitate the properties defined in XML or is of the type
+		 * ICollection to be able to store non-property definitions
+		 * within an internal list in the object.
+		 * @param	node The XML to parse.
+		 * @return	The object created as a result of parsing the XML.
+		 */
+		public function parse(node:XML):Object {
+			lookup = {};
+			var result:Object = createObject(node);
+			lookup = null;
+			return result;
+		}
+		
+		private function parseNodeInto(node:XML, target:Object):void {
 			if (node == null || target == null) return;
+			
+			var targetType:XML = describeType(target);
+			var targetMembers:XMLList = targetType..variable + targetType..accessor + targetType..method;
 			
 			// assign attributes first pass for any
 			// dependencies on contained objects
@@ -74,7 +94,8 @@ package com.myavatareditor.avatarcore.data.xml {
 			
 			var element:XML;
 			var attsParsed:Boolean;
-			var name:String;
+			var elemName:String;
+			var memberType:String;
 			var ref:Object;
 			var children:XMLList;
 			var firstChild:XML;
@@ -82,117 +103,151 @@ package com.myavatareditor.avatarcore.data.xml {
 			for each(element in node.elements()){
 				
 				attsParsed = false;
-				name = element.localName();
+				elemName = element.localName();
 				
 				// check to see if the name of the element exists
 				// as a property of the target object. If so, the
 				// value of the XML element will be assigned to
 				// that property
-				if (name in target){
-					
+				if (elemName in target){
+					memberType = targetMembers.(attribute("name") == elemName).@type.toString();
+				
+					// ----------------------------------------------
+					// referencing a pre-created object
+					// in the XML if defined
 					ref = lookup[element.@ref] as Object;
 					if (ref == null && element.@ref != undefined){
-						print("Parsing XML; couldn't find referenced object named '"+element.@ref+"' for "+name, PrintLevel.ERROR, this);
+						print("Parsing XML; couldn't find referenced object named '"+element.@ref+"' for "+elemName, PrintLevel.ERROR, this);
 					}
-					
-					if (ref){
-						// referencing a pre-created object
-						// in the XML 
-						target[name] = ref;
+					if (ref) {
+						
+						target[elemName] = ref;
 						
 					}else{
+						// normal, non-referenced definition
 						
 						children = element.children();
 						
 						// A new object value; there should only be
 						// one node; others, if present, are ignored
 						var numChildren:int = children.length();
-						if (numChildren != 0){
+						if (numChildren != 0) {
+							
 							firstChild = children[0];
 							
+							// ----------------------------------------------
+							// for simple text elements, the text is
+							// converted to a primitive value
 							if (numChildren == 1 && firstChild.nodeKind() == "text"){
-								// for simple text elements, the text is
-								// converted to a primitive value
-								assignPrimitiveValue(target, name, String(firstChild));
 								
-							}else if (target[name] != null 
-							      && firstChild.name().toString() != getQualifiedClassName(target[name])){
-								// parse node into existing value
-								parseNode(element, target[name]);
-								attsParsed = true;
-							}else{
+								assignPrimitiveValue(target, elemName, firstChild.toString());
+							
+							
+							// ----------------------------------------------
+							// if the first and only node is of the target type,
+							// that full object is the target property's full definition
+							}else if (numChildren == 1 && firstChild.name().toString() == memberType) {
+								
 								// create definition from first child element as object
 								try {
-									target[name] = createObject(firstChild);
+									target[elemName] = createObject(firstChild);
 								}catch (error:Error){
 									// likely a type error where createObject
 									// created an instance of an incompatible type
 									print("Parsing XML; couldn't assign an XML-generated object to an object property ("+error+")", PrintLevel.ERROR, this);
 								}
+								
+								
+							// ----------------------------------------------
+							// otherwise parse the nodes into the existing value
+							}else{
+								
+								// create object if null
+								if (target[elemName] == null) {
+									target[elemName] = getInstanceFromType(memberType);
+								}
+								
+								// parse node into existing value
+								if (target[elemName] != null) {
+									parseNodeInto(element, target[elemName]);
+									attsParsed = true; // parsing automatically parses attributes
+								}
+							}
+						
+						// no child elements
+						}else {
+							
+							// create object if null
+							if (target[elemName] == null) {
+								target[elemName] = getInstanceFromType(memberType);
 							}
 						}
 					}
 					
-					if (!attsParsed && target[name] != null){
-						// if target value exists, assign attributes
-						// these are assigned on top of any existing
+					if (!attsParsed){
+						// assign attributes on top of any existing
 						// values (node parsing already adds these)
-						assignAttributes(target[name], element);
+						assignAttributes(target[elemName], element);
 					}
 					
-				}else if (target is ICollection){
+				
+				// property elemName not in target
+				}else if (target is ICollection) {
+					
 					// for non-property values, the only way
 					// definitions can be assigned to the target
 					// object is if the object is a collcetion
 					instance = createObject(element);
 					if (instance){
-						ICollection(target).addCollectionItem(instance);
+						ICollection(target).addItem(instance);
 					}
 				}
 			}
 		}
 		
 		private function createObject(element:XML):Object {
-			var qname:QName;
-			var name:String;
-			var def:Class;
+			var qname:QName = element.name();
+			var elemName:String = (qname.uri) ? qname.uri + "::" + qname.localName : qname.localName;
+			var instance:Object = getInstanceFromType(elemName);
+			if (instance){
+				parseNodeInto(element, instance);
+			}
+			return instance;
+		}
+		
+		private function getInstanceFromType(type:String):Object {
 			var instance:Object;
+			var instanceClass:Class;
 			try {
-				qname = element.name();
-				name = (qname.uri) ? qname.uri + "::" + qname.localName : qname.localName;
-				def = getDefinitionByName(name) as Class;
-				instance = new def();
+				instanceClass = getDefinitionByName(type) as Class;
+				instance = new instanceClass();
 			}catch (error:Error){
 				// likely to occur if the definition of the class
 				// does not exist within the application
-				print("Parsing XML; cannot create a new object instance from "+name+" ("+error+")", PrintLevel.ERROR, this);
-			}
-			
-			if (instance){
-				parseNode(element, instance);
-				return instance;
-			}
-			
-			return null;
+				print("Parsing XML; cannot create a new object instance from " + type + " (" + error + ")", PrintLevel.ERROR, this);
+				throw(error);
+			}			
+			return instance;
 		}
 		
 		private function assignAttributes(target:Object, element:XML):void {
+			if (target == null || element == null) return;
 			var att:XML;
-			var name:String;
+			var elemName:String;
 			var value:String;
 			for each (att in element.attributes()){
-				name = att.localName();
+				elemName = att.localName();
 				value = String(att);
 				
 				// if an attribute of the name defined by 
-				// lookupAttribute is found, be sure to
+				// nameKey is found, be sure to
 				// update the lookup table so the object
 				// can be referenced through ref attributes
-				if (name == lookupAttribute){
+				if (elemName == Collection.nameKey){
 					lookup[value] = target;
 				}
 				
-				assignPrimitiveValue(target, name, value);
+				assignPrimitiveValue(target, elemName, value);
 			}
 		}
 		

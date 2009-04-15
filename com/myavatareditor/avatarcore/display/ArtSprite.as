@@ -46,6 +46,10 @@ package com.myavatareditor.avatarcore.display {
 	 */
 	public class ArtSprite extends Sprite {
 		
+		/**
+		 * The Avatar instance associated with the AvatarArt
+		 * object that contains this art sprite.
+		 */
 		public function get avatar():Avatar {
 			var avatarArt:AvatarArt = parent as AvatarArt;
 			if (avatarArt){
@@ -65,6 +69,12 @@ package com.myavatareditor.avatarcore.display {
 		}
 		private var _feature:Feature;
 		
+		/**
+		 * Art object associated with this art sprite. This
+		 * and the feature should be set at the same time if
+		 * the art for this sprite is changed so that they
+		 * remain congruent.
+		 */
 		public function get art():Art {
 			return _art;
 		}
@@ -76,7 +86,11 @@ package com.myavatareditor.avatarcore.display {
 		}
 		private var _art:Art;
 		
-		
+		/**
+		 * Z-index, or location within sorted arrangement
+		 * of the art within an AvatarArt object as defined
+		 * by the linked Art instance.
+		 */
 		public function get zIndex():Number {
 			return _art && isNaN(_art.zIndex) == false ? _art.zIndex : 0;
 		}
@@ -84,6 +98,11 @@ package com.myavatareditor.avatarcore.display {
 			return _feature ? _feature.name : null;
 		}
 		
+		/**
+		 * The art source as defined by the linked Art object.
+		 * This is generally not set directly, instead relying
+		 * on the src defined in the linked Art object.
+		 */
 		public function get src():String {
 			return _src;
 		}
@@ -97,6 +116,13 @@ package com.myavatareditor.avatarcore.display {
 		
 		private var loader:Loader;
 			
+		/**
+		 * Constructor for creating new ArtSprite instances. ArtSprite
+		 * instances are created automatically by AvatarArt instances
+		 * when drawing an avatar.
+		 * @param	art
+		 * @param	feature
+		 */
 		public function ArtSprite(art:Art = null, feature:Feature = null) {
 			
 			// we're going under the assumption here that you'll want to
@@ -130,7 +156,7 @@ package com.myavatareditor.avatarcore.display {
 				addChild(new displayClass() as DisplayObject);
 				return;
 			}catch (error:Error){
-				print("Art Generation; class definition for asset '"+_src+"' not found ("+error+"). Attempting to load as external asset...", PrintLevel.NORMAL, this);
+				print("Art Generation; class definition for asset '"+_src+"' not found ("+error+"). Attempting to load as external asset...", PrintLevel.DEBUG, this);
 			}
 			
 			

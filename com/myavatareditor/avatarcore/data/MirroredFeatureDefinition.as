@@ -22,7 +22,7 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.data {
 	
 	import com.myavatareditor.avatarcore.display.ArtSprite;
-	import com.myavatareditor.avatarcore.display.MirrorArtSprite;
+	import com.myavatareditor.avatarcore.display.MirroredArtSprite;
 	
 	/**
 	 * A variation of a feature definition that creates a mirrored
@@ -44,11 +44,11 @@ package com.myavatareditor.avatarcore.data {
 			
 			// add additional sprites (the same ones again) for the mirror
 			var origArt:ArtSprite;
-			var mirrorArt:MirrorArtSprite;
+			var mirrorArt:MirroredArtSprite;
 			var i:int = sprites.length;
 			while (i--){
 				origArt = sprites[i] as ArtSprite;
-				mirrorArt = new MirrorArtSprite(origArt.art, origArt.feature, origArt);
+				mirrorArt = new MirroredArtSprite(origArt.art, origArt.feature, origArt);
 				sprites.push(mirrorArt);
 			}
 			return sprites;
@@ -56,7 +56,7 @@ package com.myavatareditor.avatarcore.data {
 		
 		public override function drawArtSprite(artSprite:ArtSprite):void {
 			super.drawArtSprite(artSprite);
-			var mirrorArt:MirrorArtSprite = artSprite as MirrorArtSprite;
+			var mirrorArt:MirroredArtSprite = artSprite as MirroredArtSprite;
 			if (mirrorArt){
 				mirrorArt.x = -mirrorArt.x;
 				mirrorArt.scaleX = -mirrorArt.scaleX;

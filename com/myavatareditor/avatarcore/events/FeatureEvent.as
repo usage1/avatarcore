@@ -38,7 +38,14 @@ package com.myavatareditor.avatarcore.events {
 		public static const FEATURE_TRANSFORMED:String = "featureTransformed";
 		public static const FEATURE_CHANGED:String = "featureChanged";
 		
-		public var feature:Feature;
+		/**
+		 * The Feature object associated with this event.
+		 */
+		public function get feature():Feature { return _feature; }
+		public function set feature(value:Feature):void {
+			_feature = value;
+		}
+		private var _feature:Feature;
 		
 		public function FeatureEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, feature:Feature = null) {
 			super(type, bubbles, cancelable);

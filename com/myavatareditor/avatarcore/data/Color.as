@@ -21,6 +21,7 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.data {
 	
+	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.geom.ColorTransform;
 	
 	/**
@@ -29,14 +30,44 @@ package com.myavatareditor.avatarcore.data {
 	 * through collections.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Color extends ColorTransform {
+	public class Color extends ColorTransform implements IXMLWritable {
 		
 		public var name:String;
+		
 		public function Color(redMultiplier:Number = 1.0, greenMultiplier:Number = 1.0, blueMultiplier:Number = 1.0, alphaMultiplier:Number = 1.0,
 							redOffset:Number = 0, greenOffset:Number = 0, blueOffset:Number = 0, alphaOffset:Number = 0) {
 						
-			super(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
+			super(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier,
+				redOffset, greenOffset, blueOffset, alphaOffset);
 		}
 		
+		public function getPropertiesIgnoredByXML():Object {
+			return {};
+		}
+		
+		public function getPropertiesAsAttributesInXML():Object {
+			return {name:1, redMultiplier:1, greenMultiplier:1, blueMultiplier:1, alphaMultiplier:1,
+				redOffset:1, greenOffset:1, blueOffset:1, alphaOffset:1};
+		}
+		
+		public function getObjectAsXML():XML {
+			var xml:XML = <Color />;
+			if (name){
+				xml.@name = name;
+			}
+			if (redMultiplier == 0 && greenMultiplier == 0 && blueMultiplier == 0 && alphaMultiplier == 1.0){
+				xml.@color = "#" + color.toString(16);
+			}else{
+				if (redMultiplier != 1.0) xml.@redMultiplier = redMultiplier;
+				if (greenMultiplier != 1.0) xml.@greenMultiplier = greenMultiplier;
+				if (blueMultiplier != 1.0) xml.@blueMultiplier = blueMultiplier;
+				if (alphaMultiplier != 1.0) xml.@alphaMultiplier = alphaMultiplier;
+				if (redOffset != 0) xml.@redOffset = redOffset;
+				if (greenOffset != 0) xml.@greenOffset = greenOffset;
+				if (blueOffset != 0) xml.@blueOffset = blueOffset;
+				if (alphaOffset != 0) xml.@alphaOffset = alphaOffset;
+			}
+			return xml;
+		}
 	}
 }

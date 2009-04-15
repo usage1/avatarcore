@@ -22,6 +22,7 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.data {
 	
 	import com.myavatareditor.avatarcore.data.Collection;
+	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
 	
 	/**
 	 * A collection of feature definitions associated with Avatar
@@ -31,7 +32,11 @@ package com.myavatareditor.avatarcore.data {
 	 */
 	public class Library extends Collection {
 		
-		public function get featureDefinitions():Array {
+		/**
+		 * An array of FeatureDefinition objects located in
+		 * the collection of this Library.
+		 */
+		public function getDefinitions():Array {
 			var result:Array = [];
 			var source:Array = this.collection;
 			var definition:FeatureDefinition;
@@ -45,10 +50,39 @@ package com.myavatareditor.avatarcore.data {
 			return result;
 		}
 		
+		
+		/**
+		 * Constructor for new Library instances.
+		 */
 		public function Library() {
 			
 		}
 		
+		public override function addItem(item:*):* {
+			var eventType:String;
+			
+			// remove existing item by name without events
+			// assumes (forces) requireUniqueNames true
+			var itemName:String = (Collection.nameKey in item) ? item[Collection.nameKey] : null;
+			if (itemName && super.removeItemByName(itemName)) { 
+				eventType = FeatureDefinitionEvent.FEATURE_DEFINITION_CHANGED;
+			}else {
+				eventType = FeatureDefinitionEvent.FEATURE_DEFINITION_ADDED;
+			}
+			
+			var added:* = super.addItem(item);
+			if (added is FeatureDefinition) {
+				dispatchEvent(new FeatureDefinitionEvent(eventType, false, false, added as FeatureDefinition));
+			}
+			return added;
+		}
+		
+		public override function removeItem(item:*):* {
+			var removed:* = super.removeItem(item);
+			if (removed is FeatureDefinition) {
+				dispatchEvent(new FeatureDefinitionEvent(FeatureDefinitionEvent.FEATURE_DEFINITION_REMOVED, false, false, removed as FeatureDefinition));
+			}
+			return removed;
+		}
 	}
-	
 }

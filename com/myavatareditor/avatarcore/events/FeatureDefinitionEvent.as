@@ -19,25 +19,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore.events {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
+	import com.myavatareditor.avatarcore.data.FeatureDefinition;
+	import flash.events.Event;
 	
 	/**
-	 * A collection of art objects. Each art group represents
-	 * a single feature's graphics.  A feature may consist of
-	 * one or more Art objects, each of which are contained
-	 * within a group related to that feature.
+	 * Event class for feature-specific events.  In addition to
+	 * standard event properties, this class includes a feature
+	 * member representing the feature for which the event is
+	 * associated.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class ArtGroup extends Collection {
+	public class FeatureDefinitionEvent extends Event {
 		
-		public var name:String;
+		public static const FEATURE_DEFINITION_ADDED:String = "featureDefinitionAdded";
+		public static const FEATURE_DEFINITION_REMOVED:String = "featureDefinitionRemoved";
+		public static const FEATURE_DEFINITION_CHANGED:String = "featureDefinitionChanged";
 		
-		public function ArtGroup() {
-			
+		/**
+		 * The FeatureDefinition object associated with this event.
+		 */
+		public function get definition():FeatureDefinition { return _definition; }
+		public function set definition(value:FeatureDefinition):void {
+			_definition = value;
+		}
+		private var _definition:FeatureDefinition;
+		
+		public function FeatureDefinitionEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, definition:FeatureDefinition = null) {
+			super(type, bubbles, cancelable);
+			this.definition = definition;
 		}
 		
 	}
-	
 }
