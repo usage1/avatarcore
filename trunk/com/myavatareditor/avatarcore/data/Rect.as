@@ -21,6 +21,7 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.data {
 	
+	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.geom.Rectangle;
 	
 	/**
@@ -29,13 +30,22 @@ package com.myavatareditor.avatarcore.data {
 	 * through collections.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Rect extends Rectangle {
+	public class Rect extends Rectangle implements IXMLWritable {
 		
-		public var name:String;
-		
-		public function Rect() {
-			
+		public function Rect(x:Number = 0, y:Number = 0, width:Number = 0, height:Number = 0) {
+			super(x, y, width, height);
 		}
 		
+		public function getPropertiesIgnoredByXML():Object {
+			return {bottom:1, bottomRight:1, top:1, topLeft:1, right:1, left:1, size:1};
+		}
+		
+		public function getPropertiesAsAttributesInXML():Object {
+			return {x:1, y:1, height:1, width:1};
+		}
+		
+		public function getObjectAsXML():XML {
+			return null;
+		}
 	}
 }

@@ -32,14 +32,120 @@ package com.myavatareditor.avatarcore.data {
 	 */
 	public class FeatureDefinition {
 		
-		public var name:String;
-		public var parentName:String;
+		/**
+		 * Identifies the feature definition by name. Features in 
+		 * Avatar objects will reference FeatureDefinition objects
+		 * that share the same name.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
 		
-		public var transform:Transform = new Transform();
-		public var artSet:ArtSet = new ArtSet();
-		public var colorSet:ColorSet = new ColorSet();
-		public var constraint:Constraint = new Constraint();
+		/**
+		 * Name of the parent feature from which this feature
+		 * inherits transformations such as position, scale and
+		 * rotation.
+		 */
+		public function get parentName():String { return _parentName; }
+		public function set parentName(value:String):void {
+			_parentName = value;
+		}
+		private var _parentName:String;
 		
+		/**
+		 * Default transformation to be applied to a feature
+		 * when it is first added to an avatar when that
+		 * feature is linked to this definition.
+		 */
+		public function get defaultTransform():Transform { return _defaultTransform; }
+		public function set defaultTransform(value:Transform):void {
+			_defaultTransform = value;
+		}
+		private var _defaultTransform:Transform;
+		
+		/**
+		 * Default art to be applied to new features. When
+		 * not set the first within the artSet is assumed.
+		 */
+		public function get defaultArtName():String { return _defaultArtName; }
+		public function set defaultArtName(value:String):void {
+			_defaultArtName = value;
+		}
+		private var _defaultArtName:String;
+		
+		/**
+		 * Default art to be applied to new features. This not
+		 * commonly used usually assuming art sets are not being
+		 * used.
+		 */
+		public function get defaultArt():Art { return _defaultArt; }
+		public function set defaultArt(value:Art):void {
+			_defaultArt = value;
+		}
+		private var _defaultArt:Art;
+		
+		/**
+		 * Default color from a color set to be applied to new
+		 * features. When not set, and a color set exists, the
+		 * first is assumed.
+		 */
+		public function get defaultColorName():String { return _defaultColorName; }
+		public function set defaultColorName(value:String):void {
+			_defaultColorName = value;
+		}
+		private var _defaultColorName:String;
+		
+		/**
+		 * Default color to be applied to new features.
+		 * This usually assumes color sets are not being used.
+		 */
+		public function get defaultColor():Color { return _defaultColor; }
+		public function set defaultColor(value:Color):void {
+			_defaultColor = value;
+		}
+		private var _defaultColor:Color;
+		
+		/**
+		 * Variations of art available for this feature
+		 * definition. Art sets cannot be null.
+		 */
+		public function get artSet():ArtSet { return _artSet; }
+		public function set artSet(value:ArtSet):void {
+			if (value){
+				_artSet = value;
+			}
+		}
+		private var _artSet:ArtSet = new ArtSet();
+		
+		/**
+		 * Variations of colors (color transforms) that can be
+		 * applied to art within this definition.  Color sets
+		 * cannot be null.
+		 */
+		public function get colorSet():ColorSet { return _colorSet; }
+		public function set colorSet(value:ColorSet):void {
+			if (value){
+				_colorSet = value;
+			}
+		}
+		private var _colorSet:ColorSet = new ColorSet();
+		
+		/**
+		 * A constraint for moving, scaling, or rotating art in
+		 * this definition.  When transformed, an art's transformation
+		 * cannot exceed the values defined in this contraint.
+		 */
+		public function get constraint():Constraint { return _constraint; }
+		public function set constraint(value:Constraint):void {
+			_constraint = value;
+		}
+		private var _constraint:Constraint;
+		
+		/**
+		 * Constructor for creating new FeatureDefinition instances.
+		 */
 		public function FeatureDefinition() {
 			
 		}
@@ -59,41 +165,48 @@ package com.myavatareditor.avatarcore.data {
 			return sprites;
 		}
 		
+		/**
+		 * Draws an art sprite based on the conditions defined by
+		 * this definition. By default, the drawing responsibility
+		 * of feature definitions is keeping art sprite(s) within
+		 * the defined constraints.
+		 * @param	artSprite The art sprite being drawn.
+		 */
 		public function drawArtSprite(artSprite:ArtSprite):void {
 			if (artSprite == null) return;
 			
 			// restrict to constraints
-			if (constraint){
+			if (_constraint){
 				
 				// position
-				if (constraint.position){
-					if (artSprite.x < constraint.position.left){
-						artSprite.x = constraint.position.left;
-					}else if (artSprite.x > constraint.position.right){
-						artSprite.x = constraint.position.right;
+				if (_constraint.position){
+					if (artSprite.x < _constraint.position.left){
+						artSprite.x = _constraint.position.left;
+					}else if (artSprite.x > _constraint.position.right){
+						artSprite.x = _constraint.position.right;
 					}
-					if (artSprite.y < constraint.position.top){
-						artSprite.y = constraint.position.top;
-					}else if (artSprite.y > constraint.position.bottom){
-						artSprite.y = constraint.position.bottom;
+					if (artSprite.y < _constraint.position.top){
+						artSprite.y = _constraint.position.top;
+					}else if (artSprite.y > _constraint.position.bottom){
+						artSprite.y = _constraint.position.bottom;
 					}
 				}
 				
 				// rotation
-				if (constraint.rotation){
-					if (artSprite.rotation > constraint.rotation.max){
-						artSprite.rotation = constraint.rotation.max;
-					}else if (artSprite.rotation < constraint.rotation.min){
-						artSprite.rotation = constraint.rotation.min;
+				if (_constraint.rotation){
+					if (artSprite.rotation > _constraint.rotation.max){
+						artSprite.rotation = _constraint.rotation.max;
+					}else if (artSprite.rotation < _constraint.rotation.min){
+						artSprite.rotation = _constraint.rotation.min;
 					}
 				}
 				
 				// scale
-				if (constraint.scale){
-					if (artSprite.scaleX > constraint.scale.max){
-						artSprite.scaleX = artSprite.scaleY = constraint.scale.max;
-					}else if (artSprite.scaleX < constraint.scale.min){
-						artSprite.scaleX = artSprite.scaleY = constraint.scale.min;
+				if (_constraint.scale){
+					if (artSprite.scaleX > _constraint.scale.max){
+						artSprite.scaleX = artSprite.scaleY = _constraint.scale.max;
+					}else if (artSprite.scaleX < _constraint.scale.min){
+						artSprite.scaleX = artSprite.scaleY = _constraint.scale.min;
 					}
 				}
 			}

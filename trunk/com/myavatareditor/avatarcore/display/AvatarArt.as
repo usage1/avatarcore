@@ -33,11 +33,12 @@ package com.myavatareditor.avatarcore.display {
 	import flash.events.Event;
 	
 	/**
-	 * A container display object for all art used in an avatar.  All
-	 * avatar art exists as child sprite of this container, irrespective
+	 * A controller and container display object for all art used in an avatar. 
+	 * All avatar art exists as child sprite of this container, irrespective
 	 * of their feature parent hierarchies.  Layering of art is based 
-	 * solely on the defined zIndex values within the features' 
-	 * definitions. Without a zIndex, their ordering is up to chance.
+	 * solely on the defined zIndex values within the features' definitions.
+	 * Without a zIndex, their ordering is up to chance.  Art drawn is based
+	 * on the referenced Avatar instance.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class AvatarArt extends Sprite {
@@ -68,6 +69,10 @@ package com.myavatareditor.avatarcore.display {
 		private var displayList:Array = [];
 		private var sortKey:String = "zIndex";
 		
+		/**
+		 * Constructor for creating new AvatarArt instances.
+		 * @param	avatar
+		 */
 		public function AvatarArt(avatar:Avatar = null){
 			this.avatar = avatar;
 		}

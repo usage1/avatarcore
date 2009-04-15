@@ -28,9 +28,12 @@ package com.myavatareditor.avatarcore.data {
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public interface ICollection {
-		function addCollectionItem(item:*):*;
-		function removeCollectionItem(item:*):*;
+		function addItem(item:*):*;
 		function collectionItemExists(item:*):Boolean;
+		function getItemByName(key:String):*;
+		function getItemsByType(type:Class):Array;
+		function removeItem(item:*):*;
+		function removeItemByName(key:String):*;
 		function clearCollection():void;
 		function get collection():Array;
 	}

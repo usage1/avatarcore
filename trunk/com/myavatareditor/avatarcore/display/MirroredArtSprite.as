@@ -19,33 +19,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore.display {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
-	import flash.geom.ColorTransform;
+	import com.myavatareditor.avatarcore.data.Feature;
+	import com.myavatareditor.avatarcore.data.Art;
 	
 	/**
-	 * A collection for groups of Color objects used
-	 * to represent a set of colors that can be applied to
-	 * a graphic.
+	 * ArtSprite for mirrored art defined in a
+	 * MiiroredFeatureDefinition.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class ColorSet extends Collection {
+	public class MirroredArtSprite extends ArtSprite {
 		
 		/**
-		 * Name identifier for the ColorSet object.
+		 * A reference to the ArtSprite this object mirrors.
 		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
+		public var mirror:ArtSprite;
+		
+		/**
+		 * Constructor for creating new MirroredArtSprite instances.
+		 * @param	art
+		 * @param	feature
+		 * @param	mirror
+		 */
+		public function MirroredArtSprite(art:Art = null, feature:Feature = null, mirror:ArtSprite = null) {
+			this.mirror = mirror;
+			super(art, feature);
 		}
-		private var _name:String;
-		
-		public function ColorSet() {
-			
-		}
-		
-		
 	}
-	
 }

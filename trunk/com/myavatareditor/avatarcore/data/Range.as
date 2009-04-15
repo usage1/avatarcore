@@ -20,15 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
 package com.myavatareditor.avatarcore.data {
+	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	
 	/**
 	 * Defines a numeric rannge by which a number
 	 * can be constrained between a min and max value.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Range {
+	public class Range implements IXMLWritable {
 		
-		public var span:Number;
+		private var span:Number;
 			
 		public function get min():Number {
 			return _min;
@@ -56,6 +57,18 @@ package com.myavatareditor.avatarcore.data {
 		
 		public function toString():String {
 			return "[Range "+_min+", "+_max+"]";
+		}
+		
+		public function getPropertiesIgnoredByXML():Object {
+			return {};
+		}
+		
+		public function getPropertiesAsAttributesInXML():Object {
+			return {min:1, max:1};
+		}
+		
+		public function getObjectAsXML():XML {
+			return null;
 		}
 		
 		/**

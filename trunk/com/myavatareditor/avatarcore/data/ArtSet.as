@@ -21,71 +21,67 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.data {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
-	
 	/**
-	 * A collection of Art Group objects for feature definitions.
-	 * When Art objects are added to an ArtSet collection, they are 
-	 * automatically wrapped in ArtGroup objects which inherit the Art
-	 * object's name property.  Additionally, if any Art object added 
-	 * in this manner, or any Art object within an ArtGroup added to
-	 * the collection will have it's zIndex value set to zIndex of the
-	 * ArtSet if it's own zIndex is NaN.
+	 * A collection of Art objects for feature definitions.
+	 * Defaults for some Art definitions can be defined in a
+	 * ArtSet first which then get applied to Art instances
+	 * when added to the art set collection.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class ArtSet extends Collection {
 		
-		public var name:String;
-		public var zIndex:Number; // default: NaN
-		public var colorize:Number; // default: NaN
+		/**
+		 * Name identifying this art set.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
 		
+		/**
+		 * Default zIndex for child Art objects if their
+		 * zIndex is NaN when added to the ArtSet.
+		 */
+		public function get zIndex():Number { return _zIndex; }
+		public function set zIndex(value:Number):void {
+			_zIndex = value;
+		}
+		private var _zIndex:Number; // default: NaN
+		
+		/**
+		 * Default colorize for child Art objects if their
+		 * colorize is NaN when added to the ArtSet.
+		 */
+		public function get colorize():Number { return _colorize; }
+		public function set colorize(value:Number):void {
+			_colorize = value;
+		}
+		private var _colorize:Number; // default: NaN
+		
+		/**
+		 * Constructor for new ArtSet instances.
+		 */
 		public function ArtSet() {
 			
 		}
 		
-		public override function addCollectionItem(item:*):* {
-			var artItem:Art;
-			var groupItem:ArtGroup;
+		/**
+		 * Custom addItem that assigns default colorize and
+		 * zIndex values to added Art objects when their values are
+		 * undefined.
+		 * @param	item Item to be added to the art set collection.
+		 * @return The collection item added.
+		 */
+		public override function addItem(item:*):* {
 			
+			// assign default properties to added art
 			if (item is Art) {
-				artItem = item as Art;
-				
-				// assign inherited default properties
-				assignDefaults(artItem);
-				
-				// shortcut for automatically adding ArtGroup
-				// wrappers is an art is added to an ArtSet
-				// Only the addCollectionItem method has this
-				// functionalty; other methods will reference
-				// the ArtGroup created here.
-				var wrapper:ArtGroup = new ArtGroup();
-				wrapper.name = artItem.name;
-				wrapper.addCollectionItem(artItem);
-				item = wrapper;
-				
-			}else if (item is ArtGroup) {
-				groupItem = item as ArtGroup;
-				
-				// assign defaults to group's art
-				var i:int = groupItem.collection.length;
-				while (i--) {
-					artItem = groupItem.collection[i] as Art;
-					assignDefaults(artItem);
-				}
+				var artItem:Art = item as Art;
+				artItem.assignDefaults(zIndex, colorize);
 			}
 			
-			return super.addCollectionItem(item);
-		}
-		
-		private function assignDefaults(art:Art):void {
-			
-			if (art == null) return;
-			if (isNaN(zIndex) == false && isNaN(art.zIndex)) {
-				art.zIndex = zIndex;
-			}
-			if (isNaN(colorize) == false && isNaN(art.colorize)) {
-				art.colorize = colorize;
-			}
+			return super.addItem(item);
 		}
 	}
 }

@@ -19,23 +19,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.display {
-	
-	import com.myavatareditor.avatarcore.data.Feature;
-	import com.myavatareditor.avatarcore.data.Art;
+package com.myavatareditor.avatarcore.xml {
 	
 	/**
-	 * ArtSprite for mirrored art defined in a
-	 * MiiroredFeatureDefinition.
+	 * A class with definitions that guide XML creation
+	 * through the XMLDefinitionWriter class.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class MirrorArtSprite extends ArtSprite {
-		
-		public var mirror:ArtSprite;
-		
-		public function MirrorArtSprite(art:Art = null, feature:Feature = null, mirror:ArtSprite = null) {
-			this.mirror = mirror;
-			super(art, feature);
-		}
+	public interface IXMLWritable {
+		function getPropertiesIgnoredByXML():Object;
+		function getPropertiesAsAttributesInXML():Object;
+		function getObjectAsXML():XML;
 	}
 }

@@ -52,7 +52,7 @@ package com.myavatareditor.avatarcore.debug {
 		 * Represents the lowest error level to report
 		 * in print messages.
 		 */
-		public static var reporting:int		= DEBUG;
+		public static var reporting:int		= NORMAL;
 		
 		/**
 		 * Collection of prefixes used to prepend to a printed message

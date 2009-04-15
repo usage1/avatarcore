@@ -24,21 +24,39 @@ package com.myavatareditor.avatarcore.data {
 	import com.myavatareditor.avatarcore.data.Collection;
 	import com.myavatareditor.avatarcore.display.AvatarArt;
 	import com.myavatareditor.avatarcore.events.FeatureEvent;
+	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
 	/**
 	 * Represents an avatar.  An Avatar instance contains the feature
 	 * definitions for an avatar and manages interaction with those 
-	 * features such as adding, removing, and changing.
+	 * features such as adding, removing, and changing.  The actual 
+	 * visual representation of Avatars is controlled by AvatarArt 
+	 * instances which reference Avatar objects to know what to display.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Avatar extends Collection {
 		
+		/**
+		 * Rebuild event constant.
+		 */
 		public static const REBUILD:String = "rebuild";
+		
+		/**
+		 * Changed library event constant.
+		 */
 		public static const LIBRARY_CHANGED:String = "libraryChanged";
 		
+		/**
+		 * The name provided to the avatar character as defined
+		 * by the user that created the avatar.
+		 */
 		public var name:String;
+		
+		/**
+		 * The name of the user that created the avatar.
+		 */
 		public var creator:String;
 		
 		/**
@@ -55,85 +73,63 @@ package com.myavatareditor.avatarcore.data {
 		public function set library(value:Library):void {
 			if (value == _library) return;
 			
+			cleanupLibrary();
 			_library = value;
+			setupLibrary();
 			
 			rebuild();
 			dispatchEvent(new Event(LIBRARY_CHANGED));
 		}
 		private var _library:Library;
 		
-		
-		
+		/**
+		 * Constructor for creating new Avatar instances.
+		 * @param	library Library to be associated with the
+		 * Avatar instance.
+		 */
 		public function Avatar(library:Library = null) {
 			this.library = library;
 		}
 		
+		public override function getPropertiesIgnoredByXML():Object {
+			var obj:Object = super.getPropertiesIgnoredByXML();
+			obj.library = 1;
+			return obj;
+		}
 		
+		public override function getPropertiesAsAttributesInXML():Object {
+			var obj:Object = super.getPropertiesIgnoredByXML();
+			delete obj.name;
+			return obj;
+		}
 		
-		/**
-		 * Adds a feature to or replaces a feature in the makeup of
-		 * the avatar.  If a feature by the same name of the feature
-		 * passed already exists within the avatar, it is removed.
-		 * When adding a new feature, a FeatureEvent.FEATURE_ADDED
-		 * event is added.  If the feature already exists and is 
-		 * removed, instead of dispatching both the
-		 * FeatureEvent.FEATURE_REMOVED and FeatureEvent.FEATURE_ADDED 
-		 * events, a single FeatureEvent.FEATURE_CHANGED event is
-		 * dispatched.
-		 * @param	feature Feature to be a part of this
-		 * avatar.
-		 */
-		public function addFeature(feature:Feature):void {
-			if (feature == null) return;
-			var eventType:String = FeatureEvent.FEATURE_ADDED;
+		public override function addItem(item:*):* {
+			var eventType:String;
 			
-			if (silentRemoveFeature(feature)){
+			// remove existing item by name without events
+			// assumes (forces) requireUniqueNames true
+			var itemName:String = (Collection.nameKey in item) ? item[Collection.nameKey] : null;
+			if (itemName && super.removeItemByName(itemName)) { 
 				eventType = FeatureEvent.FEATURE_CHANGED;
+			}else {
+				eventType = FeatureEvent.FEATURE_ADDED;
 			}
 			
-			addCollectionItem(feature);
-			dispatchEvent(new FeatureEvent(eventType, false, false, feature));
-		}
-		
-		/**
-		 * Removes a feature from the makeup of the avatar. If the
-		 * feature is found and removed, a FeatureEvent.FEATURE_REMOVED
-		 * event is dispatched.
-		 * @param	feature Feature to be removed from this
-		 * avatar.
-		 */
-		public function removeFeature(feature:Feature):void {
-			if (feature == null) return;
-			
-			if (silentRemoveFeature(feature)){
-				dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_REMOVED, false, false, feature));
+			var added:* = super.addItem(item);
+			if (added is Feature) {
+				var feature:Feature = added as Feature;
+				coupleFeatureToLibrary(feature);
+				dispatchEvent(new FeatureEvent(eventType, false, false, feature));
 			}
+			return added;
 		}
 		
-		/**
-		 * Removes a feature from the makeup of the avatar by it's feature name.
-		 * If the feature is found and removed, a FeatureEvent.FEATURE_REMOVED
-		 * event is dispatched.
-		 * @param	featureName Name of the feature to be removed from this
-		 * avatar.
-		 */
-		public function removeFeatureByName(name:String):void {
-			removeFeature(getFeatureByName(name));
-		}
-		
-		private function silentRemoveFeature(feature:Feature):Boolean {
-			return Boolean(removeCollectionItem(feature) != null);
-		}
-		
-		/**
-		 * Returns a feature in the avatar by its name.
-		 * @param	key Name of the feature as stored in the
-		 * avatar's collection
-		 * @return The feature in the avatar by the specified
-		 * name if it exists, otherwise null.
-		 */
-		public function getFeatureByName(name:String):Feature {
-			return collection[name] as Feature;
+		public override function removeItem(item:*):* {
+			var removed:* = super.removeItem(item);
+			if (removed is Feature) {
+				dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_REMOVED, false, false, removed as Feature));
+			}
+			return removed;
 		}
 		
 		/**
@@ -155,7 +151,7 @@ package com.myavatareditor.avatarcore.data {
 		 */
 		public function refreshFeature(feature:Feature, rebuildArt:Boolean = false):void {
 			if (feature == null) return;
-			if (feature != getFeatureByName(feature.name)) return;
+			if (feature != getItemByName(feature.name)) return;
 			var eventType:String = rebuildArt ? FeatureEvent.FEATURE_CHANGED : FeatureEvent.FEATURE_TRANSFORMED;
 			dispatchEvent(new FeatureEvent(eventType, false, false, feature));
 		}
@@ -172,12 +168,37 @@ package com.myavatareditor.avatarcore.data {
 		
 		private function coupleLibrary():void {
 			// decoupling will occur if _library is null
-			var feature:Feature;
 			var i:int = collection.length;
 			while (i--){
-				feature = collection[i] as Feature;
+				coupleFeatureToLibrary(collection[i] as Feature);
+			}
+		}
+		private function coupleFeatureToLibrary(feature:Feature):void {
+			if (feature == null || !feature.name) return;
+			feature.definition = _library ? _library.collection[feature.name] as FeatureDefinition : null;
+		}
+		
+		private function setupLibrary():void {
+			if (_library == null) return;
+			_library.addEventListener(FeatureDefinitionEvent.FEATURE_DEFINITION_ADDED, definitionChangedHandler, false, 0, true);
+			_library.addEventListener(FeatureDefinitionEvent.FEATURE_DEFINITION_CHANGED, definitionChangedHandler, false, 0, true);
+			_library.addEventListener(FeatureDefinitionEvent.FEATURE_DEFINITION_REMOVED, definitionChangedHandler, false, 0, true);
+		}
+		private function cleanupLibrary():void {
+			if (_library == null) return;
+			_library.removeEventListener(FeatureDefinitionEvent.FEATURE_DEFINITION_ADDED, definitionChangedHandler, false);
+			_library.removeEventListener(FeatureDefinitionEvent.FEATURE_DEFINITION_CHANGED, definitionChangedHandler, false);
+			_library.removeEventListener(FeatureDefinitionEvent.FEATURE_DEFINITION_REMOVED, definitionChangedHandler, false);
+		}
+		
+		private function definitionChangedHandler(definitionEvent:FeatureDefinitionEvent):void {
+			// (de)couple feature of the definition name
+			if (definitionEvent.definition) {
+				var featureName:String = definitionEvent.definition.name;
+				var feature:Feature = getItemByName(featureName) as Feature;
 				if (feature){
-					feature.definition = _library ? _library.collection[feature.name] as FeatureDefinition : null;
+					coupleFeatureToLibrary(feature);
+					refreshFeature(feature, true);
 				}
 			}
 		}

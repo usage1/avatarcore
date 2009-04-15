@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
 package com.myavatareditor.avatarcore.data {
+	
 	import flash.geom.Rectangle;
 	
 	/**
@@ -30,16 +31,53 @@ package com.myavatareditor.avatarcore.data {
 	 */
 	public class Constraint {
 		
-		public var name:String;
-		
-		public var position:Rect;
-		public var scale:Range;
-		public var rotation:Range;
-		
-		public function Constraint() {
-			
+		/**
+		 * Name identifying this constraint.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
 		}
+		private var _name:String;
 		
+		/**
+		 * A rectangular area to constrain the center position
+		 * of art sprites in an avatar art object.
+		 */
+		public function get position():Rect { return _position; }
+		public function set position(value:Rect):void {
+			_position = value;
+		}
+		private var _position:Rect;
+		
+		/**
+		 * The possible scale values for art sprites.
+		 */
+		public function get scale():Range { return _scale; }
+		public function set scale(value:Range):void {
+			_scale = value;
+		}
+		private var _scale:Range;
+		
+		/**
+		 * The possible rotation values for art sprites.
+		 */
+		public function get rotation():Range { return _rotation; }
+		public function set rotation(value:Range):void {
+			_rotation = value;
+		}
+		private var _rotation:Range;
+		
+		/**
+		 * Constructor for creating new Constraint instances.
+		 * @param	position Position rectagnle value.
+		 * @param	scale Scale range value.
+		 * @param	rotation Rotation range value.
+		 */
+		public function Constraint(position:Rect = null, scale:Range = null, rotation:Range = null) {
+			this.position = position;
+			this.scale = scale;
+			this.rotation = rotation;
+		}
 	}
-	
 }
