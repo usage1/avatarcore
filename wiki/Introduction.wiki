@@ -29,29 +29,29 @@ Library and Avatar objects can be defined in XML.
 			
 			<FeatureDefinition name="Nose">
 				<artSet zIndex="2">
-					<ArtGroup name="Round">
+					<Art name="Round">
 						<Art src="NoseStandard" />
-					</ArtGroup>
+					</Art>
 					
-					<ArtGroup name="Piggy">
+					<Art name="Piggy">
 						<Art src="NoseUp" />
-					</ArtGroup>
+					</Art>
 					
-					<ArtGroup name="Rigid">
+					<Art name="Rigid">
 						<Art src="NoseRigid" />
-					</ArtGroup>
+					</Art>
 				</artSet>
 			</FeatureDefinition>
 			
 			<FeatureDefinition name="Mouth">
 				<artSet zIndex="1">
-					<ArtGroup name="Straight">
+					<Art name="Straight">
 						<Art src="MouthFlat" />
-					</ArtGroup>
+					</Art>
 					
-					<ArtGroup name="Grin">
+					<Art name="Grin">
 						<Art src="MouthGrin" />
-					</ArtGroup>
+					</Art>
 				</artSet>
 			</FeatureDefinition>
 		</Library>
