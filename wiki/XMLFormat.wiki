@@ -1,0 +1,17 @@
+#summary Format of the XML used to define Library and Avatar objects.
+
+XML is the format by which Library and Avatar objects are initially defined.  The Avatar Core framework includes a generic XML parser that converts XML definitions into their respective objects in code.  Its generic nature allows you to customize your definitions in both code and XML without having to worry about updating the parser to match them.
+
+== About the Parser ==
+
+TBD.
+
+
+== Library Format ==
+
+TBD.
+
+
+== Avatar Format ==
+
+TBD.
