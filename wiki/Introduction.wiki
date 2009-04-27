@@ -1,5 +1,7 @@
 #summary An introduction to the Avatar Core framework.
 
+<font color="#FF0000">Updated for ver 0.0.2</font>
+
 Avatar Core is an open source, client-side framework for defining and viewing avatar characters.  Currently, it is implemented with Flash and ActionScript.
 
 == Goals == 
