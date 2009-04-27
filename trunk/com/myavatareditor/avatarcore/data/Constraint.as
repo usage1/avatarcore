@@ -26,7 +26,12 @@ package com.myavatareditor.avatarcore.data {
 	/**
 	 * A transformation (position, scale, and rotation) constraint
 	 * for feature art.  Constraints are applied to all art assets
-	 * in an art group as though they were one.
+	 * in an art group as though they were one.  Constraints are defined
+	 * as optional objects within Feature Definitions and are only necessary
+	 * if control of transformations are not confined to the developer, i.e.
+	 * user controls exist for modifying transformations within an editor
+	 * and that editor should asure that those transformations do not
+	 * exceed certain boundaries.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Constraint {

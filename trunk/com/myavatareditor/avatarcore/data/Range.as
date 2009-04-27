@@ -29,8 +29,9 @@ package com.myavatareditor.avatarcore.data {
 	 */
 	public class Range implements IXMLWritable {
 		
-		private var span:Number;
-			
+		/**
+		 * Minimum value in the range.
+		 */
 		public function get min():Number {
 			return _min;
 		}
@@ -38,8 +39,11 @@ package com.myavatareditor.avatarcore.data {
 			_min = n;
 			updateSpan();
 		}
-		protected var _min:Number;
+		private var _min:Number;
 		
+		/**
+		 * Maximum value in the range.
+		 */
 		public function get max():Number {
 			return _max;
 		}
@@ -47,7 +51,9 @@ package com.myavatareditor.avatarcore.data {
 			_max = n;
 			updateSpan();
 		}
-		protected var _max:Number;
+		private var _max:Number;
+		
+		private var span:Number;
 		
 		public function Range(min:Number = 0, max:Number = 0) {
 			_min = min;

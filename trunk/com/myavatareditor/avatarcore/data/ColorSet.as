@@ -21,31 +21,19 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.data {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
-	import flash.geom.ColorTransform;
-	
 	/**
-	 * A collection for groups of Color objects used
-	 * to represent a set of colors that can be applied to
-	 * a graphic.
+	 * A collection of Color objects for feature definitions. When
+	 * a feature definition defines different colors for an avatar,
+	 * they are stored within the colorSet collection.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class ColorSet extends Collection {
+	public class ColorSet extends SetCollection {
 		
 		/**
-		 * Name identifier for the ColorSet object.
+		 * Constructor for creating new ColorSet instances.
 		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		private var _name:String;
-		
 		public function ColorSet() {
 			
 		}
-		
-		
 	}
-	
 }

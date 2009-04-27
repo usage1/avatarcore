@@ -25,31 +25,27 @@ package com.myavatareditor.avatarcore.data {
 	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
 	
 	/**
-	 * A collection of feature definitions associated with Avatar
-	 * objects.  At any time an avatar can change its library to
-	 * another allowing it to completely change it's style.
+	 * A collection of FeatureDefinition objects to be associated with an Avatar
+	 * object's Feature objects.  At any time an avatar can change its library to
+	 * another allowing it to completely change it's appearance.  Libraries are 
+	 * not required for avatars; avatars can optionally reference Art, Color, and 
+	 * Transform objects directly. Using library reduces redundancy between available
+	 * assets and those used by avatars.  Libraries also allow avatar editors to
+	 * know what characteristics are available to avatars as users modify them.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Library extends Collection {
 		
 		/**
-		 * An array of FeatureDefinition objects located in
-		 * the collection of this Library.
+		 * Name identifier for this library. This is used by the
+		 * Definitions class to make associations with Avatar instances
+		 * that specify a libraryName property.
 		 */
-		public function getDefinitions():Array {
-			var result:Array = [];
-			var source:Array = this.collection;
-			var definition:FeatureDefinition;
-			var i:int, n:int = source.length;
-			for (i=0; i<n; i++){
-				definition = source[i] as FeatureDefinition;
-				if (definition){
-					result.push(definition);
-				}
-			}
-			return result;
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
 		}
-		
+		private var _name:String;
 		
 		/**
 		 * Constructor for new Library instances.

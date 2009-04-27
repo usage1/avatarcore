@@ -28,7 +28,9 @@ package com.myavatareditor.avatarcore.data {
 	 * Standard ICollection implementation.  When possible
 	 * collection objects should extend Collection.  Collection
 	 * classes contain a collection array for storing generic
-	 * data of non-specific types.
+	 * data of non-specific types.  Collections are also used in XML
+	 * to store objects as children objects in which their XML node
+	 * exists.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Collection extends EventDispatcher implements ICollection, IXMLWritable {
@@ -78,6 +80,31 @@ package com.myavatareditor.avatarcore.data {
 		}
 		
 		/**
+		 * Copies the collection from one ICollection into this
+		 * Collection, creating clones of any object that supports
+		 * the clone member. Objects that don't contain a clone
+		 * method are copied by reference. Any objects within the
+		 * current collection are removed before the new copy is made.
+		 * @param	source The ICollection from which to make a copy.
+		 */
+		public function copyCollectionFrom(source:ICollection):void {
+			clearCollection();
+			if (source == null) return;
+			var item:*;
+			var sourceCollection:Array = source.collection;
+			var i:int, n:int = sourceCollection.length;
+			for (i=0; i<n; i++){
+				item = sourceCollection[i];
+				// clone item into copied collection
+				// otherwise include a reference
+				if ("clone" in item){
+					addItem(item.clone());
+				}else{
+					addItem(item);
+				}
+			}
+		}
+		/**
 		 * Adds an object to the collection.  The object
 		 * must be non-null.  If the lookup attribute
 		 * (i.e. name) exists within the object, that value
@@ -97,14 +124,16 @@ package com.myavatareditor.avatarcore.data {
 			if (item == null) return null;
 			
 			if (nameKey in item){
-				if (item[nameKey] != null) {
+				
+				var itemName:String = item[nameKey];
+				if (itemName != null && isNaN(Number(itemName))) {
 					
-					var lookupKey:String = item[nameKey];
 					// remove existing item of the same name if necessary
 					if (requireUniqueNames) {
-						removeItemByName(lookupKey);
+						removeItemByName(itemName);
 					}
-					_collection[lookupKey] = item;
+					
+					_collection[itemName] = item;
 					
 				}else{
 					// if null, force lookup key to be the
@@ -129,16 +158,18 @@ package com.myavatareditor.avatarcore.data {
 		public function collectionItemExists(item:*):Boolean {
 			if (item == null) return false;
 			
+			// item by index
+			var index:int = _collection.indexOf(item);
+			if (index != -1){
+				return true;
+			}
+			
+			// item by key
 			if (nameKey in item){
 				var lookupKey:String = item[nameKey];
 				if (_collection[lookupKey] == item){
 					return true;
 				}
-			}
-			
-			var index:int = _collection.indexOf(item);
-			if (index != -1){
-				return true;
 			}
 			
 			return false;
@@ -184,6 +215,13 @@ package com.myavatareditor.avatarcore.data {
 			if (item == null) return null;
 			var itemFound:Boolean = false;
 			
+			// item by index
+			var index:int = _collection.indexOf(item);
+			if (index != -1){
+				_collection.splice(index, 1);
+				itemFound = true;
+			}
+			
 			// item by key
 			if (nameKey in item){
 				var lookupKey:String = item[nameKey];
@@ -191,13 +229,6 @@ package com.myavatareditor.avatarcore.data {
 					delete _collection[lookupKey];
 					itemFound = true;
 				}
-			}
-			
-			// item by index
-			var index:int = _collection.indexOf(item);
-			if (index != -1){
-				_collection.splice(index, 1);
-				itemFound = true;
 			}
 			
 			return itemFound ? item : null;
@@ -218,11 +249,11 @@ package com.myavatareditor.avatarcore.data {
 		 * Removes all items from the collection.
 		 */
 		public function clearCollection():void {
+			_collection.length = 0;
 			var key:String;
 			for (key in _collection){
 				delete _collection[key];
 			}
-			_collection.length = 0;
 		}
 	}
 }

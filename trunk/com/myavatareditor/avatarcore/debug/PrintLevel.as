@@ -22,9 +22,11 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.debug {
 	
 	/**
-	 * Information relating to the global print function, 
-	 * notably print levels used when reporting different
-	 * forms of data.
+	 * Information relating to the print function, notably print
+	 * levels used when reporting different forms of data in calls to
+	 * print. Specifying a print level determines whether or not the
+	 * print is made visible based on its relationship to 
+	 * PrintLevel.reporting.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class PrintLevel {

@@ -30,7 +30,10 @@ package com.myavatareditor.avatarcore.display {
 	import flash.geom.Rectangle;
 	
 	/**
-	 * A cropped (masked) area for viewing display objects.
+	 * A cropped (masked) area for viewing display objects.  Viewports
+	 * make it easy to fit and/or center content within its boundaries
+	 * as well as provide an easy means to produce a bitmap (BitmapData)
+	 * of that content.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Viewport extends Sprite {
@@ -102,8 +105,8 @@ package com.myavatareditor.avatarcore.display {
 		 * @param	height The starting height of the viewport.
 		 */
 		public function Viewport(width:Number = 100, height:Number = 100) {
-			this.width = 100;
-			this.height = 100;
+			this.width = width;
+			this.height = height;
 		}
 		
 		/**
@@ -171,7 +174,7 @@ package com.myavatareditor.avatarcore.display {
 		
 		private function drawBackground():void {
 			clearBackground();
-			if (_background == null) return;
+			if (_background === null) return;
 			
 			if (_background is Number){
 				with (bgSprite.graphics){

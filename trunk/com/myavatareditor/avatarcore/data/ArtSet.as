@@ -22,22 +22,15 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.data {
 	
 	/**
-	 * A collection of Art objects for feature definitions.
-	 * Defaults for some Art definitions can be defined in a
-	 * ArtSet first which then get applied to Art instances
-	 * when added to the art set collection.
+	 * A collection of Art objects for feature definitions. When
+	 * a feature definition defines different art variations for
+	 * an avatar, they are stored within the artSet collection.
+	 * Defaults for some Art definitions (zIndex, colorize) can be
+	 * defined in a ArtSet first which then get applied to Art
+	 * instances when added to the art set collection.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class ArtSet extends Collection {
-		
-		/**
-		 * Name identifying this art set.
-		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		private var _name:String;
+	public class ArtSet extends SetCollection {
 		
 		/**
 		 * Default zIndex for child Art objects if their

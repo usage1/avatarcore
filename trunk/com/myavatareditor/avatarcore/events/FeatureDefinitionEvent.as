@@ -25,10 +25,10 @@ package com.myavatareditor.avatarcore.events {
 	import flash.events.Event;
 	
 	/**
-	 * Event class for feature-specific events.  In addition to
-	 * standard event properties, this class includes a feature
-	 * member representing the feature for which the event is
-	 * associated.
+	 * Event class for feature definition-specific events.  In addition
+	 * to standard event properties, this class includes a feature
+	 * definition member representing the feature for which the event
+	 * is associated.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class FeatureDefinitionEvent extends Event {
