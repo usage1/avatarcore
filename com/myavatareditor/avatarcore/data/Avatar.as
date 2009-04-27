@@ -25,18 +25,21 @@ package com.myavatareditor.avatarcore.data {
 	import com.myavatareditor.avatarcore.display.AvatarArt;
 	import com.myavatareditor.avatarcore.events.FeatureEvent;
 	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
+	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
 	/**
-	 * Represents an avatar.  An Avatar instance contains the feature
-	 * definitions for an avatar and manages interaction with those 
-	 * features such as adding, removing, and changing.  The actual 
-	 * visual representation of Avatars is controlled by AvatarArt 
-	 * instances which reference Avatar objects to know what to display.
+	 * Avatars contain the data describing avatar characters.
+	 * Physical (visible) characteristics are defined by Feature instances
+	 * contained within avatar collections. The visual representation 
+	 * of an Avatar object is controlled by an AvatarArt instance
+	 * which references the Avatar object to know what to display. Other
+	 * qualities such as age, creator, weight, etc. can be added separately
+	 * by developer's through subclassing Avatar. 
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Avatar extends Collection {
+	public class Avatar extends Collection implements IXMLWritable {
 		
 		/**
 		 * Rebuild event constant.
@@ -49,15 +52,25 @@ package com.myavatareditor.avatarcore.data {
 		public static const LIBRARY_CHANGED:String = "libraryChanged";
 		
 		/**
-		 * The name provided to the avatar character as defined
-		 * by the user that created the avatar.
+		 * The name identifier for the avatar.
 		 */
-		public var name:String;
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
 		
 		/**
-		 * The name of the user that created the avatar.
+		 * The name of the library to be associated with this
+		 * avatar.  Associations with libraries through this
+		 * property are made when an Avatar instance is created
+		 * within a Definitions object.
 		 */
-		public var creator:String;
+		public function get libraryName():String { return _libraryName; }
+		public function set libraryName(value:String):void {
+			_libraryName = value;
+		}
+		private var _libraryName:String;
 		
 		/**
 		 * Library associated with this avatar.  When a new
@@ -103,6 +116,18 @@ package com.myavatareditor.avatarcore.data {
 			return obj;
 		}
 		
+		/**
+		 * Custom add item that will dispatch events for Feature instances
+		 * added to the Avatar's collection.  If another Feature instance
+		 * already exists within the avatar of the same name, that feature
+		 * is replaced with the new feature and a FEATURE_CHANGED event is 
+		 * dispatched.  If a Feature is added with a unique name, a
+		 * FEATURE_ADDED event is dispatched.  Features added to the 
+		 * avatar's collection are automatically associated with the library
+		 * assigned to the avatar if one exists.
+		 * @param	item Object to add to the avatar's collection.
+		 * @return Item added to the collection.
+		 */
 		public override function addItem(item:*):* {
 			var eventType:String;
 			
@@ -124,6 +149,14 @@ package com.myavatareditor.avatarcore.data {
 			return added;
 		}
 		
+		/**
+		 * Custom removeItem method that removes an item from the
+		 * Avatar's collection. If that item is of the type Feature
+		 * a FEATURE_REMOVED event is dispatched.
+		 * @param	item Object to be removed from the collection.
+		 * @return Item removed if an item is removed. Null is returned
+		 * if no item is removed.
+		 */
 		public override function removeItem(item:*):* {
 			var removed:* = super.removeItem(item);
 			if (removed is Feature) {
@@ -133,27 +166,18 @@ package com.myavatareditor.avatarcore.data {
 		}
 		
 		/**
-		 * Indicates to Avatar stakeholders that a feature has been 
-		 * changed.  This does not modify the Avatar instance itself,
-		 * just sends out the respective event so that other objects
-		 * can react to data (features) within the avatar being modified.
-		 * When art is not changed, the event dispatched is
-		 * FeatureEvent.FEATURE_TRANSFORMED.  For changing art,
-		 * FeatureEvent.FEATURE_CHANGED is dispatched.
+		 * Indicates to Avatar stakeholders (i.e. AvatarArt) that a feature
+		 * has been  changed.  This does not modify the Avatar instance itself,
+		 * just validates the feature as being a feature within this avatar and
+		 * then sends out the respective FEATURE_CHANGED event so that other
+		 * objects can react to data (feature) within the avatar being modified.
 		 * @param	feature The feature having been modified. If the
 		 * feature does not exist within the avatar, no action is taken.
-		 * @param	rebuildArt Indicates whether or not the art for the
-		 * feature have changed and needs to be redrawn. This can mean the
-		 * actual Art object definitions in the FeatureDefinition object or
-		 * just changing the variation for the specified feature - whatever
-		 * requires the actual content of the art (not color or other
-		 * transformations) to be rebuilt or reloaded.
 		 */
-		public function refreshFeature(feature:Feature, rebuildArt:Boolean = false):void {
+		public function updateFeature(feature:Feature):void {
 			if (feature == null) return;
 			if (feature != getItemByName(feature.name)) return;
-			var eventType:String = rebuildArt ? FeatureEvent.FEATURE_CHANGED : FeatureEvent.FEATURE_TRANSFORMED;
-			dispatchEvent(new FeatureEvent(eventType, false, false, feature));
+			dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_CHANGED, false, false, feature));
 		}
 		
 		/**
@@ -164,6 +188,21 @@ package com.myavatareditor.avatarcore.data {
 		public function rebuild():void {
 			coupleLibrary();
 			dispatchEvent(new Event(REBUILD));
+		}
+		
+		/**
+		 * Calls Feature.consolidate on all features within the
+		 * avatar.  This would be used to create a self-contained
+		 * version of the avatar that would be able to be displayed 
+		 * without the library.
+		 */
+		public function consolidateFeatures():void {
+			var feature:Feature;
+			var features:Array = getItemsByType(Feature);
+			var i:int = features.length;
+			while (i--){
+				Feature(features[i]).consolidate();
+			}
 		}
 		
 		private function coupleLibrary():void {
@@ -198,7 +237,7 @@ package com.myavatareditor.avatarcore.data {
 				var feature:Feature = getItemByName(featureName) as Feature;
 				if (feature){
 					coupleFeatureToLibrary(feature);
-					refreshFeature(feature, true);
+					updateFeature(feature);
 				}
 			}
 		}

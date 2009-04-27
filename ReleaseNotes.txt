@@ -1,38 +1,140 @@
 ﻿= Release Notes =
 
-Current version: 0.0.2.  This is the second (alpha) release of the Avatar Core framework.
+Avatar Core Framework - a free framework for creating and displaying avatars.
+Current version: 0.0.3.  This is the third (alpha) release of the Avatar Core
+framework.
 
-The current release improves on the API design as well as extends the XML capabilities of the framework.
+
+== Known issues ==
+
+- Feature.consolidate does not work with subclasses of FeatureDefinition such
+  as MirroredFeatureDefinition
 
 
-== Changes ==
+== Change List ==
 
-0.0.2 (April 14, 2009)
+=== 0.0.3 (April 27, 2009) ===
+
+This release mostly improves on the API, simplifying it and making it
+more consistent.
+
+- Removed Library.getDefinitions as it was redundant with
+  ICollection.getItemsByType(FeatureDefinition)
+- Combined the FeatureEvent.FEATURE_TRANSFORMED and
+  FeatureEvent.FEATURE_CHANGED events into just one
+  FeatureEvent.FEATURE_CHANGED event
+- Removed the rebuildArt parameter in Avatar.refreshFeature.  It is now 
+  automatically detected whether or not art needs to be rebuilt.
+- Renamed Avatar.refreshFeature to Avatar.updateFeature
+- Added AvatarArt.updateFeature - the respective call made from the Avatar
+  event dispatched when Avatar.updateFeature is called
+- Removed redraw parameter from AvatarArt.addFeatureArt
+- Removed AvatarArt.updateArtArrangement; it is now handled in AvatarArt.draw
+- Removed creator property from Avatar. If needed, this property, and others
+  like it, should be added in custom extensions by developers
+- Created a TransformSet class, a collection for containing variations on
+  transformations
+- Added the transformSet property to the FeatureDefinition class for
+  containing a set of pre-defined transforms
+- Added Feature.transformName
+- FeatureDefinition.defaultTransform is no longer additive; it now will
+  completely define Feature.transform if and only if Feature.transform is null
+- Added clone() methods to Transform, Color, and Art.
+- Added ICollection.copyCollectionFrom() for deep cloning of ICollection
+  collections for objects that support the clone method
+- Fixed a bug in Collection where removing an item would delete the item index
+  rather than splicing it from the collection array if the name of that item
+  was numeric (which is the default assigned name - the index - if one is not
+  explicitly provided)
+- Feature.color will now be correctly applied to an Avatar if that feature has
+  no associated definition
+- Included separate scaleX and scaleY properties in Transform. The scale
+  property now reflects an average of these two values when queried, or
+  defines both when set.
+- Fixed Viewort contstructor arguments which were previously being ignored
+- Added Library.name
+- Added Avatar.libraryName
+- Added a new Definitions class which automatically links avatars to libraries
+  when Avatar.libraryName matches Library.name
+- Changed behavior of Feature.artName and Feature.colorName to now reference
+  Feature.art.name and Feature.color.name respectively if defined, or default
+  to the names used as defaults when that feature is rendered through a library
+- Added SetCollection class as a base class for ArtSet, ColorSet and 
+  TransformSet for their redundant properties
+- Added a defaultName property to set classes (in SetCollection) to specify
+  default items. This replaces FeatureDefinition.defaultColorName and
+  defaultArtName as well as what would have been defaultTransformName.
+- Removed FeatureDefinition.defaultArt, defaultColor and defaultTransform
+- Added FeatureDefinition/Feature.baseTransform
+- Added Feature.consildate() and Avatar.consolidateFeatures()
+- Changed behavior of Transform to write Transform properties as attributes
+  when written to XML by XMLDefinitionWriter rather than child elements
+
+
+=== 0.0.2 (April 14, 2009) === 
+
+This release improves on the API design as well as extends the XML
+capabilities of the framework.
 
 - Renamed MirrorArtSprite to MirroredArtSprite
-- Art objects now replace ArtGroup objects completely.  Art requiring multiple art assets would consist of one Art instance containing multiple other Art instances.
+- Art objects now replace ArtGroup objects completely.  Art requiring multiple
+  art assets would consist of one Art instance containing multiple other Art 
+  instances.
 - Updated Art constructor to include a src parameter
-- Added a thumbnail property to the Art class. This would be used by editors to present selections to the user
+- Added a thumbnail property to the Art class. This would be used by editors 
+  to present selections to the user
 - Updated Rect with constructor parameters that mirror flash.geom.Rectangle
 - Added constructor parameters to Constraint
-- Fixed bug where new features added to avatar weren't being updated to use that avatar's library
-- Avatar.addFeature and similar APIs have been removed in favor of sticking with the inherited collection APIs of the same type.  These methods are overridden as necessary to provide feature events.
+- Fixed bug where new features added to avatar weren't being updated to use 
+  that avatar's library
+- Avatar.addFeature and similar APIs have been removed in favor of sticking 
+  with the inherited collection APIs of the same type.  These methods are 
+  overridden as necessary to provide feature events.
 - Feature.transform is now null by default
 - Added additional default properties into FeatureDefinition
 - FeatureDefinition.transform renamed to defaultTransform
 - Added FeatureDefinitionEvent
-- Library now dispatches FeatureDefinitionEvent events for definition addition, removal and changes
-- Changes in libraries (invoking events) are recognized by Avatars allowing them to update automatically as needed
-- Moved XMLDefinitionParse out of avatarcore.data.xml package into just avatarcore.xml
-- XMLDefinitionParser now creates instances for null objects where xml nodes attempt to define values
+- Library now dispatches FeatureDefinitionEvent events for definition 
+  addition, removal and changes
+- Changes in libraries (invoking events) are recognized by Avatars allowing 
+  them to update automatically as needed
+- Moved XMLDefinitionParse out of avatarcore.data.xml package into just 
+  avatarcore.xml
+- XMLDefinitionParser now creates instances for null objects where xml 
+  nodes attempt to define values
 - Added XMLDefinitionWriter for writing XML from objects
 - Added IXMLWritable interface for defining properties related to writing XML 
 - Removed term "Collection" from ICollection API
 - Added getItemsByType method in ICollection
-- Added Viewport class for containing avatar graphics and capturing graphics as bitmaps
+- Added Viewport class for containing avatar graphics and capturing graphics 
+  as bitmaps
 - Converted most class member variables to accessor methods
 - More documentation within source code
 
-0.0.1 (March 27, 2009)
+
+=== 0.0.1 (March 27, 2009) ===
 
 - First release
+
+
+== License == 
+
+Copyright (c) 2009 Trevor McCauley
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. 

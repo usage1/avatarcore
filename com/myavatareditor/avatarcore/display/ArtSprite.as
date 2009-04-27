@@ -39,9 +39,9 @@ package com.myavatareditor.avatarcore.display {
 	import flash.utils.getDefinitionByName;
 	
 	/**
-	 * Represents an individual sprite within an art group.  Art groups
-	 * represent one feature's appearance and can consist of one or more
-	 * art sprites to visually represent a feature.
+	 * Represents an individual sprite within an avatar art.  Art
+	 * variations represent one feature's appearance and can consist
+	 * of one or more art sprites to visually represent a feature.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class ArtSprite extends Sprite {
@@ -58,6 +58,11 @@ package com.myavatareditor.avatarcore.display {
 			return null;
 		}
 		
+		/**
+		 * Feature associated with this art sprite.  This feature
+		 * is used to draw the art sprite after the art has
+		 * been loaded from the src.  
+		 */
 		public function get feature():Feature {
 			return _feature;
 		}
@@ -94,6 +99,11 @@ package com.myavatareditor.avatarcore.display {
 		public function get zIndex():Number {
 			return _art && isNaN(_art.zIndex) == false ? _art.zIndex : 0;
 		}
+		
+		/**
+		 * The name of the feature associated with
+		 * this art sprite.
+		 */
 		public function get featureName():String {
 			return _feature ? _feature.name : null;
 		}

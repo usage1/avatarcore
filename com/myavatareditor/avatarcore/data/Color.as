@@ -25,15 +25,26 @@ package com.myavatareditor.avatarcore.data {
 	import flash.geom.ColorTransform;
 	
 	/**
-	 * An extended version of flash.geom.ColorTransform
-	 * that includes a name property for referencing
-	 * through collections.
+	 * Used to describe color transformations applied to avatar art.
+	 * The Color class extendeds flash.geom.ColorTransform and contains
+	 * the same properties as ColorTransform in addition to a name 
+	 * property to allow Color objects to be referenced in collections.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Color extends ColorTransform implements IXMLWritable {
 		
-		public var name:String;
+		/**
+		 * Name identifier for the Color object.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
 		
+		/**
+		 * Constructor for creating new Color instances.
+		 */
 		public function Color(redMultiplier:Number = 1.0, greenMultiplier:Number = 1.0, blueMultiplier:Number = 1.0, alphaMultiplier:Number = 1.0,
 							redOffset:Number = 0, greenOffset:Number = 0, blueOffset:Number = 0, alphaOffset:Number = 0) {
 						
@@ -68,6 +79,16 @@ package com.myavatareditor.avatarcore.data {
 				if (alphaOffset != 0) xml.@alphaOffset = alphaOffset;
 			}
 			return xml;
+		}
+		
+		/**
+		 * Creates and returns a copy of the Color object.
+		 * @return A copy of this Color object.
+		 */
+		public function clone():Color {
+			var copy:Color = new Color(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
+			copy.name = name;
+			return copy;
 		}
 	}
 }

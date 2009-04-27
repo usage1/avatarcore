@@ -22,15 +22,19 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.data {
 	
 	import com.myavatareditor.avatarcore.display.ArtSprite;
+	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.geom.Rectangle;
 	
 	/**
-	 * Defines guidelines for avatar features.  The guidelines include
-	 * possible art, color selections and constraints for art
-	 * transforms.
+	 * Defines characteristics to be referenced by avatar features.  Characteristics
+	 * include possible art, color selections, transformations and optional
+	 * constraints for transformations.  Features reference these characteristics
+	 * by name.  Features reference feature definitions when they share the same 
+	 * name.  This connection is made when an Avatar instance is associated with a 
+	 * Library instance.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class FeatureDefinition {
+	public class FeatureDefinition implements IXMLWritable {
 		
 		/**
 		 * Identifies the feature definition by name. Features in 
@@ -55,61 +59,8 @@ package com.myavatareditor.avatarcore.data {
 		private var _parentName:String;
 		
 		/**
-		 * Default transformation to be applied to a feature
-		 * when it is first added to an avatar when that
-		 * feature is linked to this definition.
-		 */
-		public function get defaultTransform():Transform { return _defaultTransform; }
-		public function set defaultTransform(value:Transform):void {
-			_defaultTransform = value;
-		}
-		private var _defaultTransform:Transform;
-		
-		/**
-		 * Default art to be applied to new features. When
-		 * not set the first within the artSet is assumed.
-		 */
-		public function get defaultArtName():String { return _defaultArtName; }
-		public function set defaultArtName(value:String):void {
-			_defaultArtName = value;
-		}
-		private var _defaultArtName:String;
-		
-		/**
-		 * Default art to be applied to new features. This not
-		 * commonly used usually assuming art sets are not being
-		 * used.
-		 */
-		public function get defaultArt():Art { return _defaultArt; }
-		public function set defaultArt(value:Art):void {
-			_defaultArt = value;
-		}
-		private var _defaultArt:Art;
-		
-		/**
-		 * Default color from a color set to be applied to new
-		 * features. When not set, and a color set exists, the
-		 * first is assumed.
-		 */
-		public function get defaultColorName():String { return _defaultColorName; }
-		public function set defaultColorName(value:String):void {
-			_defaultColorName = value;
-		}
-		private var _defaultColorName:String;
-		
-		/**
-		 * Default color to be applied to new features.
-		 * This usually assumes color sets are not being used.
-		 */
-		public function get defaultColor():Color { return _defaultColor; }
-		public function set defaultColor(value:Color):void {
-			_defaultColor = value;
-		}
-		private var _defaultColor:Color;
-		
-		/**
 		 * Variations of art available for this feature
-		 * definition. Art sets cannot be null.
+		 * definition. An artSet cannot be null.
 		 */
 		public function get artSet():ArtSet { return _artSet; }
 		public function set artSet(value:ArtSet):void {
@@ -121,7 +72,7 @@ package com.myavatareditor.avatarcore.data {
 		
 		/**
 		 * Variations of colors (color transforms) that can be
-		 * applied to art within this definition.  Color sets
+		 * applied to art within this definition.   A colorSet
 		 * cannot be null.
 		 */
 		public function get colorSet():ColorSet { return _colorSet; }
@@ -131,6 +82,32 @@ package com.myavatareditor.avatarcore.data {
 			}
 		}
 		private var _colorSet:ColorSet = new ColorSet();
+		
+		/**
+		 * Variations of transformations that can be
+		 * applied to art within this definition.  A transformSet
+		 * cannot be null.
+		 */
+		public function get transformSet():TransformSet { return _transformSet; }
+		public function set transformSet(value:TransformSet):void {
+			if (value){
+				_transformSet = value;
+			}
+		}
+		private var _transformSet:TransformSet = new TransformSet();
+		
+		/**
+		 * Base transformation on top of which other transformations
+		 * are applied.  This would be a starting point for other
+		 * transformations in, for example, a transformSet.  If the
+		 * base transform has an x of 10, and the selected transform
+		 * in a set is 20, the final transform has an x of 30.
+		 */
+		public function get baseTransform():Transform { return _baseTransform; }
+		public function set baseTransform(value:Transform):void {
+			_baseTransform = value;
+		}
+		private var _baseTransform:Transform;
 		
 		/**
 		 * A constraint for moving, scaling, or rotating art in
@@ -148,6 +125,18 @@ package com.myavatareditor.avatarcore.data {
 		 */
 		public function FeatureDefinition() {
 			
+		}
+		
+		public function getPropertiesAsAttributesInXML():Object {
+			return {name:1, parentName:1};
+		}
+		
+		public function getPropertiesIgnoredByXML():Object {
+			return {};
+		}
+		
+		public function getObjectAsXML():XML {
+			return null;
 		}
 		
 		/**
@@ -202,6 +191,9 @@ package com.myavatareditor.avatarcore.data {
 				}
 				
 				// scale
+				// TODO: constraint.scaleX/scaleY?
+				// should min/max be absolutely based? - allowing for negative
+				// scales within the min/max ranges? ... I'm thinking yes
 				if (_constraint.scale){
 					if (artSprite.scaleX > _constraint.scale.max){
 						artSprite.scaleX = artSprite.scaleY = _constraint.scale.max;

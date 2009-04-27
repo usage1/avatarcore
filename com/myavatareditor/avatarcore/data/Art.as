@@ -36,7 +36,12 @@ package com.myavatareditor.avatarcore.data {
 	public class Art extends Collection {
 		
 		/**
-		 * Name identifier for the Art object.
+		 * Name identifier for the Art object. Art is referenced
+		 * by name from features through a feature's art.  If an 
+		 * Art object is acting as a container for multiple Art
+		 * assets, that container Art should be named and referenced
+		 * by the respective feature.  The child Art object names
+		 * are ignored.
 		 */
 		public function get name():String { return _name; }
 		public function set name(value:String):void {
@@ -47,7 +52,11 @@ package com.myavatareditor.avatarcore.data {
 		
 		/**
 		 * Horizontal location (offset) of the art graphics
-		 * within an art sprite.
+		 * within an art sprite. This value should be set 
+		 * before the art is drawn in an art sprite. If changed
+		 * while the art is being displayed for an avatar, the
+		 * effects will not be seen until the feature art is
+		 * rebuilt.
 		 */
 		public function get x():Number { return _x; }
 		public function set x(value:Number):void {
@@ -57,7 +66,11 @@ package com.myavatareditor.avatarcore.data {
 		
 		/**
 		 * Vertical location (offset) of the art graphics
-		 * within an art sprite.
+		 * within an art sprite. This value should be set 
+		 * before the art is drawn in an art sprite. If changed
+		 * while the art is being displayed for an avatar, the
+		 * effects will not be seen until the feature art is
+		 * rebuilt.
 		 */
 		public function get y():Number { return _y; }
 		public function set y(value:Number):void {
@@ -69,7 +82,9 @@ package com.myavatareditor.avatarcore.data {
 		 * Arrangement value to be used in determining the stacking
 		 * order of all the art composed within an AvatarArt instance.
 		 * The higher the zIndex, the higher the art in the stacking
-		 * order.
+		 * order.  If two objects share the same zIndex, there is no
+		 * guarantee as to the order of their arrangement.  You should
+		 * always specify unique zIndex values for avatar art.
 		 */
 		public function get zIndex():Number { return _zIndex; }
 		public function set zIndex(value:Number):void {
@@ -79,7 +94,7 @@ package com.myavatareditor.avatarcore.data {
 		
 		/**
 		 * The art source. This can be either a class name or a
-		 * URL referencing a loaded asset.
+		 * URL referencing a loaded asset such as a JPEG file.
 		 */
 		public function get src():String { return _src; }
 		public function set src(value:String):void {
@@ -90,7 +105,9 @@ package com.myavatareditor.avatarcore.data {
 		/**
 		 * The source of the thumbnail to be used for previewing the
 		 * art for the user. This can be either a class name or a
-		 * URL referencing a loaded asset.
+		 * URL referencing a loaded asset. Management of a thumbnail
+		 * is handled by a custom editor; the framework does not 
+		 * internally depend on or otherwise use this value.
 		 */
 		public function get thumbnail():String { return _thumbnail; }
 		public function set thumbnail(value:String):void {
@@ -111,8 +128,14 @@ package com.myavatareditor.avatarcore.data {
 		private var _colorize:Number; // Number instead of Boolean for inheritance (NaN recognition)
 		
 		/**
-		 * The style name for the art.  Art styles must match feature
-		 * styles for the art to be displayed.
+		 * The style name for the art.  In specifying a style, you
+		 * limit the use of the art to only features with the same
+		 * artStyle defined. By default both Art.style and 
+		 * Feature.artStyle are null, so all art is used.  Whenever
+		 * one or the other is changed, the art will be ignored unless
+		 * it's value of style matches the feature's.  This is an
+		 * optional property that is used for more advanced control
+		 * over the application of feature art.
 		 */
 		public function get style():String { return _style; }
 		public function set style(value:String):void {
@@ -128,10 +151,35 @@ package com.myavatareditor.avatarcore.data {
 			this.src = src;	
 		}
 		
+		/**
+		 * Creates and returns a copy of the Art object.
+		 * If the Art object has any Art children in its
+		 * collection, they are also cloned and placed
+		 * within the cloned Art's collection
+		 * @return A copy of this Color object.
+		 */
+		public function clone():Art {
+			var copy:Art = new Art(src);
+			copy.name = name;
+			copy.x = x;
+			copy.y = y;
+			copy.thumbnail = thumbnail;
+			copy.zIndex = zIndex;
+			copy.colorize = colorize;
+			copy.style = style;
+			copy.copyCollectionFrom(this);
+			return copy;
+		}
+		
 		public override function getPropertiesAsAttributesInXML():Object {
 			var obj:Object = super.getPropertiesAsAttributesInXML();
+			obj.x = 1;
+			obj.y = 1;
 			obj.src = 1;
+			obj.thumbnail = 1;
 			obj.zIndex = 1;
+			obj.colorize = 1;
+			obj.style = 1;
 			return obj;
 		}
 		

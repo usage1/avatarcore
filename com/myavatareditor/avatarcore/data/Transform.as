@@ -31,7 +31,7 @@ package com.myavatareditor.avatarcore.data {
 	 */
 	public class Transform implements IXMLWritable {
 		
-		private static const toRadians:Number = Math.PI / 180;
+		private static const toRadians:Number = Math.PI / 180.0;
 		
 		/**
 		 * Name identifier for the Transform object.
@@ -53,21 +53,62 @@ package com.myavatareditor.avatarcore.data {
 		public var y:Number = 0;
 		
 		/**
-		 * Scale multiplier to be applied to an art sprite.
+		 * Horizontal scale multiplier to be applied to an art sprite.
 		 * This accounts for scaling in both the x and y axes.
 		 */
-		public var scale:Number = 1;
+		public var scaleX:Number = 1;
+		
+		/**
+		 * Vertical scale multiplier to be applied to an art sprite.
+		 * This accounts for scaling in both the x and y axes.
+		 */
+		public var scaleY:Number = 1;
+		
+		/**
+		 * The average scale of the transform. This is determined
+		 * dynamically to be the avarage value of scaleX and scaleY.
+		 * When setting scale, both scaleX and scaleY are set to 
+		 * the value provided.
+		 */
+		public function get scale():Number {
+			return (scaleX + scaleY)/2;
+		}
+		public function set scale(value:Number):void {
+			scaleX = value;
+			scaleY = value;
+		}
 		
 		/**
 		 * Rotation in degrees to be applied to an art sprite.
 		 */
 		public var rotation:Number = 0;
 		
+		/**
+		 * Constructor for creating new Transform instances.
+		 * @param	x The starting x, or horizontal position, value.
+		 * @param	y The starting y, or vertical position, value.
+		 * @param	scale The starting scale value. This is applied to both
+		 * scaleX and scaleY. If you want to set them independently, do so
+		 * after the object is created.
+		 * @param	rotation The starting rotation value.
+		 */
 		public function Transform(x:Number = 0, y:Number = 0, scale:Number = 1, rotation:Number = 0) {
 			this.x = x;
 			this.y = y;
 			this.scale = scale;
 			this.rotation = rotation;
+		}
+		
+		/**
+		 * Creates and returns a copy of the Transform object.
+		 * @return A copy of this Transform object.
+		 */
+		public function clone():Transform {
+			var copy:Transform = new Transform(x, y, 1, rotation);
+			copy.scaleX = scaleX;
+			copy.scaleY = scaleY;
+			copy.name = name;
+			return copy;
 		}
 		
 		public function getPropertiesIgnoredByXML():Object {
@@ -83,12 +124,15 @@ package com.myavatareditor.avatarcore.data {
 			if (name){
 				xml.@name = name;
 			}
-			var children:XMLList = new XMLList();
-			if (!isNaN(x) && x != 0) children += <x>{x}</x>;
-			if (!isNaN(y) && y != 0) children += <y>{y}</y>;
-			if (!isNaN(scale) && scale != 1.0) children += <scale>{scale}</scale>;
-			if (!isNaN(rotation) && rotation != 0) children += <rotation>{rotation}</rotation>;
-			xml.setChildren(children);
+			if (!isNaN(x) && x != 0) xml.@x = x;
+			if (!isNaN(y) && y != 0) xml.@y = y;
+			if (!isNaN(scaleX) && scaleX != 1.0 && scaleX == scaleY){
+				xml.@scale = scale;
+			}else{
+				if (!isNaN(scaleX) && scaleX != 1.0) xml.@scaleX = scaleX;
+				if (!isNaN(scaleY) && scaleY != 1.0) xml.@scaleY = scaleY;
+			}
+			if (!isNaN(rotation) && rotation != 0) xml.@rotation = rotation;
 			return xml;
 		}
 		
@@ -98,17 +142,25 @@ package com.myavatareditor.avatarcore.data {
 		 * @return A matrix object with all of the characteristics
 		 * of this transform.
 		 */
-		public function getMatrix():Matrix {
+		public function getMatrix():Matrix {		
+			// PLATFORMBUG: Flash Players before 9,0,28,0 (CS3) will fail to 
+			// recognize changed x/y/scale/rotation properties when
+			// transformed through their matrix [184739]
+				
 			var matrix:Matrix = new Matrix();
-			if (isNaN(scale) == false) {
-				matrix.scale(scale, scale);
-			}
+			
+			var sx:Number = isNaN(scaleX) ? 1 : scaleX;
+			var sy:Number = isNaN(scaleY) ? 1 : scaleY;
+			matrix.scale(sx, sy);
+			
 			if (isNaN(rotation) == false) {
 				matrix.rotate(rotation * toRadians);
 			}
+			
 			var tx:Number = isNaN(x) ? 0 : x;
 			var ty:Number = isNaN(y) ? 0 : y;
 			matrix.translate(x, y);
+			
 			return matrix;
 		}
 		
@@ -122,7 +174,8 @@ package com.myavatareditor.avatarcore.data {
 		public function fill(transform:Transform):void {
 			if (isNaN(x)) x = transform.x;
 			if (isNaN(y)) y = transform.y;
-			if (isNaN(scale)) scale = transform.scale;
+			if (isNaN(scaleX)) scaleX = transform.scaleX;
+			if (isNaN(scaleY)) scaleY = transform.scaleY;
 			if (isNaN(rotation)) rotation = transform.rotation;
 		}
 	}

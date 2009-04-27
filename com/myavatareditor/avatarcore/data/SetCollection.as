@@ -19,36 +19,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.events {
-	
-	import com.myavatareditor.avatarcore.data.Feature;
-	import flash.events.Event;
+package com.myavatareditor.avatarcore.data {
 	
 	/**
-	 * Event class for feature-specific events.  In addition to
-	 * standard event properties, this class includes a feature
-	 * member representing the feature for which the event is
-	 * associated.
+	 * A collection of Transform objects for feature definitions. When
+	 * a feature definition defines different transforms for an avatar,
+	 * they are stored within the transformSet collection.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class FeatureEvent extends Event {
-		
-		public static const FEATURE_ADDED:String = "featureAdded";
-		public static const FEATURE_REMOVED:String = "featureRemoved";
-		public static const FEATURE_CHANGED:String = "featureChanged";
+	public class SetCollection extends Collection {
 		
 		/**
-		 * The Feature object associated with this event.
+		 * Name identifier for the set.
 		 */
-		public function get feature():Feature { return _feature; }
-		public function set feature(value:Feature):void {
-			_feature = value;
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
 		}
-		private var _feature:Feature;
+		private var _name:String;
 		
-		public function FeatureEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, feature:Feature = null) {
-			super(type, bubbles, cancelable);
-			this.feature = feature;
+		/**
+		 * Name of the default item in the set for cases when
+		 * a feature does not specify a reference to one of
+		 * the set items (or its own) explicitly.
+		 */
+		public function get defaultName():String { return _defaultName; }
+		public function set defaultName(value:String):void {
+			_defaultName = value;
+		}
+		private var _defaultName:String;
+		
+		public override function getPropertiesAsAttributesInXML():Object {
+			var obj:Object = super.getPropertiesAsAttributesInXML();
+			obj.defaultName = true;
+			return obj;
+		}
+		
+		public function SetCollection() {
+			
 		}
 	}
 }

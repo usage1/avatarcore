@@ -26,12 +26,17 @@ package com.myavatareditor.avatarcore.data {
 	import com.myavatareditor.avatarcore.display.ArtSprite;
 	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.display.Sprite;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	
 	/**
 	 * Represents a feature within an avatar.  Features describe a part
-	 * of how an avatar is represented through physical transformations
-	 * and other information through a referenced FeatureDefinition.
+	 * of an avatar and how it is represented by graphical assets and 
+	 * physical transformations such as position, scale, or color. Feature
+	 * values can be defined directly within the feature itself or link
+	 * to definitions within a FeatureDefinitioninstance of a library which
+	 * gets associated with the feature when an avatar containing the feature
+	 * is linked with a Library object.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Feature implements IXMLWritable {
@@ -47,25 +52,116 @@ package com.myavatareditor.avatarcore.data {
 		private var _name:String;
 		
 		/**
-		 * Name of the color in a linked FeatureDefinition to be
-		 * associated with this feature.
+		 * Shortcut to art.name.  If art or art.name does not
+		 * exist and the feature is linked to a feature definition
+		 * the value returned is the default name specified by
+		 * artSet or, if that's not available, the name of the first
+		 * item within the definition's art set collection.  Otherwise
+		 * the value is null. If artName is set when art is null,
+		 * a new Art instance will be created and its name set
+		 * to the value given to artName.
 		 */
-		public function get colorName():String { return _colorName; }
-		public function set colorName(value:String):void {
-			_colorName = value;
+		public function get artName():String {
+			if (_art && _art.name) {
+				return _art.name;
+			}
+			if (_definition){
+				if (_definition.artSet.defaultName){
+					return _definition.artSet.defaultName;
+				}
+				
+				// if a feature references a definition, but does not
+				// provide specification on which art, the first is used
+				// (or whatever is specified by defaultSetID)
+				var defaultArt:Art = _definition.artSet.collection[defaultSetID] as Art;
+				if (defaultArt){
+					return defaultArt.name;
+				}
+			}
+			
+			return null;
 		}
-		private var _colorName:String; // defaults to first
+		public function set artName(value:String):void {
+			if (_art == null){
+				_art = new Art();
+			}
+			_art.name = value;
+		}
 		
 		/**
-		 * Name of the art group in a linked FeatureDefinition to be
-		 * associated with this feature.
+		 * Shortcut to color.name.  If color or color.name does not
+		 * exist and the feature is linked to a feature definition
+		 * the value returned is the default name specified by
+		 * colorSet or, if that's not available, the name of the first
+		 * item within the definition's color set collection.  Otherwise
+		 * the value is null. If colorName is set when color is null,
+		 * a new Color instance will be created and its name set
+		 * to the value given to colorName.
 		 */
-		public function get artName():String { return _artName; }
-		public function set artName(value:String):void {
-			_artName = value;
+		public function get colorName():String {
+			if (_color && _color.name) {
+				return _color.name;
+			}
+			if (_definition){
+				if (_definition.colorSet.defaultName){
+					return _definition.colorSet.defaultName;
+				}
+				
+				// if a feature references a definition, but does not
+				// provide specification on which color, the first is used
+				// (or whatever is specified by defaultSetID)
+				var defaultColor:Color = _definition.colorSet.collection[defaultSetID] as Color;
+				if (defaultColor){
+					return defaultColor.name;
+				}
+			}
+			
+			return null;
 		}
-		private var _artName:String; // defaults to first
+		public function set colorName(value:String):void {
+			if (_color == null){
+				_color = new Color();
+			}
+			_color.name = value;
+		}
 		
+		/**
+		 * Shortcut to transform.name.  If transform or transform.name does not
+		 * exist and the feature is linked to a feature definition
+		 * the value returned is the default name specified by
+		 * transformSet or, if that's not available, the name of the first
+		 * item within the definition's transform set collection.  Otherwise
+		 * the value is null. If transformName is set when transform is null,
+		 * a new Transform instance will be created and its name set
+		 * to the value given to transformName.
+		 */
+		public function get transformName():String {
+			if (_transform && _transform.name) {
+				return _transform.name;
+			}
+			if (_definition){
+				if (_definition.transformSet.defaultName){
+					return _definition.transformSet.defaultName;
+				}
+				
+				// if a feature references a definition, but does not
+				// provide specification on which transform, the first is used
+				// (or whatever is specified by defaultSetID)
+				var defaultTransform:Transform = _definition.transformSet.collection[defaultSetID] as Transform;
+				if (defaultTransform){
+					return defaultTransform.name;
+				}
+			}
+			
+			return null;
+		}
+		public function set transformName(value:String):void {
+			if (_transform == null){
+				_transform = new Transform();
+			}
+			_transform.name = value;
+		}
+			
 		/**
 		 * Style name for this feature.  When defined, art associated
 		 * with this feature must be of the same style to be visible.
@@ -77,21 +173,20 @@ package com.myavatareditor.avatarcore.data {
 		private var _artStyle:String; // defaults to not using
 		
 		/**
-		 * Transformation (position, size, and rotation) to be applied
-		 * to a feature and its art.  When null, no transformation is
-		 * applied (x=0, y=0, scale=1, rotation=0).
+		 * A specific Art object to be applied to an avatar. This can contain
+		 * an Art definition or, if a name property is defined, be linked
+		 * to an Art definition within a respective FeatureDefinition object.
 		 */
-		public function get transform():Transform { return _transform; }
-		public function set transform(value:Transform):void {
-			_transform = value;
+		public function get art():Art { return _art; }
+		public function set art(value:Art):void {
+			_art = value;
 		}
-		private var _transform:Transform;
+		private var _art:Art; // if not using definition's
 		
 		/**
-		 * A specific color to be applied to an avatar. Usually this
-		 * is null in favor of using colorName to reference a color
-		 * defined in the library, but this value can be set as an
-		 * alternative so that the avatar definition can be self-contained.
+		 * A specific color to be applied to an avatar. This can contain
+		 * a Color definition or, if a name property is defined, be linked
+		 * to an Color definition within a respective FeatureDefinition object.
 		 */
 		public function get color():Color { return _color; }
 		public function set color(value:Color):void {
@@ -100,16 +195,37 @@ package com.myavatareditor.avatarcore.data {
 		private var _color:Color; // if not using definition's
 		
 		/**
-		 * A specific Art object to be applied to an avatar. Usually this
-		 * is null in favor of using artName to reference an Art object
-		 * defined in the library, but this value can be set as an
-		 * alternative so that the avatar definition can be self-contained.
+		 * Transformation (position, size, and rotation) to be applied
+		 * to a feature and its art.  When null, no transformation is
+		 * applied (x=0, y=0, scale=1, rotation=0). If a name property is
+		 * defined, it can be linked to an Color definition within a 
+		 * respective FeatureDefinition object.  This transform is applied
+		 * on top of a definitions baseTransform if defined.
 		 */
-		public function get art():Art { return _art; }
-		public function set art(value:Art):void {
-			_art = value;
+		public function get transform():Transform { return _transform; }
+		public function set transform(value:Transform):void {
+			_transform = value;
 		}
-		private var _art:Art; // if not using definition's
+		private var _transform:Transform;
+		
+		/**
+		 * Base transformation on top of which other transformations
+		 * are applied. If both a feature and its definition specify
+		 * a base transform, only the definition's base transform will
+		 * be used.  Normally Feature.baseTransform is not necessary.
+		 * It is mostly useful to help maintain parity with 
+		 * tranformation combinations from feature definitions. For
+		 * example, when copying FeatureDefinition characteristics into
+		 * Feature objects, you would want both the transform and the
+		 * baseTransform objects so that the combined transform will
+		 * be used for the avatar when a library and it's related 
+		 * definitions are not available.
+		 */
+		public function get baseTransform():Transform { return _baseTransform; }
+		public function set baseTransform(value:Transform):void {
+			_baseTransform = value;
+		}
+		private var _baseTransform:Transform;
 		
 		/**
 		 * Gets the feature definition associated with this
@@ -124,34 +240,24 @@ package com.myavatareditor.avatarcore.data {
 		 * with this avatar feature.  This is usually set automatically
 		 * when the avatar is associated with a library or when a 
 		 * feature is added to an avatar that has an associated library.
+		 * These associations are made when the name of the definition
+		 * and feature matches. If a definition is assigned to a 
+		 * feature when it has no name, it automatically inherits the
+		 * name from the definition.
 		 */
 		public function set definition(definition:FeatureDefinition):void {
 			_definition = definition;
 			
 			if (_definition){
 				
-				// defaults
-				if (_definition.defaultTransform) {
-					if (_transform == null) {
-						// undefined transform object (allows defaults)
-						transform = new Transform(Number.NaN, Number.NaN, Number.NaN, Number.NaN);
-					}
-					_transform.fill(_definition.defaultTransform);
-				}
-				
-				if (_artName == null && _definition.defaultArtName) {
-					artName = _definition.defaultArtName;
-				}
-				
-				if (_colorName == null && _definition.defaultColorName) {
-					colorName = _definition.defaultColorName;
-				}
-				
 				// inherit name of definition if not defined here
 				// usually this is a non-issue since libraries should
 				// only make the association if the names match
+				// this also works the other way around
 				if (!_name){
 					name = _definition.name;
+				}else if (!_definition.name){
+					_definition.name = _name;
 				}
 			}
 		}
@@ -180,7 +286,7 @@ package com.myavatareditor.avatarcore.data {
 		}
 		
 		public function getPropertiesIgnoredByXML():Object {
-			return {definition:1};
+			return {definition:1,artName:1,colorName:1,transformName:1};
 		}
 		
 		public function getObjectAsXML():XML {
@@ -188,7 +294,37 @@ package com.myavatareditor.avatarcore.data {
 		}
 		
 		/**
+		 * Copies feature characteristics (Art, Colors, and Transforms)
+		 * from the referenced feature definition into the feature's
+		 * own characteristics.  This would be used to create a self-contained
+		 * version of the feature that would be able to be displayed 
+		 * without the library.
+		 */
+		public function consolidate():void {
+			trace("consolidating");
+			var defArt:Art;
+			var defColor:Color;
+			var defTransform:Transform;
+			if (_definition){
+				
+				defArt = _definition.artSet.getItemByName(artName) as Art;
+				art = (defArt) ? defArt.clone() : null;
+				
+				defColor = _definition.colorSet.getItemByName(colorName) as Color;
+				color = (defColor) ? defColor.clone() : null;
+				
+				defTransform = _definition.transformSet.getItemByName(transformName) as Transform;
+				transform = (defTransform) ? defTransform.clone() : null;
+				
+				defTransform = _definition.baseTransform;
+				baseTransform = (defTransform) ? defTransform.clone() : null;
+			}
+		}
+		
+		/**
 		 * Returns the art sprites needed to represent this feature.
+		 * This is called internally by AvatarArt to create the sprites
+		 * used to present the avatar on screen.
 		 * @param	sprites Any set of pre-existing art sprites
 		 * assumed to be necessary for the feature.
 		 * @return An array of art sprites.
@@ -198,20 +334,12 @@ package com.myavatareditor.avatarcore.data {
 				sprites = [];
 			}
 			
-			var featureArt:Art;
-			// first get group from definition
-			if (_definition && _definition.artSet) {
-				featureArt = _definition.artSet.collection[_artName || defaultSetID] as Art;
-			}
-			
-			// if no group from definition, use own definition
-			// if available (may be null)
-			if (featureArt == null) {
-				featureArt = _art;
-			}
+			// use definition art through name reference if available
+			// otherwise fallback to local art object
+			var featureArt:Art = getFeatureArt();
 			
 			if (featureArt == null){
-				print("Creating Feature Art; no feature art found for Feature [name:"+_name+", artName:"+_artName+"]", PrintLevel.WARNING, this);
+				print("Creating Feature Art; no feature art found for Feature [name:"+_name+"]", PrintLevel.WARNING, this);
 				return sprites;
 			}
 			
@@ -243,6 +371,13 @@ package com.myavatareditor.avatarcore.data {
 						}
 					}
 				}
+				
+				// in the rare case that no child sprites were
+				// found in the collection, revert back to
+				// using the original art
+				if (sprites.length == 0 && _artStyle == featureArt.style) {
+					sprites.push(new ArtSprite(featureArt, this));
+				}
 			}
 			
 			// definitions also determine what sprites
@@ -254,49 +389,84 @@ package com.myavatareditor.avatarcore.data {
 			return sprites;
 		}
 		
-		private function hasArtSprites():Boolean {
-			try {
-				return Boolean(_definition.artSet.collection[artName || defaultSetID]);
-			}catch (error:Error) {
-				// definition or art set is null
+		private function getFeatureArt():Art {
+			var featureArt:Art;
+			if (_definition){
+				featureArt = _definition.artSet.getItemByName(artName) as Art;
 			}
-			return false;
+			if (featureArt == null) {
+				featureArt = _art;
+			}
+			return featureArt;
 		}
 		
 		/**
-		 * Applies feature transformations to an art sprite.
+		 * Applies feature transformations to an art sprite. This
+		 * is called internally by AvatarArt to render the sprites
+		 * it creates to present the avatar on screen.
 		 * @param	artSprite The art sprite to apply feature
 		 * transformations to.
 		 */
 		public function drawArtSprite(artSprite:ArtSprite):void {
 			if (artSprite == null) return;
-
-			artSprite.transform.matrix = _transform ? _transform.getMatrix() : new Matrix();
-			// BUG: Flash Players before 9,0,28,0 (CS3) will fail to 
-			// recognize changed x/y/scale/rotation properties when
-			// transformed through their matrix [184739]
 			
-			// if available, apply definition transformations
-			if (_definition){
-				
-				// apply color, referenced in Feature, defined in definition
-				var art:Art = artSprite.art;
-				if (art && art.colorize !== 0) { // NaN colorize == color; 0 == no color
-					
-					// apply feature's own color
-					if (_color){
-						artSprite.transform.colorTransform = _color;
-					}
-					
-					// override color with definitions color from 
-					// color set if available
-					if (_definition.colorSet){
-						var colorSetColor:Color = _definition.colorSet.collection[_colorName || defaultSetID] as Color;
-						if (colorSetColor){
-							artSprite.transform.colorTransform = colorSetColor;
-						}
-					}
+			// apply transform
+			var featureBaseTransform:Transform;
+			var featureTransform:Transform;
+			if (_definition){ 
+				// transforms from definition
+				if (_definition.baseTransform){
+					// base transform on which other transforms are based
+					featureBaseTransform = _definition.baseTransform;
 				}
+				// linked transform
+				featureTransform = _definition.transformSet.getItemByName(transformName) as Transform;
+			}
+			if (featureBaseTransform == null) {
+				// baseTransform in avatar if not found in definition
+				featureBaseTransform = _baseTransform;
+			}
+			if (featureTransform == null) {
+				// transform in avatar if not found in definition
+				featureTransform = _transform;
+			}
+			
+			var matrix:Matrix = (featureBaseTransform)
+				? featureBaseTransform.getMatrix() // base transform
+				: new Matrix();
+			
+			if (featureTransform){
+				// additional transform 
+				matrix.concat(featureTransform.getMatrix());
+			}
+			
+			// assign matrix to art sprite
+			artSprite.transform.matrix = matrix;
+	
+			// apply color
+			var featureColor:Color;
+			var spriteArt:Art = artSprite.art;
+			if (spriteArt && spriteArt.colorize !== 0){ // NaN colorize -> color; 0 -> no color
+				
+				if (_definition){
+					// color from definition
+					featureColor = _definition.colorSet.getItemByName(colorName) as Color;
+				}
+				if (featureColor == null) {
+					// color in avatar if not found in definition
+					featureColor = _color;
+				}
+				if (featureColor){
+					// assign color to art sprite
+					artSprite.transform.colorTransform = featureColor;
+				}else{
+					// reset sprite color if color can't be resolved
+					artSprite.transform.colorTransform = new ColorTransform();
+				}
+			}
+			
+			// if available, invoke feature definition drawing
+			if (_definition){
 				
 				// modifications applied by definition
 				_definition.drawArtSprite(artSprite);
@@ -316,9 +486,9 @@ package com.myavatareditor.avatarcore.data {
 				var parentMatrix:Matrix = getParentTransformMatrix(artSprite.avatar);
 				if (parentMatrix){
 					
-					// transform correctly found/created
-					// apply transform to sprite on top of
-					// existing transform
+					// parent transform correctly found/created
+					// apply parent transform to sprite on top of
+					// sprite's own, existing transform
 					var concatenatedMatrix:Matrix = artSprite.transform.matrix;
 					concatenatedMatrix.concat(parentMatrix);
 					artSprite.transform.matrix = concatenatedMatrix;
@@ -363,7 +533,7 @@ package com.myavatareditor.avatarcore.data {
 				// find the next parent - this is a little involved
 				if (parentFeature._definition){
 					
-					if (parentFeature.hasArtSprites() == false){
+					if (parentFeature.getFeatureArt() == null){
 						print("Feature parent matrix unresolved due to lack of parent art", PrintLevel.DEBUG, this);
 						return null;
 					}

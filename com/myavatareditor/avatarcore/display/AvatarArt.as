@@ -37,8 +37,10 @@ package com.myavatareditor.avatarcore.display {
 	 * All avatar art exists as child sprite of this container, irrespective
 	 * of their feature parent hierarchies.  Layering of art is based 
 	 * solely on the defined zIndex values within the features' definitions.
-	 * Without a zIndex, their ordering is up to chance.  Art drawn is based
-	 * on the referenced Avatar instance.
+	 * Without a zIndex, their ordering is up to chance.  Art for avatars is
+	 * created in ArtSprite instances and added to the AvatarArt automatically
+	 * as the avatar being referenced is updated.  Most of the API is not needed
+	 * for normal use.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class AvatarArt extends Sprite {
@@ -67,7 +69,9 @@ package com.myavatareditor.avatarcore.display {
 		private var _avatar:Avatar;
 		
 		private var displayList:Array = [];
-		private var sortKey:String = "zIndex";
+		private var displayListSortKey:String = "zIndex";
+		private var artMapSortKey:String = "src";
+		private var featureArtMap:Object = {};
 		
 		/**
 		 * Constructor for creating new AvatarArt instances.
@@ -96,27 +100,29 @@ package com.myavatareditor.avatarcore.display {
 			while (i--){
 				feature = features[i] as Feature;
 				if (feature){
-					addFeatureArt(feature, false);
+					addFeatureArtSprites(feature);
 				}
 			}
 			
-			updateArtArrangement();
 			draw();
 		}
 		
 		/**
-		 * Draws the art sprites in the avatar art
-		 * updating their transformations as defined
-		 * in their respective features. If a feature's 
-		 * art definition has changed, you should use
-		 * addFeatureArt or rebuild.
+		 * Draws the art sprites in the avatar art updating their
+		 * transformations as defined in their respective features.
+		 * If a feature's art definition has changed, you should use
+		 * updateFeatureArt method to update that feature.
 		 */
 		public function draw():void {
+			displayList.sortOn(displayListSortKey, Array.NUMERIC);
 			var artSprite:ArtSprite;
 			var i:int = displayList.length;
 			while (i--){
 				artSprite = displayList[i] as ArtSprite;
 				artSprite.draw();
+				if (getChildIndex(artSprite) != i) {
+					setChildIndex(artSprite, i);
+				}
 			}
 		}
 		
@@ -143,6 +149,7 @@ package com.myavatareditor.avatarcore.display {
 				}
 			}
 			displayList.length = 0;
+			featureArtMap = {};
 		}
 		
 		/**
@@ -152,27 +159,42 @@ package com.myavatareditor.avatarcore.display {
 		 * sprite display list and updates arrangement.  Set this
 		 * to false if you want to defer the drawing process for later.
 		 */
-		public function addFeatureArt(feature:Feature, redraw:Boolean = true):void {
+		public function addFeatureArt(feature:Feature):void {
 			if (feature == null){
 				print("Adding Feature Art; invalid feature definition", PrintLevel.WARNING, this);
 				return;
 			}
 			
-			removeFeatureArtByName(feature.name);
+			addFeatureArtSprites(feature);
+			draw();
+		}
+		
+		private function addFeatureArtSprites(feature:Feature):void {
+			var sprites:Array = validateFeatureArt(feature);
+			if (sprites){
 			
-			var sprites:Array = feature.getArtSprites();
-			var artSprite:ArtSprite;
-			var i:int = sprites.length;
-			while (i--){
-				artSprite = sprites[i] as ArtSprite;
-				displayList.push(artSprite);
-				addChild(artSprite);
-			}
+				removeFeatureArtByName(feature.name);
 			
-			if (redraw){
-				draw();
-				updateArtArrangement();
+				var artSprite:ArtSprite;
+				var i:int = sprites.length;
+				while (i--){
+					artSprite = sprites[i] as ArtSprite;
+					displayList.push(artSprite);
+					addChild(artSprite);
+				}
 			}
+		}
+		
+		/**
+		 * Validates a feature exists within the referenced avatar
+		 * and updates it on the screen.
+		 * @param	feature The feature having been modified. If the
+		 * feature does not exist within the avatar, no action is taken.
+		 */
+		public function updateFeatureArt(feature:Feature):void {
+			if (feature == null || _avatar == null) return;
+			if (feature != _avatar.getItemByName(feature.name)) return;
+			addFeatureArt(feature);
 		}
 		
 		/**
@@ -195,8 +217,6 @@ package com.myavatareditor.avatarcore.display {
 			}
 			
 			draw();
-			// removing from display list shouldn't
-			// require rearrangement
 		}
 		
 		/**
@@ -221,55 +241,65 @@ package com.myavatareditor.avatarcore.display {
 			}
 			
 			draw();
-			// removing from display list shouldn't
-			// require rearrangement
 		}
 		
-		/**
-		 * Reorders art sprites based on the zIndex value
-		 * specified in each sprite's respective Art definition.
-		 */
-		public function updateArtArrangement():void {
-			var artSprite:ArtSprite;
-			displayList.sortOn(sortKey, Array.NUMERIC);
+		private function validateFeatureArt(feature:Feature):Array {
+			if (feature == null) return null;
 			
-			var i:int = displayList.length;
-			while (i--){
-				artSprite = displayList[i] as ArtSprite;
-				if (getChildIndex(artSprite) != i) {
-					setChildIndex(artSprite, i);
+			var featureName:String = feature.name;
+			if (featureName){
+				var currentSprites:Array = featureArtMap[featureName] as Array;
+				var newSprites:Array = feature.getArtSprites();
+				newSprites.sortOn(artMapSortKey); // spritesSrcMatch assumes sorted sprite lists
+				
+				if (spritesSrcMatch(newSprites, currentSprites)){
+					return null;
+				}else{
+					featureArtMap[featureName] = newSprites;
+					return newSprites;
 				}
 			}
+			return null;
+		}
+		
+		private function spritesSrcMatch(list1:Array, list2:Array):Boolean {
+			if (list1 == null || list2 == null) return false;
+			if (list1.length != list2.length) return false;
+			var i:int = list1.length;
+			while (i--){
+				// only checking for changes in source references
+				// changes in other properties are ignored
+				if (ArtSprite(list1[i]).src != ArtSprite(list2[i]).src) return false;
+			}
+			return true;
 		}
 		
 		private function setupAvatar():void {
 			if (_avatar == null) return;
 			_avatar.addEventListener(FeatureEvent.FEATURE_ADDED, featureAddedHandler, false, 0, true);
-			_avatar.addEventListener(FeatureEvent.FEATURE_CHANGED, featureAddedHandler, false, 0, true);
+			_avatar.addEventListener(FeatureEvent.FEATURE_CHANGED, featureChangedHandler, false, 0, true);
 			_avatar.addEventListener(FeatureEvent.FEATURE_REMOVED, featureRemovedHandler, false, 0, true);
-			_avatar.addEventListener(FeatureEvent.FEATURE_TRANSFORMED, drawFeatureHandler, false, 0, true);
 			_avatar.addEventListener(Avatar.REBUILD, rebuildHandler, false, 0, true);
 		}
 		private function cleanupAvatar():void {
 			if (_avatar == null) return;
 			_avatar.removeEventListener(FeatureEvent.FEATURE_ADDED, featureAddedHandler, false);
-			_avatar.removeEventListener(FeatureEvent.FEATURE_CHANGED, featureAddedHandler, false);
+			_avatar.removeEventListener(FeatureEvent.FEATURE_CHANGED, featureChangedHandler, false);
 			_avatar.removeEventListener(FeatureEvent.FEATURE_REMOVED, featureRemovedHandler, false);
-			_avatar.removeEventListener(FeatureEvent.FEATURE_TRANSFORMED, drawFeatureHandler, false);
 			_avatar.removeEventListener(Avatar.REBUILD, rebuildHandler, false);
 		}
 		
 		private function featureAddedHandler(featureEvent:FeatureEvent):void {
 			addFeatureArt(featureEvent.feature);
 		}
+		private function featureChangedHandler(featureEvent:FeatureEvent):void {
+			updateFeatureArt(featureEvent.feature);
+		}
 		private function featureRemovedHandler(featureEvent:FeatureEvent):void {
 			removeFeatureArt(featureEvent.feature);
 		}
 		private function rebuildHandler(event:Event):void {
 			rebuild();
-		}
-		private function drawFeatureHandler(featureEvent:FeatureEvent):void {
-			draw();
 		}
 	}
 }

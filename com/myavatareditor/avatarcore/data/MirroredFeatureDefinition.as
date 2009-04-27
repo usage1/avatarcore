@@ -25,12 +25,15 @@ package com.myavatareditor.avatarcore.data {
 	import com.myavatareditor.avatarcore.display.MirroredArtSprite;
 	
 	/**
-	 * A variation of a feature definition that creates a mirrored
-	 * duplicate (along y axis) of the definition's art.  This allows
-	 * characteristics like eyes to be both graphically similar and to 
-	 * be transformed in a synchronous fashion.  Transformations apply 
-	 * to the original art. The mirror is recreated to mirror the
-	 * transformation applied.
+	 * A variation of a feature definition that creates a mirrored duplicate
+	 * (along y axis) of the definition's art.  This allows characteristics
+	 * like eyes to be both graphically similar and to be transformed in 
+	 * a synchronous fashion.  Transformations apply to the original
+	 * art. The mirror is recreated to mirror the transformation applied.
+	 * This is not a piece of the core framework, but an extension of it. As
+	 * such, if referenced only in XML, you will need to be sure to include
+	 * a reference of the class in your SWF so that it gets compiled into
+	 * the SWF bytecode and is accessible when the XML is parsed.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class MirroredFeatureDefinition extends FeatureDefinition {
