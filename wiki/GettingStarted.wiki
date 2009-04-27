@@ -1,5 +1,7 @@
 #summary Simple code samples to get you started with the framework.
 
+<font color="#FF0000">Updated for ver 0.0.2</font>
+
 Using Avatar Core is fairly simple. Most of the hard work has already been done for you.  All you need to do is create the necessary objects and make the right connections.  Though the frameworks was specifically designed to work with XML, it is not required. In fact the XML maps directly to definitions in code.
 
 
