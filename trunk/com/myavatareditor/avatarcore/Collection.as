@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
 	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.events.EventDispatcher;
@@ -40,6 +40,18 @@ package com.myavatareditor.avatarcore.data {
 		 * within the collection by string key (as a hash).
 		 */
 		public static const nameKey:String = "name";
+		
+		/**
+		 * The name identifier for the Collection object. Within
+		 * the Avatar Core framework, names are used to make 
+		 * associations with different objects such as features 
+		 * and definitions in associated libraries.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
 		
 		/**
 		 * When true, new items of the same name of existing

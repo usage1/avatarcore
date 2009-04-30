@@ -19,9 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
+	import com.myavatareditor.avatarcore.Collection;
 	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
 	
 	/**
@@ -35,17 +35,6 @@ package com.myavatareditor.avatarcore.data {
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Library extends Collection {
-		
-		/**
-		 * Name identifier for this library. This is used by the
-		 * Definitions class to make associations with Avatar instances
-		 * that specify a libraryName property.
-		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		private var _name:String;
 		
 		/**
 		 * Constructor for new Library instances.

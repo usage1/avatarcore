@@ -21,8 +21,8 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.display {
 	
-	import com.myavatareditor.avatarcore.data.Feature;
-	import com.myavatareditor.avatarcore.data.Art;
+	import com.myavatareditor.avatarcore.Feature;
+	import com.myavatareditor.avatarcore.Art;
 	
 	/**
 	 * ArtSprite for mirrored art defined in a MiiroredFeatureDefinition.

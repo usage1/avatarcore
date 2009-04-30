@@ -19,21 +19,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
+	
+	import com.myavatareditor.avatarcore.Feature;
+	import com.myavatareditor.avatarcore.display.ArtSprite;
 	
 	/**
-	 * A collection of Transform objects for feature definitions. When
-	 * a feature definition defines different transforms for an avatar,
-	 * they are stored within the transformSet collection.
+	 * Interface for behaviors used to modify or otherwise influence
+	 * the presentation of an avatar on the screen.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class TransformSet extends SetCollection {
+	public interface IBehavior {
 		
-		/**
-		 * Constructor for creating new TransformSet instances.
-		 */
-		public function TransformSet() {
-			
-		}
+		function getArtSprites(feature:Feature, sprites:Array):Array;
+		function drawArtSprite(artSprite:ArtSprite):void;
+		function clone():IBehavior;
 	}
 }

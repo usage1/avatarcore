@@ -19,8 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
+	import com.myavatareditor.avatarcore.Feature;
 	import com.myavatareditor.avatarcore.display.ArtSprite;
 	import com.myavatareditor.avatarcore.display.MirroredArtSprite;
 	
@@ -36,14 +37,13 @@ package com.myavatareditor.avatarcore.data {
 	 * the SWF bytecode and is accessible when the XML is parsed.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class MirroredFeatureDefinition extends FeatureDefinition {
+	public class Mirror implements IBehavior {
 		
-		public function MirroredFeatureDefinition() {
+		public function Mirror() {
 			
 		}
 		
-		public override function getArtSprites(sprites:Array = null):Array {
-			var sprites:Array = super.getArtSprites(sprites);
+		public function getArtSprites(feature:Feature, sprites:Array):Array {
 			
 			// add additional sprites (the same ones again) for the mirror
 			var origArt:ArtSprite;
@@ -57,14 +57,17 @@ package com.myavatareditor.avatarcore.data {
 			return sprites;
 		}
 		
-		public override function drawArtSprite(artSprite:ArtSprite):void {
-			super.drawArtSprite(artSprite);
+		public function drawArtSprite(artSprite:ArtSprite):void {
 			var mirrorArt:MirroredArtSprite = artSprite as MirroredArtSprite;
 			if (mirrorArt){
 				mirrorArt.x = -mirrorArt.x;
 				mirrorArt.scaleX = -mirrorArt.scaleX;
 				mirrorArt.rotation = -mirrorArt.rotation;
 			}
+		}
+		
+		public function clone():IBehavior {
+			return new Mirror();
 		}
 	}
 	

@@ -19,21 +19,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
 	/**
-	 * A collection of Color objects for feature definitions. When
-	 * a feature definition defines different colors for an avatar,
-	 * they are stored within the colorSet collection.
+	 * Contains version information for the Avatar Core framework.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class ColorSet extends SetCollection {
+	public class AvatarCoreVersion {
 		
-		/**
-		 * Constructor for creating new ColorSet instances.
-		 */
-		public function ColorSet() {
-			
-		}
+		public const CURRENT_VERSION:String = "0.0.4a";
+		
 	}
+	
 }

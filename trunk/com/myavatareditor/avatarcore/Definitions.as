@@ -19,7 +19,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
+	
+	import com.myavatareditor.avatarcore.debug.print;
+	import com.myavatareditor.avatarcore.debug.PrintLevel;
+	import com.myavatareditor.avatarcore.events.SimpleDataEvent;
+	import com.myavatareditor.avatarcore.xml.XMLDefinitionParser;
+	import flash.events.ErrorEvent;
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
 	
 	/**
 	 * A collection of definitions such as Library and Avatar instances 
@@ -33,6 +44,8 @@ package com.myavatareditor.avatarcore.data {
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Definitions extends Collection {
+		
+		private var xmlLoader:URLLoader = new URLLoader();
 		
 		/**
 		 * Custom addItem which creates associations with avatars
@@ -79,7 +92,72 @@ package com.myavatareditor.avatarcore.data {
 		 * XML.
 		 */
 		public function Definitions() {
+			xmlLoader.addEventListener(Event.COMPLETE, xmlCompleteHandler, false, 0, true);
+			xmlLoader.addEventListener(IOErrorEvent.IO_ERROR, xmlCompleteHandler, false, 0, true);
+			xmlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, xmlCompleteHandler, false, 0, true);
+		}
+		
+		/**
+		 * Loads and parses an XML file into the Definitions object. 
+		 * When loaded, all collection content in this object are cleared
+		 * and the first Definitions node in the XML file is found and
+		 * parsed into this object.  A SimpleDataEvent of the type
+		 * Event.COMPLETE is dispatched when this process is complete. If 
+		 * there was an error, the COMPLETE event is still dispatched, but
+		 * the DataEvent.error property will contain the error that
+		 * occured.
+		 * @param	request A URLRequest linking to the xml file to be loaded.
+		 */
+		public function loadXML(request:URLRequest):void {
+			try {
+				xmlLoader.load(request);
+			}catch (error:Error){
+				
+				// synchronous error, dispatch event with the error
+				var completeEvent:SimpleDataEvent = new SimpleDataEvent(Event.COMPLETE, false, false, null, error);
+				dispatchEvent(completeEvent);
+			}
+		}
+		
+		private function xmlCompleteHandler(event:Event):void {
+			var completeEvent:SimpleDataEvent = new SimpleDataEvent(Event.COMPLETE, false, false, xmlLoader.data);
 			
+			if (event is ErrorEvent){
+				completeEvent.error = event;
+			}else{
+				var xml:XML;
+				
+				try {
+					xml = new XML(xmlLoader.data);
+				}catch (error:Error){
+					completeEvent.error = error;
+				}
+				
+				setXML(xml);
+			}
+			
+			dispatchEvent(completeEvent);
+		}
+		
+		/**
+		 * Sets the definition of the Definitions object based on the
+		 * XML provided, this works much in the same way as loadXML but
+		 * does not load the XML from a URL. Rather, it is passed directly
+		 * into this method.
+		 * @param	xml XML to be parsed into this Definitions object.
+		 * @throws Error Any error thrown by the XML object if parsing fails.
+		 */
+		public function setXML(xml:XML):void {
+			if (xml == null) return;
+			var definitions:XMLList = xml + xml.descendants("Definitions");
+		
+			if (definitions.length()){
+				clearCollection();
+				var parser:XMLDefinitionParser = new XMLDefinitionParser();
+				parser.parseInto(definitions[0], this); // use the first if many
+			}else{
+				print("Definitions object cannot be derived from XML because no <Definitions> node exists", PrintLevel.WARNING, this);
+			}
 		}
 	}
 }

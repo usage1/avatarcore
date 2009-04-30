@@ -21,9 +21,9 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.display {
 	
-	import com.myavatareditor.avatarcore.data.Art;
-	import com.myavatareditor.avatarcore.data.Avatar;
-	import com.myavatareditor.avatarcore.data.Feature;
+	import com.myavatareditor.avatarcore.Art;
+	import com.myavatareditor.avatarcore.Avatar;
+	import com.myavatareditor.avatarcore.Feature;
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import flash.display.Bitmap;

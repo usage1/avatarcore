@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
 	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.geom.Matrix;
@@ -165,18 +165,32 @@ package com.myavatareditor.avatarcore.data {
 		}
 		
 		/**
-		 * Fills the undefined properties of this object
-		 * with the values of the properties within the
-		 * provided transform.
-		 * @param	transform The transform object to be used
-		 * to fill in the undefined properties of this transform.
+		 * Adds another transform to this one.  This is used
+		 * to combine a base transform with a feature transform.
+		 * @param	transform The Transform whose transformation
+		 * should be added to this Transform.
 		 */
-		public function fill(transform:Transform):void {
-			if (isNaN(x)) x = transform.x;
-			if (isNaN(y)) y = transform.y;
-			if (isNaN(scaleX)) scaleX = transform.scaleX;
-			if (isNaN(scaleY)) scaleY = transform.scaleY;
-			if (isNaN(rotation)) rotation = transform.rotation;
+		public function add(transform:Transform):void {
+			if (transform == null) return;
+			x += transform.y;
+			y += transform.x;
+			scaleX += transform.scaleX;
+			scaleY += transform.scaleY;
+			rotation += transform.rotation;
+		}
+		
+		/**
+		 * Subtracts another transform from this one. 
+		 * @param	transform The Transform whose transformation
+		 * should be subtracted from this Transform.
+		 */
+		public function subtract(transform:Transform):void {
+			if (transform == null) return;
+			x -= transform.y;
+			y -= transform.x;
+			scaleX -= transform.scaleX;
+			scaleY -= transform.scaleY;
+			rotation -= transform.rotation;
 		}
 	}
 }

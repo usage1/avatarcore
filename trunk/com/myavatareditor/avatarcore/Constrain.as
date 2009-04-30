@@ -19,31 +19,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
-	
-	import flash.geom.Rectangle;
+package com.myavatareditor.avatarcore {
+
+	import com.myavatareditor.avatarcore.Feature;
+	import com.myavatareditor.avatarcore.Range;
+	import com.myavatareditor.avatarcore.Rect;
+	import com.myavatareditor.avatarcore.display.ArtSprite;
 	
 	/**
 	 * A transformation (position, scale, and rotation) constraint
-	 * for feature art.  Constraints are applied to all art assets
-	 * in an art group as though they were one.  Constraints are defined
-	 * as optional objects within Feature Definitions and are only necessary
-	 * if control of transformations are not confined to the developer, i.e.
-	 * user controls exist for modifying transformations within an editor
-	 * and that editor should asure that those transformations do not
-	 * exceed certain boundaries.
+	 * behavior for feature art.  Constrains are applied to all art assets
+	 * in an art group as though they were one. 
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Constraint {
-		
-		/**
-		 * Name identifying this constraint.
-		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		private var _name:String;
+	public class Constrain implements IBehavior {
 		
 		/**
 		 * A rectangular area to constrain the center position
@@ -79,10 +68,63 @@ package com.myavatareditor.avatarcore.data {
 		 * @param	scale Scale range value.
 		 * @param	rotation Rotation range value.
 		 */
-		public function Constraint(position:Rect = null, scale:Range = null, rotation:Range = null) {
+		public function Constrain(position:Rect = null, scale:Range = null, rotation:Range = null) {
 			this.position = position;
 			this.scale = scale;
 			this.rotation = rotation;
+		}
+		
+		public function getArtSprites(feature:Feature, sprites:Array):Array {
+			return sprites;
+		}
+		
+		/**
+		 * Draws an art sprite based on the conditions defined by
+		 * this definition.
+		 * @param	artSprite The art sprite being drawn.
+		 */
+		public function drawArtSprite(artSprite:ArtSprite):void {
+			if (artSprite == null) return;
+			
+			// position
+			if (_position){
+				if (artSprite.x < _position.left){
+					artSprite.x = _position.left;
+				}else if (artSprite.x > _position.right){
+					artSprite.x = _position.right;
+				}
+				if (artSprite.y < _position.top){
+					artSprite.y = _position.top;
+				}else if (artSprite.y > _position.bottom){
+					artSprite.y = _position.bottom;
+				}
+			}
+			
+			// rotation
+			if (_rotation){
+				if (artSprite.rotation > _rotation.max){
+					artSprite.rotation = _rotation.max;
+				}else if (artSprite.rotation < _rotation.min){
+					artSprite.rotation = _rotation.min;
+				}
+			}
+			
+			// scale
+			// TODO: constrain scaleX and scaleY individually?
+			// should min/max be absolutely based? - allowing for negative
+			// scales within the min/max ranges? ... I'm thinking yes
+			if (_scale){
+				if (artSprite.scaleX > _scale.max){
+					artSprite.scaleX = artSprite.scaleY = _scale.max;
+				}else if (artSprite.scaleX < _scale.min){
+					artSprite.scaleX = artSprite.scaleY = _scale.min;
+				}
+			}
+		}
+		
+		public function clone():IBehavior {
+			var copy:Constrain = new Constrain(_position.clone() as Rect, _scale.clone(), _rotation.clone());
+			return copy;
 		}
 	}
 }

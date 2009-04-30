@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
 package com.myavatareditor.avatarcore.xml {
-	import com.myavatareditor.avatarcore.data.ICollection;
+	
+	import com.myavatareditor.avatarcore.ICollection;
 	import flash.utils.describeType;
 	
 	/**
@@ -114,8 +115,12 @@ package com.myavatareditor.avatarcore.xml {
 					children += value;
 				}else{
 					childElem = write(value);
-					childElem.setName(propName);
-					children += childElem;
+					
+					// only add property XML if non-empty
+					if (childElem.elements().length() || childElem.attributes().length()){
+						childElem.setName(propName);
+						children += childElem;
+					}
 				}
 			}
 			
