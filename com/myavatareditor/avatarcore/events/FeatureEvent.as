@@ -21,7 +21,7 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.events {
 	
-	import com.myavatareditor.avatarcore.data.Feature;
+	import com.myavatareditor.avatarcore.Feature;
 	import flash.events.Event;
 	
 	/**
@@ -49,6 +49,10 @@ package com.myavatareditor.avatarcore.events {
 		public function FeatureEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, feature:Feature = null) {
 			super(type, bubbles, cancelable);
 			this.feature = feature;
+		}
+		
+		public override function clone():Event {
+			return new FeatureEvent(type, bubbles, cancelable, _feature);
 		}
 	}
 }

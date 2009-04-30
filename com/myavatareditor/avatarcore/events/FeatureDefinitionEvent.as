@@ -21,7 +21,7 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.events {
 	
-	import com.myavatareditor.avatarcore.data.FeatureDefinition;
+	import com.myavatareditor.avatarcore.FeatureDefinition;
 	import flash.events.Event;
 	
 	/**
@@ -40,16 +40,19 @@ package com.myavatareditor.avatarcore.events {
 		/**
 		 * The FeatureDefinition object associated with this event.
 		 */
-		public function get definition():FeatureDefinition { return _definition; }
-		public function set definition(value:FeatureDefinition):void {
-			_definition = value;
+		public function get featureDefinition():FeatureDefinition { return _featureDefinition; }
+		public function set featureDefinition(value:FeatureDefinition):void {
+			_featureDefinition = value;
 		}
-		private var _definition:FeatureDefinition;
+		private var _featureDefinition:FeatureDefinition;
 		
-		public function FeatureDefinitionEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, definition:FeatureDefinition = null) {
+		public function FeatureDefinitionEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, featureDefinition:FeatureDefinition = null) {
 			super(type, bubbles, cancelable);
-			this.definition = definition;
+			this.featureDefinition = featureDefinition;
 		}
 		
+		public override function clone():Event {
+			return new FeatureDefinitionEvent(type, bubbles, cancelable, _featureDefinition);
+		}
 	}
 }

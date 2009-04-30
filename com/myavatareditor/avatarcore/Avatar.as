@@ -19,9 +19,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
+	import com.myavatareditor.avatarcore.Collection;
+	import com.myavatareditor.avatarcore.debug.print;
+	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import com.myavatareditor.avatarcore.display.AvatarArt;
 	import com.myavatareditor.avatarcore.events.FeatureEvent;
 	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
@@ -50,15 +52,6 @@ package com.myavatareditor.avatarcore.data {
 		 * Changed library event constant.
 		 */
 		public static const LIBRARY_CHANGED:String = "libraryChanged";
-		
-		/**
-		 * The name identifier for the avatar.
-		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		private var _name:String;
 		
 		/**
 		 * The name of the library to be associated with this
@@ -104,6 +97,10 @@ package com.myavatareditor.avatarcore.data {
 			this.library = library;
 		}
 		
+		public override function toString():String {
+			return "[Avatar name:" + name + "]";
+		}
+		
 		public override function getPropertiesIgnoredByXML():Object {
 			var obj:Object = super.getPropertiesIgnoredByXML();
 			obj.library = 1;
@@ -112,7 +109,7 @@ package com.myavatareditor.avatarcore.data {
 		
 		public override function getPropertiesAsAttributesInXML():Object {
 			var obj:Object = super.getPropertiesIgnoredByXML();
-			delete obj.name;
+			obj.libraryName = 1;
 			return obj;
 		}
 		
@@ -176,7 +173,10 @@ package com.myavatareditor.avatarcore.data {
 		 */
 		public function updateFeature(feature:Feature):void {
 			if (feature == null) return;
-			if (feature != getItemByName(feature.name)) return;
+			if (feature != getItemByName(feature.name)) {
+				print(feature + " cannot be updated because it is not present in " + this, PrintLevel.WARNING, this);
+				return;
+			}
 			dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_CHANGED, false, false, feature));
 		}
 		
@@ -232,8 +232,8 @@ package com.myavatareditor.avatarcore.data {
 		
 		private function definitionChangedHandler(definitionEvent:FeatureDefinitionEvent):void {
 			// (de)couple feature of the definition name
-			if (definitionEvent.definition) {
-				var featureName:String = definitionEvent.definition.name;
+			if (definitionEvent.featureDefinition) {
+				var featureName:String = definitionEvent.featureDefinition.name;
 				var feature:Feature = getItemByName(featureName) as Feature;
 				if (feature){
 					coupleFeatureToLibrary(feature);

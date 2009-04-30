@@ -21,8 +21,8 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.xml {
 	
-	import com.myavatareditor.avatarcore.data.Collection;
-	import com.myavatareditor.avatarcore.data.ICollection;
+	import com.myavatareditor.avatarcore.Collection;
+	import com.myavatareditor.avatarcore.ICollection;
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import flash.utils.describeType;
@@ -224,8 +224,8 @@ package com.myavatareditor.avatarcore.xml {
 			}catch (error:Error){
 				// likely to occur if the definition of the class
 				// does not exist within the application
-				print("Parsing XML; cannot create a new object instance from " + type + " (" + error + ")", PrintLevel.ERROR, this);
-				throw(error);
+				print("Parsing XML; cannot locate definition for " + type, PrintLevel.WARNING, this);
+				return null;
 			}			
 			return instance;
 		}

@@ -22,18 +22,17 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.xml {
 	
 	/**
-	 * A class with definitions that guide XML creation
-	 * through the XMLDefinitionWriter class.   If a class is an
-	 * instance of IXMLWritable, the XMLDefinitionWriter class will
-	 * use the functions in this interface to guide the XML
-	 * creation process for the class instance that is being written.
+	 * An API that guides XML creation through the XMLDefinitionWriter
+	 * class.  If a class is an instance of IXMLWritable, the
+	 * XMLDefinitionWriter class will use the functions in this
+	 * interface to guide the XML creation process for the class instance
+	 * that is being written.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public interface IXMLWritable {
 		
 		/**
-		 * This method is used to create the XML representation
-		 * of the target class instance when being written to XML.  
+		 * Provides an XML representation of an object being written to XML.  
 		 * If the return value is null, the XML for the class instance
 		 * is created automatically by the XMLDefinitionWriter class.
 		 * At that point getPropertiesIgnoredByXML and
@@ -46,6 +45,7 @@ package com.myavatareditor.avatarcore.xml {
 		function getObjectAsXML():XML;
 		
 		/**
+		 * Specifies which object properties are omitted from XML.
 		 * If getObjectAsXML returns null, this method is used by
 		 * XMLDefinitionWriter to get the class members of the
 		 * object that are not written to XML. The object returned
@@ -61,8 +61,9 @@ package com.myavatareditor.avatarcore.xml {
 		function getPropertiesIgnoredByXML():Object;
 		
 		/**
-		 * If getObjectAsXML returns null, this method is used by
-		 * XMLDefinitionWriter to get the class members of the
+		 * Specifies which object properties are defined as attributes
+		 * in XML. If getObjectAsXML returns null, this method is used
+		 * by XMLDefinitionWriter to get the class members of the
 		 * object that are created as attributes.  By default, class
 		 * members are written as child elements.  Members specified
 		 * as attributes should contain primitive values such as

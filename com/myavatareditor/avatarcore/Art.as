@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
 	/**
 	 * Represents the characteristics of the visual art used
@@ -34,21 +34,6 @@ package com.myavatareditor.avatarcore.data {
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Art extends Collection {
-		
-		/**
-		 * Name identifier for the Art object. Art is referenced
-		 * by name from features through a feature's art.  If an 
-		 * Art object is acting as a container for multiple Art
-		 * assets, that container Art should be named and referenced
-		 * by the respective feature.  The child Art object names
-		 * are ignored.
-		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		
-		private var _name:String;
 		
 		/**
 		 * Horizontal location (offset) of the art graphics

@@ -21,11 +21,11 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.display {
 	
-	import com.myavatareditor.avatarcore.data.Art;
-	import com.myavatareditor.avatarcore.data.Avatar;
-	import com.myavatareditor.avatarcore.data.Feature;
-	import com.myavatareditor.avatarcore.data.FeatureDefinition;
-	import com.myavatareditor.avatarcore.data.Library;
+	import com.myavatareditor.avatarcore.Art;
+	import com.myavatareditor.avatarcore.Avatar;
+	import com.myavatareditor.avatarcore.Feature;
+	import com.myavatareditor.avatarcore.FeatureDefinition;
+	import com.myavatareditor.avatarcore.Library;
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import com.myavatareditor.avatarcore.events.FeatureEvent;
@@ -72,6 +72,7 @@ package com.myavatareditor.avatarcore.display {
 		private var displayListSortKey:String = "zIndex";
 		private var artMapSortKey:String = "src";
 		private var featureArtMap:Object = {};
+		private var suppressDraw:Boolean = false;
 		
 		/**
 		 * Constructor for creating new AvatarArt instances.
@@ -93,6 +94,8 @@ package com.myavatareditor.avatarcore.display {
 				return;
 			}
 			
+			suppressDraw = true;
+			
 			var features:Array = _avatar.collection;
 			var feature:Feature;
 			
@@ -104,6 +107,8 @@ package com.myavatareditor.avatarcore.display {
 				}
 			}
 			
+			suppressDraw = false;
+			
 			draw();
 		}
 		
@@ -114,6 +119,8 @@ package com.myavatareditor.avatarcore.display {
 		 * updateFeatureArt method to update that feature.
 		 */
 		public function draw():void {
+			if (suppressDraw) return;
+			
 			displayList.sortOn(displayListSortKey, Array.NUMERIC);
 			var artSprite:ArtSprite;
 			var i:int = displayList.length;

@@ -19,44 +19,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
 	/**
-	 * A collection of Transform objects for feature definitions. When
-	 * a feature definition defines different transforms for an avatar,
-	 * they are stored within the transformSet collection.
+	 * Interface for objects containing collections, namely
+	 * those used within a definition XML that can contain
+	 * a dynamic number of instances of various types.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class SetCollection extends Collection {
-		
-		/**
-		 * Name identifier for the set.
-		 */
-		public function get name():String { return _name; }
-		public function set name(value:String):void {
-			_name = value;
-		}
-		private var _name:String;
-		
-		/**
-		 * Name of the default item in the set for cases when
-		 * a feature does not specify a reference to one of
-		 * the set items (or its own) explicitly.
-		 */
-		public function get defaultName():String { return _defaultName; }
-		public function set defaultName(value:String):void {
-			_defaultName = value;
-		}
-		private var _defaultName:String;
-		
-		public override function getPropertiesAsAttributesInXML():Object {
-			var obj:Object = super.getPropertiesAsAttributesInXML();
-			obj.defaultName = true;
-			return obj;
-		}
-		
-		public function SetCollection() {
-			
-		}
+	public interface ICollection {
+		function copyCollectionFrom(source:ICollection):void;
+		function addItem(item:*):*;
+		function collectionItemExists(item:*):Boolean;
+		function getItemByName(key:String):*;
+		function getItemsByType(type:Class):Array;
+		function removeItem(item:*):*;
+		function removeItemByName(key:String):*;
+		function clearCollection():void;
+		function get collection():Array;
 	}
+	
 }

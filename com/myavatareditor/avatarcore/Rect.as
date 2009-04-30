@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	
 	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.geom.Rectangle;
@@ -46,6 +46,11 @@ package com.myavatareditor.avatarcore.data {
 		
 		public function getObjectAsXML():XML {
 			return null;
+		}
+		
+		public override function clone():Rectangle {
+			var copy:Rect = new Rect(x, y, width, height);
+			return copy;
 		}
 	}
 }

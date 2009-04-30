@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. 
 */
-package com.myavatareditor.avatarcore.data {
+package com.myavatareditor.avatarcore {
 	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	
 	/**
@@ -63,6 +63,11 @@ package com.myavatareditor.avatarcore.data {
 		
 		public function toString():String {
 			return "[Range "+_min+", "+_max+"]";
+		}
+		
+		public function clone():Range {
+			var copy:Range = new Range(_min, _max);
+			return copy;
 		}
 		
 		public function getPropertiesIgnoredByXML():Object {
