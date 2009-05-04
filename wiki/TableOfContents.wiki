@@ -2,3 +2,5 @@
   * [Introduction]
   * [GettingStarted]
   * [XMLFormat]
+<hr />
+  * [http://www.myavatareditor.com/avatarcore/docs/ API Documentation]
