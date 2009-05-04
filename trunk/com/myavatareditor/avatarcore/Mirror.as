@@ -26,11 +26,10 @@ package com.myavatareditor.avatarcore {
 	import com.myavatareditor.avatarcore.display.MirroredArtSprite;
 	
 	/**
-	 * A variation of a feature definition that creates a mirrored duplicate
-	 * (along y axis) of the definition's art.  This allows characteristics
-	 * like eyes to be both graphically similar and to be transformed in 
-	 * a synchronous fashion.  Transformations apply to the original
-	 * art. The mirror is recreated to mirror the transformation applied.
+	 * A behavior that creates a mirrored duplicate (along y axis) of a
+	 * feature's art.  This allows characteristics like eyes to be both
+	 * graphically similar and to be transformed in a synchronous fashion.
+	 * Mirror art is recreated to mirror the original transformation applied.
 	 * This is not a piece of the core framework, but an extension of it. As
 	 * such, if referenced only in XML, you will need to be sure to include
 	 * a reference of the class in your SWF so that it gets compiled into
@@ -39,6 +38,9 @@ package com.myavatareditor.avatarcore {
 	 */
 	public class Mirror implements IBehavior {
 		
+		/**
+		 * Constructor for creating new Mirror instances.
+		 */
 		public function Mirror() {
 			
 		}
@@ -51,7 +53,7 @@ package com.myavatareditor.avatarcore {
 			var i:int = sprites.length;
 			while (i--){
 				origArt = sprites[i] as ArtSprite;
-				mirrorArt = new MirroredArtSprite(origArt.art, origArt.feature, origArt);
+				mirrorArt = new MirroredArtSprite(origArt.art, feature, origArt);
 				sprites.push(mirrorArt);
 			}
 			return sprites;
@@ -70,5 +72,4 @@ package com.myavatareditor.avatarcore {
 			return new Mirror();
 		}
 	}
-	
 }

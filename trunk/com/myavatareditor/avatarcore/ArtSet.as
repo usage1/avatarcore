@@ -53,6 +53,16 @@ package com.myavatareditor.avatarcore {
 		private var _colorize:Number; // default: NaN
 		
 		/**
+		 * Default smoothing for child Art objects if their
+		 * smoothing is NaN when added to the ArtSet.
+		 */
+		public function get smoothing():Number { return _smoothing; }
+		public function set smoothing(value:Number):void {
+			_smoothing = smoothing;
+		}
+		private var _smoothing:Number;
+		
+		/**
 		 * Constructor for new ArtSet instances.
 		 */
 		public function ArtSet() {
@@ -71,7 +81,7 @@ package com.myavatareditor.avatarcore {
 			// assign default properties to added art
 			if (item is Art) {
 				var artItem:Art = item as Art;
-				artItem.assignDefaults(zIndex, colorize);
+				artItem.assignDefaults(_zIndex, _colorize, _smoothing);
 			}
 			
 			return super.addItem(item);

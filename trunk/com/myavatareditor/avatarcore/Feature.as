@@ -47,20 +47,26 @@ package com.myavatareditor.avatarcore {
 		 * A specific Art object to be applied to an avatar. This can contain
 		 * an Art definition or, if a name property is defined, be linked
 		 * to an Art definition within a respective FeatureDefinition object.
+		 * When set, the feature is automatically updated.
 		 */
 		public function get art():Art { return _art; }
 		public function set art(value:Art):void {
+			if (_art == value) return;
 			_art = value;
+			update();
 		}
 		private var _art:Art;
 			
 		/**
 		 * Style name for this feature.  When defined, art associated
 		 * with this feature must be of the same style to be visible.
+		 * When set, the feature is automatically updated.
 		 */
 		public function get artStyle():String { return _artStyle; }
 		public function set artStyle(value:String):void {
+			if (_artStyle == value) return;
 			_artStyle = value;
+			update();
 		}
 		private var _artStyle:String; // defaults to not using
 		
@@ -68,10 +74,13 @@ package com.myavatareditor.avatarcore {
 		 * A specific color to be applied to an avatar. This can contain
 		 * a Color definition or, if a name property is defined, be linked
 		 * to an Color definition within a respective FeatureDefinition object.
+		 * When set, the feature is automatically updated.
 		 */
 		public function get color():Color { return _color; }
 		public function set color(value:Color):void {
+			if (_color == value) return;
 			_color = value;
+			update();
 		}
 		private var _color:Color;
 		
@@ -81,11 +90,14 @@ package com.myavatareditor.avatarcore {
 		 * applied (x=0, y=0, scale=1, rotation=0). If a name property is
 		 * defined, it can be linked to an Color definition within a 
 		 * respective FeatureDefinition object.  This transform is applied
-		 * on top of a definitions baseTransform if defined.
+		 * on top of a definitions baseTransform if defined. When set, the
+		 * feature is automatically updated.
 		 */
 		public function get transform():Transform { return _transform; }
 		public function set transform(value:Transform):void {
+			if (_transform == value) return;
 			_transform = value;
+			update();
 		}
 		private var _transform:Transform;
 		
@@ -97,7 +109,8 @@ package com.myavatareditor.avatarcore {
 		 * item within the definition's art set collection.  Otherwise
 		 * the value is null. If artName is set when art is null,
 		 * a new Art instance will be created and its name set
-		 * to the value given to artName.
+		 * to the value given to artName. When set, the feature is 
+		 * automatically updated.
 		 */
 		public function get artName():String {
 			if (_art && _art.name) {
@@ -127,6 +140,7 @@ package com.myavatareditor.avatarcore {
 				_art = new Art();
 			}
 			_art.name = value;
+			update();
 		}
 		
 		/**
@@ -137,7 +151,8 @@ package com.myavatareditor.avatarcore {
 		 * item within the definition's color set collection.  Otherwise
 		 * the value is null. If colorName is set when color is null,
 		 * a new Color instance will be created and its name set
-		 * to the value given to colorName.
+		 * to the value given to colorName. When set, the feature is 
+		 * automatically updated.
 		 */
 		public function get colorName():String {
 			if (_color && _color.name) {
@@ -166,6 +181,7 @@ package com.myavatareditor.avatarcore {
 				_color = new Color();
 			}
 			_color.name = value;
+			update();
 		}
 		
 		/**
@@ -176,7 +192,8 @@ package com.myavatareditor.avatarcore {
 		 * item within the definition's transform set collection.  Otherwise
 		 * the value is null. If transformName is set when transform is null,
 		 * a new Transform instance will be created and its name set
-		 * to the value given to transformName.
+		 * to the value given to transformName. When set, the feature is 
+		 * automatically updated.
 		 */
 		public function get transformName():String {
 			if (_transform && _transform.name) {
@@ -205,19 +222,27 @@ package com.myavatareditor.avatarcore {
 				_transform = new Transform();
 			}
 			_transform.name = value;
+			update();
 		}
 		
+		
 		/**
-		 * Gets the feature definition associated with this
-		 * avatar feature.
+		 * The avatar that is associated with this feature.  This is 
+		 * usually set automatically when the feature is added to an avatar
+		 * through Avatar.addItem(). This property serves as a reference
+		 * to the avatar instance in that relationship.
 		 */
-		public function get definition():FeatureDefinition {
-			return _definition;
+		public function get avatar():Avatar {
+			return _avatar;
 		}
+		public function set avatar(value:Avatar):void {
+			_avatar = value;
+		}
+		private var _avatar:Avatar;
 		
 		/**
-		 * Sets the feature definition that is to be associated
-		 * with this avatar feature.  This is usually set automatically
+		 * The feature definition that is to be associated with this
+		 * avatar feature.  This is usually set automatically
 		 * when the avatar is associated with a library or when a 
 		 * feature is added to an avatar that has an associated library.
 		 * These associations are made when the name of the definition
@@ -225,8 +250,13 @@ package com.myavatareditor.avatarcore {
 		 * feature when it has no name, it automatically inherits the
 		 * name from the definition.
 		 */
-		public function set definition(definition:FeatureDefinition):void {
-			_definition = definition;
+		public function get definition():FeatureDefinition {
+			return _definition;
+		}
+		public function set definition(value:FeatureDefinition):void {
+			if (_definition == value) return;
+			
+			_definition = value;
 			
 			if (_definition){
 				
@@ -262,13 +292,29 @@ package com.myavatareditor.avatarcore {
 			obj.colorName = 1;
 			obj.transformName = 1;
 			obj.definition = 1;
+			obj.avatar = 1;
 			return obj;
 		}
 		
 		/**
-		 * Copies feature characteristics (Art, Colors, and Transforms)
-		 * from the referenced feature definition into the feature's
-		 * own characteristics.  This would be used to create a self-contained
+		 * Shortcut to calling Avatar.updateFeature() with this feature
+		 * if this feature has been added to the collection of an
+		 * Avatar instance. This would be the same as calling
+		 * feature.avatar.updateFeature(feature);  Some properties, when
+		 * set, will automatically call update to inform the linked avatar
+		 * of changes.  For changes that do not, this should be called
+		 * manually, either through Feature.update or Avatar.updateFeature.
+		 */
+		public function update():void {
+			if (_avatar){
+				_avatar.updateFeature(this);
+			}
+		}
+		
+		/**
+		 * Copies feature characteristics (Art, Colors, Transforms, and behaviors)
+		 * from the referenced feature definition into the feature's own
+		 * characteristics.  This would be used to create a self-contained
 		 * version of the feature that would be able to be displayed 
 		 * without the library.
 		 */
@@ -316,7 +362,7 @@ package com.myavatareditor.avatarcore {
 			
 			// use definition art through name reference if available
 			// otherwise fallback to local art object
-			var featureArt:Art = getFeatureArt();
+			var featureArt:Art = getRenderedArt();
 			var i:int;
 			var collection:Array;
 			
@@ -378,7 +424,16 @@ package com.myavatareditor.avatarcore {
 			return sprites;
 		}
 		
-		private function getFeatureArt():Art {
+		/**
+		 * Returns the Art object used by this feature to display itself
+		 * visually.  This can come from one of two source, the feature's
+		 * own art definition, or a referenced Art in an artSet from a
+		 * linked FeatureDefinition instance.  If such an Art object does not
+		 * exist, null is returned.
+		 * @return The Art object used by this feature to display itself
+		 * visually.
+		 */
+		public function getRenderedArt():Art {
 			var featureArt:Art;
 			if (_definition){
 				// art from definition
@@ -392,8 +447,18 @@ package com.myavatareditor.avatarcore {
 			// unlike with transform and color, art here can be null
 			return featureArt;
 		}
-				
-		private function getFeatureTransform():Transform {
+		
+		/**
+		 * Returns the Transform object used by this feature to display itself
+		 * visually. This transform is a combination of any baseTransform as well
+		 * as the defined transform. This can come from one of two source, the feature's
+		 * own transform and baseTransform definitions, or those referenced from a
+		 * linked FeatureDefinition instance.  If such a Transform object does not
+		 * exist, a new, default Transform instance is returned.
+		 * @return The Transform object used by this feature to display itself
+		 * visually.
+		 */
+		public function getRenderedTransform():Transform {
 			var featureBaseTransform:Transform;
 			var featureTransform:Transform;
 			
@@ -426,7 +491,16 @@ package com.myavatareditor.avatarcore {
 			return featureTransform || new Transform();
 		}
 		
-		private function getFeatureColor():Color {
+		/**
+		 * Returns the Color object used by this feature to display itself
+		 * visually.  This can come from one of two source, the feature's
+		 * own color definition, or a referenced Color in a colorSet from a
+		 * linked FeatureDefinition instance. If such a Color object does not
+		 * exist, a new, default Color instance is returned.
+		 * @return The Color object used by this feature to display itself
+		 * visually.
+		 */
+		public function getRenderedColor():Color {
 			var featureColor:Color;
 			if (_definition){
 				// color from definition
@@ -443,6 +517,45 @@ package com.myavatareditor.avatarcore {
 		}
 		
 		/**
+		 * Finds and returns the parent feature associated with this
+		 * feature in the same avatar instance.  Null is returned if
+		 * no parent feature is specified in Feature.parentName. If
+		 * parentName is set, but the parent cannot be found, an
+		 * Error is thrown.
+		 * @throws Error When parentName is specified for the feature
+		 * and the parent feature by that name cannot be found.
+		 * @return The Feature instance representing this feature's
+		 * parent.
+		 */
+		public function getParentFeature():Feature {
+			var parentFeature:Feature;
+			var parentFeatureName:String;
+			if (_definition){
+				parentFeatureName = _definition.parentName;
+			}
+			if (parentFeatureName == null){
+				parentFeatureName = parentName;
+			}
+			if (parentFeatureName){
+				if (_avatar == null){
+					throw new Error("Parent feature for "+this+"could not be found because its avatar is not set");
+				}
+				parentFeature = _avatar.getItemByName(parentFeatureName) as Feature;
+				
+				// if a parent name (parentFeatureName) is found, it's expected
+				// that the parent feature exists.  If not, an error is
+				// thrown. Null cannot be returned in this case since null
+				// is returned when no parent name exists and a parent feature
+				// is not expected
+				if (parentFeature == null){
+					throw new Error("Parent feature for "+this+"could not be found");
+				}
+			}
+			
+			return parentFeature;
+		}
+		
+		/**
 		 * Applies feature transformations to an art sprite. This
 		 * is called internally by AvatarArt to render the sprites
 		 * it creates to present the avatar on screen.
@@ -453,13 +566,13 @@ package com.myavatareditor.avatarcore {
 			if (artSprite == null) return;
 			
 			// apply transform
-			artSprite.transform.matrix = getFeatureTransform().getMatrix();
+			artSprite.transform.matrix = getRenderedTransform().getMatrix();
 	
 			// apply color
 			// 0 colorize -> no color; NaN/other colorize -> color
 			var spriteArt:Art = artSprite.art;
 			artSprite.transform.colorTransform = (spriteArt && spriteArt.colorize !== 0)
-					? getFeatureColor()
+					? getRenderedColor()
 					: new ColorTransform();
 			
 			// call drawArtSprite for behaviors
@@ -479,7 +592,7 @@ package com.myavatareditor.avatarcore {
 		
 		private function parentTransformArtSprite(artSprite:ArtSprite):void {
 			
-			var parentMatrix:Matrix = getParentTransformMatrix(artSprite.avatar);
+			var parentMatrix:Matrix = getParentTransformMatrix();
 			if (parentMatrix){
 				
 				// parent transform correctly found/created
@@ -504,14 +617,14 @@ package com.myavatareditor.avatarcore {
 			}
 		}
 		
-		private function getParentTransformMatrix(avatar:Avatar):Matrix {
+		private function getParentTransformMatrix():Matrix {
 			
 			var matrix:Matrix = new Matrix(); // does not include this feature's transform
 			var recursionLookup:Dictionary = new Dictionary(true); // check to make sure parents don't create loop
 			var parentFeature:Feature;
 			
 			try {
-				parentFeature = getParentFeature(avatar);
+				parentFeature = getParentFeature();
 			}catch (error:Error){
 				// expected a feature and it was not found
 				print(error.message, PrintLevel.DEBUG, this);
@@ -526,18 +639,18 @@ package com.myavatareditor.avatarcore {
 			while (parentFeature){
 			
 				// make sure art is available in parent making it visible
-				if (parentFeature.getFeatureArt() == null){
+				if (parentFeature.getRenderedArt() == null){
 					print("Feature parent matrix unresolved due to lack of parent art", PrintLevel.DEBUG, this);
 					return null;
 				}
 				
 				// combine parent matrix with the current
-				matrix.concat(parentFeature.getFeatureTransform().getMatrix());
+				matrix.concat(parentFeature.getRenderedTransform().getMatrix());
 				
 				// find next parent
 				recursionLookup[parentFeature] = true;
 				try {
-					parentFeature = parentFeature.getParentFeature(avatar);
+					parentFeature = parentFeature.getParentFeature();
 				}catch (error:Error){
 					// expected a feature and it was not found
 					print(error.message, PrintLevel.DEBUG, this);
@@ -555,31 +668,6 @@ package com.myavatareditor.avatarcore {
 			// end of hierarchy; no more parent features
 			// return matrix up to this point
 			return matrix;
-		}
-		
-		private function getParentFeature(avatar:Avatar):Feature {
-			var parentFeature:Feature;
-			var parentFeatureName:String;
-			if (_definition){
-				parentFeatureName = _definition.parentName;
-			}
-			if (parentFeatureName == null){
-				parentFeatureName = parentName;
-			}
-			if (parentFeatureName){
-				parentFeature = avatar.getItemByName(parentFeatureName) as Feature;
-				
-				// if a parent name (parentFeatureName) is found, it's expected
-				// that the parent feature exists.  If not, an error is
-				// thrown. Null cannot be returned in this case since null
-				// is returned when no parent name exists and a parent feature
-				// is not expected
-				if (parentFeature == null){
-					throw new Error("Parent feature could not be found");
-				}
-			}
-			
-			return parentFeature;
 		}
 	}
 }

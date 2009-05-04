@@ -45,13 +45,30 @@ package com.myavatareditor.avatarcore {
 		private var _position:Rect;
 		
 		/**
-		 * The possible scale values for art sprites.
+		 * The possible scaleX values for art sprites. Scale
+		 * constraints are calculated based on absolute values
+		 * where both negative and positive scales are constrained
+		 * within the positive ranges of the range value
+		 * (with negative scales remaining negative).
 		 */
-		public function get scale():Range { return _scale; }
-		public function set scale(value:Range):void {
-			_scale = value;
+		public function get scaleX():Range { return _scaleX; }
+		public function set scaleX(value:Range):void {
+			_scaleX = value;
 		}
-		private var _scale:Range;
+		private var _scaleX:Range;
+		
+		/**
+		 * The possible scaleY values for art sprites. Scale
+		 * constraints are calculated based on absolute values
+		 * where both negative and positive scales are constrained
+		 * within the positive ranges of the range value
+		 * (with negative scales remaining negative).
+		 */
+		public function get scaleY():Range { return _scaleY; }
+		public function set scaleY(value:Range):void {
+			_scaleY = value;
+		}
+		private var _scaleY:Range;
 		
 		/**
 		 * The possible rotation values for art sprites.
@@ -65,22 +82,30 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * Constructor for creating new Constraint instances.
 		 * @param	position Position rectagnle value.
-		 * @param	scale Scale range value.
+		 * @param	scaleX ScaleX range value.
+		 * @param	scaleY ScaleY range value.
 		 * @param	rotation Rotation range value.
 		 */
-		public function Constrain(position:Rect = null, scale:Range = null, rotation:Range = null) {
+		public function Constrain(position:Rect = null, scaleX:Range = null, scaleY:Range = null, rotation:Range = null) {
 			this.position = position;
-			this.scale = scale;
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
 			this.rotation = rotation;
 		}
 		
+		/**
+		 * Returns the same sprites defined by the feature.
+		 * @param	feature
+		 * @param	sprites
+		 * @return
+		 */
 		public function getArtSprites(feature:Feature, sprites:Array):Array {
 			return sprites;
 		}
 		
 		/**
-		 * Draws an art sprite based on the conditions defined by
-		 * this definition.
+		 * Confines sprites within the region specified by the 
+		 * constrain properties. 
 		 * @param	artSprite The art sprite being drawn.
 		 */
 		public function drawArtSprite(artSprite:ArtSprite):void {
@@ -110,20 +135,30 @@ package com.myavatareditor.avatarcore {
 			}
 			
 			// scale
-			// TODO: constrain scaleX and scaleY individually?
-			// should min/max be absolutely based? - allowing for negative
-			// scales within the min/max ranges? ... I'm thinking yes
-			if (_scale){
-				if (artSprite.scaleX > _scale.max){
-					artSprite.scaleX = artSprite.scaleY = _scale.max;
-				}else if (artSprite.scaleX < _scale.min){
-					artSprite.scaleX = artSprite.scaleY = _scale.min;
+			var absScale:Number;
+			var negScale:Boolean;
+			if (_scaleX){
+				absScale = Math.abs(artSprite.scaleX);
+				negScale = Boolean(artSprite.scaleX < 0);
+				if (artSprite.scaleX > _scaleX.max){
+					artSprite.scaleX = negScale ? -_scaleX.max : _scaleX.max;
+				}else if (absScale < _scaleX.min){
+					artSprite.scaleX = negScale ? -_scaleX.min : _scaleX.min;
+				}
+			}
+			if (_scaleY){
+				absScale = Math.abs(artSprite.scaleY);
+				negScale = Boolean(artSprite.scaleY < 0);
+				if (absScale > _scaleY.max){
+					artSprite.scaleY = negScale ? -_scaleY.max : _scaleY.max;
+				}else if (absScale < _scaleY.min){
+					artSprite.scaleY = negScale ? -_scaleY.min : _scaleY.min;
 				}
 			}
 		}
 		
 		public function clone():IBehavior {
-			var copy:Constrain = new Constrain(_position.clone() as Rect, _scale.clone(), _rotation.clone());
+			var copy:Constrain = new Constrain(_position.clone() as Rect, _scaleX.clone(),  _scaleY.clone(), _rotation.clone());
 			return copy;
 		}
 	}

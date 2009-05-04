@@ -23,10 +23,11 @@ package com.myavatareditor.avatarcore.xml {
 	
 	/**
 	 * An API that guides XML creation through the XMLDefinitionWriter
-	 * class.  If a class is an instance of IXMLWritable, the
+	 * class.  If an object is of the type IXMLWritable, the
 	 * XMLDefinitionWriter class will use the functions in this
 	 * interface to guide the XML creation process for the class instance
-	 * that is being written.
+	 * that is being written.  Otherwise XMLDefinitionWriter will use
+	 * its own default process.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public interface IXMLWritable {

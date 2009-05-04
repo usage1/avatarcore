@@ -27,9 +27,11 @@ package com.myavatareditor.avatarcore.display {
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.LoaderInfo;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
@@ -51,11 +53,7 @@ package com.myavatareditor.avatarcore.display {
 		 * object that contains this art sprite.
 		 */
 		public function get avatar():Avatar {
-			var avatarArt:AvatarArt = parent as AvatarArt;
-			if (avatarArt){
-				return avatarArt.avatar;
-			}
-			return null;
+			return _feature ? _feature.avatar : null;
 		}
 		
 		/**
@@ -117,12 +115,26 @@ package com.myavatareditor.avatarcore.display {
 			return _src;
 		}
 		public function set src(value:String):void {
-			if (value == _src) return;
+			if (value == null){
+				_src = null;
+				_srcFrame = null;
+			}else{
+				
+				// separate any frame values from src
+				var parts:Array = value.split("#");
+				if (parts.length > 1){
+					_src = parts[0];
+					_srcFrame = parts[1];
+				}else{
+					_src = value;
+					_srcFrame = null;
+				}
+			}
 			
-			_src = value;
 			loadSourceContent();
 		}
 		private var _src:String;
+		private var _srcFrame:String;
 		
 		private var loader:Loader;
 			
@@ -162,13 +174,22 @@ package com.myavatareditor.avatarcore.display {
 			
 			// try loading source as a class definition
 			try {
+				
 				var displayClass:Class = getDefinitionByName(_src) as Class;
-				addChild(new displayClass() as DisplayObject);
+				var content:* = new displayClass();
+				
+				// class can be for bitmaps or display objects
+				content = (content is BitmapData)
+					? new Bitmap(content as BitmapData)
+					: DisplayObject(content);
+				
+				applyContentProperties(content);
+				addChild(content);
 				return;
+				
 			}catch (error:Error){
 				print("Art Generation; class definition for asset '"+_src+"' not found ("+error+"). Attempting to load as external asset...", PrintLevel.DEBUG, this);
 			}
-			
 			
 			// try loading source as a URL
 			try {
@@ -185,7 +206,10 @@ package com.myavatareditor.avatarcore.display {
 		 * by the feature referenced by the art sprite.
 		 */
 		public function draw():void {
-			if (parent == null || _feature == null) return;
+			if (_feature == null) {
+				print("Cannot draw art sprite because feature is not defined", PrintLevel.WARNING, this);
+				return;
+			}
 			_feature.drawArtSprite(this);
 		}
 		
@@ -209,21 +233,43 @@ package com.myavatareditor.avatarcore.display {
 		 */
 		public function clearContent():void {
 			while (numChildren){
-				removeChildAt(0);
+				var playable:MovieClip = removeChildAt(0) as MovieClip;
+				// if a movie clip, prevent additional playback
+				if (playable){
+					playable.stop();
+				}
 			}
 			
 			loaderCleanup();
 		}
 		
 		private function loaderCompleteHandler(event:Event):void {
-			// smooth loaded bitmaps
-			var contentAsBitmap:Bitmap = LoaderInfo(event.currentTarget).content as Bitmap;
-			if (contentAsBitmap){
-				contentAsBitmap.smoothing = true;
+			// make sure this complete handler is for 
+			// the current loader and not some rogue loader
+			// for content that got replaced during loading
+			if (event.currentTarget != loader){
+				return;
 			}
 			
+			// loader isn't added until after it's loaded
+			addChild(loader);
+			
 			// update visually
+			applyContentProperties(loader.content);
 			applyArtTransforms();
+		}
+		
+		private function applyContentProperties(content:DisplayObject):void {
+			
+			// smooth bitmaps?
+			if (_art && content is Bitmap){
+				Bitmap(content).smoothing = isNaN(_art.smoothing) || Boolean(_art.smoothing);
+			}
+			
+			// go to specified content frame
+			if (_srcFrame && content is MovieClip){
+				MovieClip(content).gotoAndStop(_srcFrame);
+			}
 		}
 		
 		private function applyArtTransforms():void {
@@ -247,7 +293,6 @@ package com.myavatareditor.avatarcore.display {
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleteHandler, false, 0, true);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loaderErrorHandler, false, 0, true);
 			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, loaderErrorHandler, false, 0, true);
-			addChild(loader);
 		}
 		
 		private function loaderCleanup():void {
@@ -256,6 +301,12 @@ package com.myavatareditor.avatarcore.display {
 			try {
 				loader.close();
 			}catch (error:Error){}
+			
+			// if a movie clip, prevent additional playback
+			var playable:MovieClip = loader.content as MovieClip;
+			if (playable){
+				playable.stop();
+			}
 			
 			loader.unload();
 			if (loader.parent){

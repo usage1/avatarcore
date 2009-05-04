@@ -58,7 +58,11 @@ package com.myavatareditor.avatarcore {
 		 * items will cause the existing items to be removed
 		 * before added to the collection themselves.
 		 */
-		public var requireUniqueNames:Boolean = true;
+		public function get requireUniqueNames():Boolean { return _requireUniqueNames; }
+		public function set requireUniqueNames(value:Boolean):void {
+			_requireUniqueNames = value;
+		}
+		private var _requireUniqueNames:Boolean = true;
 		
 		/**
 		 * Collection array where items are stored.  Items are
@@ -116,6 +120,7 @@ package com.myavatareditor.avatarcore {
 				}
 			}
 		}
+		
 		/**
 		 * Adds an object to the collection.  The object
 		 * must be non-null.  If the lookup attribute
@@ -148,7 +153,7 @@ package com.myavatareditor.avatarcore {
 					_collection[itemName] = item;
 					
 				}else{
-					// if null, force lookup key to be the
+					// if null, force name key to be the
 					// index at which the item is stored
 					// in the collection as an array
 					item[nameKey] = String(_collection.length);
