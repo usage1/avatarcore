@@ -1,4 +1,5 @@
 #summary Format of the XML used to define Library and Avatar objects.
+#sidebar TableOfContents
 
 <font color="#FF0000">Updated for ver 0.0.3</font>
 
