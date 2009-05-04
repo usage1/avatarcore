@@ -1,6 +1,8 @@
 #summary Table of contents
+  * [http://code.google.com/p/avatarcore Project Home]
+----
   * [Introduction]
   * [GettingStarted]
   * [XMLFormat]
-<hr />
+----
   * [http://www.myavatareditor.com/avatarcore/docs/ API Documentation]
