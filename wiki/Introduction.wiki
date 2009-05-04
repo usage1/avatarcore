@@ -2,7 +2,7 @@
 #labels Featured
 #sidebar TableOfContents
 
-<font color="#FF0000">Updated for ver 0.0.2</font>
+<font color="#FF0000">Updated for ver 0.0.5</font>
 
 Avatar Core is an open source, client-side framework for describing and displaying avatar characters.  Currently, it is implemented with Flash and ActionScript 3.0.
 
@@ -10,58 +10,61 @@ Avatar Core is an open source, client-side framework for describing and displayi
 
 The primary goal of Avatar Core is to make a simple, yet feature-rich framework for avatar creation and presentation that can be easily updated or changed with no or minimal interaction with source code.  More specifically, the framework should allow individual avatar characters, as well as the possible combinations that make up their characteristics, to be defined entirely in XML and loaded into an Avatar application (viewer or editor) at runtime giving complete control to the content creators.
 
-== Basic Design == 
+== Basic Design ==
 
-The framework is made up of a number of components, many of which are optional.  Typical usage includes the use of XML to define:
-  * One or more Library objects
-  * One or more Avatar objects
-Library objects define the possible features (along with each variation) avatars can contain.  Each feature defined this way in a library is defined in a FeatureDefinition object.
+==== Displaying Avatars ====
 
-Avatar objects define what features an avatar currently contain.  Avatars define these through Feature objects.  These can be self-contained, but when using libraries, will alternatively link to what is available from the possible selections within the library's related FeatureDefinition object.
+Avatar characters are represented in the framework by Avatar objects.  Avatar objects contain any data related avatars including their visual characteristics. These visuals are represented by Feature objects.  Features define different parts of an avatar including those such as the eyes, nose, or mouth.  Each feature may use one many possible variations of the same characteristic.  Which variation being used is defined by the feature's referenced Art object.  Art directly specifies the visual assets (PNG, SWF, etc.) currently being used to show a feature.
 
-<img src="http://www.myavatareditor.com/avatarcore/images/basic_uml_diagram.jpg" title="Basic UML Diagram" alt="Basic UML Diagram" />
+AvatarArt objects are used to collectively gather up and assemble an avatar's art for presentation to the user. They represent the display of the data contained within the Avatar, Feature, and Art objects.
 
-Library and Avatar objects can be defined in XML.
+<img src="http://www.myavatareditor.com/avatarcore/images/uml_avatar_avatarart.jpg" alt="Avatar Class Diagram" />
 
+==== Creating and Modifying Avatars ====
+
+Collections of possible feature variations are contained within Library objects.   Instead of Features, Libraries contain FeatureDefinition objects.  FeatureDefinition objects contain multiple Art objects from which a related Feature within an Avatar can select from.  A Library is the means by which an avatar editor client knows which options to present to a user as possible variations for their avatar's features.
+
+<img src="http://www.myavatareditor.com/avatarcore/images/uml_library_avatarart.jpg" alt="Avatar Class Diagram with Library" />
+
+(Connections between Feature, FeatureDefinition, and Art objects are made through their name properties.)
+
+==== XML ====
+
+Data used to describe avatars and libraries can be represented with XML. XML definitions mirror their respective object definitions in code. In fact, the XML parser within the Avatar Core framework is generic enough that it can be used to create just about any object through an XML representation.
+
+By having data in XML, developers or content creators have complete control over what avatars look like and what options are presented to the user for avatar modification without having to modify a client application.
+
+The following example is a very simple Library definition in XML:
 {{{
-<?xml version="1.0" encoding="utf-8" ?>
-<Definitions xmlns="com.myavatareditor.avatarcore.data">
+<Library>
 
-	<Library>
-		
-		<FeatureDefinition name="Nose">
-			<artSet zIndex="2">
-				<Art name="Round" src="NoseStandard" />
-				<Art name="Piggy" src="NoseUp" />
-				<Art name="Rigid" src="NoseRigid" />
-			</artSet>
-		</FeatureDefinition>
-		
-		<FeatureDefinition name="Mouth">
-			<artSet zIndex="1">
-				<Art name="Straight" src="MouthFlat" />
-				<Art name="Grin" src="MouthGrin" />
-			</artSet>
-		</FeatureDefinition>
-	</Library>
-
-	<Avatar>
-		<Feature name="Nose">
-			<artName>Round</artName>
-		</Feature>
-		
-		<Feature name="Mouth">
-			<artName>Kissy</artName>
-		</Feature>
-	</Avatar>
-
-</Definitions>
+	<FeatureDefinition name="Eyes">
+		<artSet>
+			<Art name="Round" src="EyesRound.png" />
+			<Art name="Square" src="EyesSquare.png" />
+			<Art name="Closed" src="EyesClosed.png" />
+		</artSet>
+	</FeatureDefinition>
+	
+	<FeatureDefinition name="Mouth">
+		<artSet>
+			<Art name="Smile" src="MouthSmile.png" />
+			<Art name="Frown" src="MouthFrown.png" />
+		</artSet>
+	</FeatureDefinition>
+	
+</Library>
 }}}
 
-== Basic Workflow == 
 
-An Editor application loads a Library definition from XML or creates one internally programmatically.  When a user decides to create an avatar, new, default Avatar and AvatarArt instances are created for the user.  The Avatar object references the library; the AvatarArt object references the Avatar.  As items are selected by the user from the library (its visual representation is determined by the custom editor client), they are added to and referenced from the Avatar object.  The AvatarArt is updated to reflect those changes so they can be seen visually.  When finished, The user saves and completes their work with the editor.
+== Additional Features ==
 
-Upon saving, the editor has a few options:
-  * A bitmap image can be created from the AvatarArt and provided to the user.  This can be presented as a download for the user or saved to a server for reference by unique URL.
-  * The data in the Avatar object can be provided to the user. As with the image, this can be saved to a database and referenced through a unique id, or provided to the user as raw data.  Then an avatar viewer (e.g. a SWF that reads the saved avatar and its library to produce and display an AvatarArt) can be used to view that data.
+When displaying avatar characters, you only really need to work with Avatar, Feature, Art, and AvatarArt instances.  They are the core set of classes fo getting avatar visuals on the screen.
+
+The editability requirements for avatars brings to use Library and FeatureDefinition objects.  These objects give options for selecting different feature art.  But additional editability options may also be necessary.  Avatar Core includes additional control over features in the form of Transform and Color objects
+
+Transforms are used to specify where (and how) on the screen a feature is to be positioned.  They can also control art size and rotation.  As with Art, FeatureDefinition objects can specify a set of transforms from which a user can select from, though it is also possible to leave transformations open for the user to specify themselves without limitation.
+
+Colors are used to colorize art. You may have a feature art that visually remains the same asside from variations in color. Instead of creating multiple copies of that art, the same art can be used with different variations of color applied to it.  Like Transform objects, Color objects can also be presented as a restricted set or left open for specification without limitation.
+
+A more advanced feature of the Avatar Core framework is behaviors. Behaviors are components referenced by features that further influence the presentation of an avatar feature.  Behaviors can influence avatar presentation both when AvatarArt collects Art as individual sprites and when AvatarArt draws those sprites to the screen.
