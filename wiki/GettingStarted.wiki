@@ -1,4 +1,5 @@
 #summary Simple code samples to get you started with the framework.
+#sidebar TableOfContents
 
 <font color="#FF0000">Updated for ver 0.0.2</font>
 
