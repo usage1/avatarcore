@@ -30,8 +30,10 @@ package com.myavatareditor.avatarcore.xml {
 	import flash.utils.getQualifiedClassName;
 	
 	/**
-	 * A generic XML parser for parsing XML into an object of
-	 * a non-specific type. Attributes and child elements within a
+	 * A generic XML parser for parsing XML into an object of its respective
+	 * type. Classes specified within XML must be able to be instantiated
+	 * without constructor arguments as they are not supplied when instances
+	 * are created by the parser. Attributes and child elements within a
 	 * parent elements match the properties of that parent element's
 	 * class.  If the parent element does not have a property of that
 	 * name, the value is ignored.  Child elements may not be ignored

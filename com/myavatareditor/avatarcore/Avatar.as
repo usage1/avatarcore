@@ -120,8 +120,9 @@ package com.myavatareditor.avatarcore {
 		 * is replaced with the new feature and a FEATURE_CHANGED event is 
 		 * dispatched.  If a Feature is added with a unique name, a
 		 * FEATURE_ADDED event is dispatched.  Features added to the 
-		 * avatar's collection are automatically associated with the library
-		 * assigned to the avatar if one exists.
+		 * avatar's collection are automatically associated with this avatar
+		 * and the library assigned to the avatar if one exists (defining
+		 * Feature.definition).
 		 * @param	item Object to add to the avatar's collection.
 		 * @return Item added to the collection.
 		 */
@@ -140,6 +141,7 @@ package com.myavatareditor.avatarcore {
 			var added:* = super.addItem(item);
 			if (added is Feature) {
 				var feature:Feature = added as Feature;
+				feature.avatar = this;
 				coupleFeatureToLibrary(feature);
 				dispatchEvent(new FeatureEvent(eventType, false, false, feature));
 			}
@@ -149,7 +151,9 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * Custom removeItem method that removes an item from the
 		 * Avatar's collection. If that item is of the type Feature
-		 * a FEATURE_REMOVED event is dispatched.
+		 * a FEATURE_REMOVED event is dispatched.  Values set up in
+		 * Avatar.addItem, such as Feature.avatar and Feature.definition
+		 * are set to null.
 		 * @param	item Object to be removed from the collection.
 		 * @return Item removed if an item is removed. Null is returned
 		 * if no item is removed.
@@ -157,7 +161,10 @@ package com.myavatareditor.avatarcore {
 		public override function removeItem(item:*):* {
 			var removed:* = super.removeItem(item);
 			if (removed is Feature) {
-				dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_REMOVED, false, false, removed as Feature));
+				var feature:Feature = removed as Feature;
+				dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_REMOVED, false, false, feature));
+				feature.avatar = null;
+				feature.definition = null;
 			}
 			return removed;
 		}
@@ -173,6 +180,9 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function updateFeature(feature:Feature):void {
 			if (feature == null) return;
+			
+			// if feature has no defined name, feature.name should still
+			// exist since its enforced in Collection.addItem
 			if (feature != getItemByName(feature.name)) {
 				print(feature + " cannot be updated because it is not present in " + this, PrintLevel.WARNING, this);
 				return;
@@ -180,6 +190,21 @@ package com.myavatareditor.avatarcore {
 			dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_CHANGED, false, false, feature));
 		}
 		
+		/**
+		 * Calls updateFeature() for all Feature instances within this 
+		 * Avatar instance.
+		 */
+		public function updateFeatures():void {
+			var feature:Feature;
+			var features:Array = this.collection;
+			var i:int = features.length;
+			while (i--){
+				feature = features[i] as Feature;
+				if (feature){
+					updateFeature(feature);
+				}
+			}
+		}
 		/**
 		 * Rebuilds an avatar definition by reassociating the
 		 * avatar's library with its feature definitions. After
@@ -198,10 +223,13 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function consolidateFeatures():void {
 			var feature:Feature;
-			var features:Array = getItemsByType(Feature);
+			var features:Array = this.collection;
 			var i:int = features.length;
 			while (i--){
-				Feature(features[i]).consolidate();
+				feature = features[i] as Feature;
+				if (feature){
+					feature.consolidate();
+				}
 			}
 		}
 		

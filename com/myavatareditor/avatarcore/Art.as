@@ -41,7 +41,9 @@ package com.myavatareditor.avatarcore {
 		 * before the art is drawn in an art sprite. If changed
 		 * while the art is being displayed for an avatar, the
 		 * effects will not be seen until the feature art is
-		 * rebuilt.
+		 * rebuilt.  By changing this value you're effectively
+		 * changing the registration point (the point around which
+		 * transformations occur) for the art.
 		 */
 		public function get x():Number { return _x; }
 		public function set x(value:Number):void {
@@ -55,7 +57,9 @@ package com.myavatareditor.avatarcore {
 		 * before the art is drawn in an art sprite. If changed
 		 * while the art is being displayed for an avatar, the
 		 * effects will not be seen until the feature art is
-		 * rebuilt.
+		 * rebuilt.  By changing this value you're effectively
+		 * changing the registration point (the point around which
+		 * transformations occur) for the art.
 		 */
 		public function get y():Number { return _y; }
 		public function set y(value:Number):void {
@@ -79,7 +83,16 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * The art source. This can be either a class name or a
-		 * URL referencing a loaded asset such as a JPEG file.
+		 * URL referencing a loaded asset such as a JPEG file. When
+		 * loaded, the src value assumed first to be a class name
+		 * for a DisplayObject (or BitmapData) instance.  If that fails,
+		 * the value is loaded as a url.  For multiframe content, you
+		 * can specify a destination frame by following the src 
+		 * value with a hash (#) followed by the desired frame
+		 * number or label. For example, src="eyes.swf#12" will 
+		 * will first try to create a new eyes.swf instance. When
+		 * that fails, eyes.swf will be loaded as an external asset.
+		 * When complete, it will goto and stop at frame 12.
 		 */
 		public function get src():String { return _src; }
 		public function set src(value:String):void {
@@ -111,6 +124,17 @@ package com.myavatareditor.avatarcore {
 			_colorize = value;
 		}
 		private var _colorize:Number; // Number instead of Boolean for inheritance (NaN recognition)
+		
+		/**
+		 * Indicates whether or not bitmaps loaded from an external
+		 * source use smoothed pixels. When smoothing is NaN (default)
+		 * or non-zero, smoothing is turned on.
+		 */
+		public function get smoothing():Number { return _smoothing; }
+		public function set smoothing(value:Number):void {
+			_smoothing = smoothing;
+		}
+		private var _smoothing:Number;
 		
 		/**
 		 * The style name for the art.  In specifying a style, you
@@ -148,9 +172,10 @@ package com.myavatareditor.avatarcore {
 			copy.name = name;
 			copy.x = x;
 			copy.y = y;
-			copy.thumbnail = thumbnail;
 			copy.zIndex = zIndex;
+			copy.thumbnail = thumbnail;
 			copy.colorize = colorize;
+			copy.smoothing = smoothing;
 			copy.style = style;
 			copy.copyCollectionFrom(this);
 			return copy;
@@ -160,10 +185,11 @@ package com.myavatareditor.avatarcore {
 			var obj:Object = super.getPropertiesAsAttributesInXML();
 			obj.x = 1;
 			obj.y = 1;
+			obj.zIndex = 1;
 			obj.src = 1;
 			obj.thumbnail = 1;
-			obj.zIndex = 1;
 			obj.colorize = 1;
+			obj.smoothing = 1;
 			obj.style = 1;
 			return obj;
 		}
@@ -193,8 +219,9 @@ package com.myavatareditor.avatarcore {
 		 * defaults as well.
 		 * @param	zIndex Default zIndex.
 		 * @param	colorize Default colorize.
+		 * @param	smoothing Default smoothing.
 		 */
-		public function assignDefaults(zIndex:Number = Number.NaN, colorize:Number = Number.NaN):void {
+		public function assignDefaults(zIndex:Number = Number.NaN, colorize:Number = Number.NaN, smoothing:Number = Number.NaN):void {
 			
 			if (isNaN(zIndex) == false && isNaN(_zIndex)) {
 				_zIndex = zIndex;
@@ -204,17 +231,18 @@ package com.myavatareditor.avatarcore {
 				_colorize = colorize;
 			}
 			
+			if (isNaN(smoothing) == false && isNaN(_smoothing)) {
+				_colorize = smoothing;
+			}
+			
 			// assign defaults to child Art items in collection
 			var children:Array = this.collection;
-			if (children.length) {
-				
-				var childArt:Art;
-				var i:int = children.length;
-				while (i--) {
-					childArt = children[i] as Art;
-					if (childArt){
-						childArt.assignDefaults(_zIndex, _colorize);
-					}
+			var childArt:Art;
+			var i:int = children.length;
+			while (i--) {
+				childArt = children[i] as Art;
+				if (childArt){
+					childArt.assignDefaults(zIndex, colorize, smoothing);
 				}
 			}
 		}

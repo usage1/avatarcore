@@ -28,14 +28,76 @@ package com.myavatareditor.avatarcore {
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public interface ICollection {
+		
+		/**
+		 * Copies the collection from one ICollection into this
+		 * ICollection. Any objects within the current collection
+		 * are removed before the new copy is made.
+		 * @param	source The ICollection from which to make a copy.
+		 */
 		function copyCollectionFrom(source:ICollection):void;
+		
+		/**
+		 * Adds an object to the collection.  The object
+		 * must be non-null.
+		 * @param	item The object to be added to the collection.
+		 * @return The object added to the collection.
+		 */
 		function addItem(item:*):*;
+		
+		/**
+		 * Returns true if an item exists within the collection.
+		 * Returns false if it does not.
+		 * @param	item The item to determine if within the
+		 * collection.
+		 * @return True if item exists within the collection, 
+		 * otherwise false.
+		 */
 		function collectionItemExists(item:*):Boolean;
+		
+		/**
+		 * Finds an item in the collection by name and returns it.
+		 * @param	key The name of the item (as specified
+		 * by it's name property) to be returned.
+		 * @return The item found in the collection. If the item
+		 * is not within the collection, null is returned.
+		 */
 		function getItemByName(key:String):*;
+		
+		/**
+		 * Finds items in a collection of a specific type and 
+		 * returns an array of those items.
+		 * @param	type The type of items to find in the collection.
+		 * @return An array of collection items of the type provided.
+		 */
 		function getItemsByType(type:Class):Array;
+		
+		/**
+		 * Removes an item from the collection.
+		 * @param	item The item to remove from the collection.
+		 * @return The item removed.  If the item is not within
+		 * the collection, null is returned.
+		 */
 		function removeItem(item:*):*;
+		
+		/**
+		 * Removes an item within a collection by its name.
+		 * @param	key The name of the item (as specified
+		 * by it's name property) to be removed.
+		 * @return The item removed.  If the item is not within
+		 * the collection, null is returned.
+		 */
 		function removeItemByName(key:String):*;
+		
+		/**
+		 * Removes all items from the collection.
+		 */
 		function clearCollection():void;
+		
+		/**
+		 * Collection array where items are stored.  Items are
+		 * stored both by index and by name if available.
+		 */
 		function get collection():Array;
 	}
 	

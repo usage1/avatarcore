@@ -25,10 +25,10 @@ package com.myavatareditor.avatarcore.display {
 	import com.myavatareditor.avatarcore.Art;
 	
 	/**
-	 * ArtSprite for mirrored art defined in a MiiroredFeatureDefinition.
-	 * This is not a piece of the core framework, but an extension of it. As
-	 * such, if referenced only in XML, you will need to be sure to include
-	 * a reference of the class in your SWF so that it gets compiled into
+	 * ArtSprite for mirrored art defined resulting from a Mirror behavior.
+	 * This is not necessarily a piece of the core framework, but an extension
+	 * of it. As such, if referenced only in XML, you will need to be sure to
+	 * include a reference of the class in your SWF so that it gets compiled into
 	 * the SWF bytecode and is accessible when the XML is parsed and avatar
 	 * art created.
 	 * @author Trevor McCauley; www.senocular.com
