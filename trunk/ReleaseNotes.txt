@@ -2,7 +2,7 @@
 
 Avatar Core Framework - a free framework for creating and displaying avatars.
 Current version: 0.0.5.  This (beta) release is the fifth release of the
-Avatar Coreframework.
+Avatar Core framework.
 
 http://avatarcore.googlecode.com/
 
@@ -13,6 +13,15 @@ http://avatarcore.googlecode.com/
 
 
 == Change List ==
+
+=== 0.1.0 (May 3, 2009) ===
+
+This release is a quickfix for an outstanding issue related to content
+loading. It also signifies a change in version numbering, now using the
+minor version for new releases instead of just the build.
+
+- Fixed a bug preventing art referencing assets from an external source (not
+  in SWF library) from being displayed on the screen.
 
 === 0.0.5 (May 3, 2009) ===
 

@@ -142,8 +142,12 @@ package com.myavatareditor.avatarcore.display {
 		 * Constructor for creating new ArtSprite instances. ArtSprite
 		 * instances are created automatically by AvatarArt instances
 		 * when drawing an avatar.
-		 * @param	art
-		 * @param	feature
+		 * @param	art Graphic Art object associated with this sprite.
+		 * A single feature may use multiple art sprites if it is using
+		 * multiple Art instances to describe itself visually. The art
+		 * used here is one of those instances (not necessarily the
+		 * single Art reference of the feature)
+		 * @param	feature The feature being rendered through this sprite.
 		 */
 		public function ArtSprite(art:Art = null, feature:Feature = null) {
 			
@@ -244,10 +248,12 @@ package com.myavatareditor.avatarcore.display {
 		}
 		
 		private function loaderCompleteHandler(event:Event):void {
+			
 			// make sure this complete handler is for 
 			// the current loader and not some rogue loader
 			// for content that got replaced during loading
-			if (event.currentTarget != loader){
+			if (loader == null || event.currentTarget != loader.contentLoaderInfo){
+				print("Content loaded but no longer valid; aborting", PrintLevel.WARNING, this);
 				return;
 			}
 			
