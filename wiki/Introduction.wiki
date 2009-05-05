@@ -8,13 +8,13 @@ Avatar Core is an open source, client-side framework for describing and displayi
 
 == Goals == 
 
-The primary goal of Avatar Core is to make a simple, yet feature-rich framework for avatar creation and presentation that can be easily updated or changed with no or minimal interaction with source code.  More specifically, the framework should allow individual avatar characters, as well as the possible combinations that make up their characteristics, to be defined entirely in XML and loaded into an Avatar application (viewer or editor) at runtime giving complete control to the content creators.
+The primary goal of Avatar Core is to make a simple, yet feature-rich framework for avatar creation and presentation that can be easily updated or changed with no or minimal interaction with source code.  More specifically, the framework should is to allow individual avatar characters, as well as the possible combinations that make up their characteristics, to be defined entirely in XML and loaded into an Avatar application (viewer or editor) at runtime giving complete control to the content creators.
 
 == Basic Design ==
 
 ==== Displaying Avatars ====
 
-Avatar characters are represented in the framework by Avatar objects.  Avatar objects contain any data related avatars including their visual characteristics. These visuals are represented by Feature objects.  Features define different parts of an avatar including those such as the eyes, nose, or mouth.  Each feature may use one many possible variations of the same characteristic.  Which variation being used is defined by the feature's referenced Art object.  Art directly specifies the visual assets (PNG, SWF, etc.) currently being used to show a feature.
+Avatar characters are represented in the framework by Avatar objects.  Avatar objects contain any data related avatars including their visual characteristics. These visuals are represented by Feature objects.  Features define different parts of an avatar including those such as the eyes, nose, or mouth.  Each feature may use one many possible variations of the same characteristic.  Which variation being used is defined by the feature's referenced Art object.  Art directly specifies the visual assets currently being used to show a feature.  These assets can be in the form of external SWFs, JPGs, PNGs, or any class-linked bitmap or display object within the current SWF's library.
 
 AvatarArt objects are used to collectively gather up and assemble an avatar's art for presentation to the user. They represent the display of the data contained within the Avatar, Feature, and Art objects.
 
@@ -59,12 +59,10 @@ The following example is a very simple Library definition in XML:
 
 == Additional Features ==
 
-When displaying avatar characters, you only really need to work with Avatar, Feature, Art, and AvatarArt instances.  They are the core set of classes fo getting avatar visuals on the screen.
-
-The editability requirements for avatars brings to use Library and FeatureDefinition objects.  These objects give options for selecting different feature art.  But additional editability options may also be necessary.  Avatar Core includes additional control over features in the form of Transform and Color objects
+Avatar Core includes additional control over features in the form of Transform and Color objects.
 
 Transforms are used to specify where (and how) on the screen a feature is to be positioned.  They can also control art size and rotation.  As with Art, FeatureDefinition objects can specify a set of transforms from which a user can select from, though it is also possible to leave transformations open for the user to specify themselves without limitation.
 
 Colors are used to colorize art. You may have a feature art that visually remains the same asside from variations in color. Instead of creating multiple copies of that art, the same art can be used with different variations of color applied to it.  Like Transform objects, Color objects can also be presented as a restricted set or left open for specification without limitation.
 
-A more advanced feature of the Avatar Core framework is behaviors. Behaviors are components referenced by features that further influence the presentation of an avatar feature.  Behaviors can influence avatar presentation both when AvatarArt collects Art as individual sprites and when AvatarArt draws those sprites to the screen.
+Another more advanced feature of the Avatar Core framework is behaviors. Behaviors are components referenced by features that further influence the presentation of an avatar feature.  Behaviors can influence avatar presentation both when AvatarArt collects Art as individual sprites and when AvatarArt draws those sprites to the screen.
