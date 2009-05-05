@@ -3,6 +3,7 @@
   * [http://code.google.com/p/avatarcore Project Home]
 ----
   * [Introduction]
+  * [Installation]
   * [GettingStarted]
   * [XMLFormat]
 ----
