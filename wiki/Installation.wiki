@@ -1,4 +1,5 @@
 #summary Instructions for downloading and installing Avatar Core
+#sidebar TableOfContents
 
 Avatar Core is a collection ActionScript 3.0 classes.  To use these classes, they must be saved, with their directory structure intact, to a location on your hard drive.  If not already, you would then need to make sure that your compiler (Flex SDK, Flash Professional, etc.) can find these classes by adding that location to the compiler's class or source path.
 
