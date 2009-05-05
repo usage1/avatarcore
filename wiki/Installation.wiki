@@ -1,0 +1,21 @@
+#summary Instructions for downloading and installing Avatar Core
+
+Avatar Core is a collection ActionScript 3.0 classes.  To use these classes, they must be saved, with their directory structure intact, to a location on your hard drive.  If not already, you would then need to make sure that your compiler (Flex SDK, Flash Professional, etc.) can find these classes by adding that location to the compiler's class or source path.
+
+Avatar Core, at this time, is not available as a SWC.
+
+To download the Avatar Core, classes you have two options:
+  * Sync with the svn repository
+  * Download the sample application with the framework included
+  
+==== SVN ====
+
+To obtain the framework through SVN, you will need an SVN client (program).  Once you have an SVN client up and running, follow the instructions found on the [http://code.google.com/p/avatarcore/source/checkout Source section].
+
+==== Sample Download ====
+
+In the [http://code.google.com/p/avatarcore/downloads/list Downloads section], you will find a zip file containing a simple sample application that includes the full framework source.  This file gives you a direct means by which you can download the entire framework at once. However, this file is not guaranteed to be as up to date as the SVN repository.
+
+==== Requirements ====
+
+The only requirement for the Avatar Core framework is the ability to compile ActionScript 3.0 and run Adobe Flash Player SWFs in your destination environment using Flash Player 9 or greater.
