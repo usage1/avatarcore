@@ -5,6 +5,7 @@
   * [Introduction]
   * [Installation]
   * [GettingStarted]
+  * [BeyondBasics]
   * [XMLFormat]
 ----
   * [http://www.myavatareditor.com/avatarcore/docs/ API Documentation]
