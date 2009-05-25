@@ -22,9 +22,9 @@ SOFTWARE.
 package com.myavatareditor.avatarcore {
 	
 	/**
-	 * A collection of Transform objects for feature definitions. When
-	 * a feature definition defines different transforms for an avatar,
-	 * they are stored within the transformSet collection.
+	 * A common base class for collections used in feature definitions. When
+	 * a feature definition defines different objects in a collection for an 
+	 * avatar, they are stored within a collection of the type SetCollection.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class SetCollection extends Collection {

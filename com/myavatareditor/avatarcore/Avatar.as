@@ -59,7 +59,9 @@ package com.myavatareditor.avatarcore {
 		 * property are made when an Avatar instance is created
 		 * within a Definitions object.
 		 */
-		public function get libraryName():String { return _libraryName; }
+		public function get libraryName():String { 
+			return _library ? _library.name : _libraryName;
+		}
 		public function set libraryName(value:String):void {
 			_libraryName = value;
 		}

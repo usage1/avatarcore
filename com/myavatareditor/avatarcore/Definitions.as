@@ -59,11 +59,7 @@ package com.myavatareditor.avatarcore {
 			if (item is Avatar){
 				
 				// associate avatar with library
-				avatarItem = item as Avatar;
-				var library:Library = getItemByName(avatarItem.libraryName) as Library;
-				if (library){
-					avatarItem.library = library;
-				}
+				updateAvatar(item as Avatar);
 				
 			}else if (item is Library){
 				
@@ -72,11 +68,11 @@ package com.myavatareditor.avatarcore {
 				var libraryItem:Library = item as Library;
 				var libraryName:String = libraryItem.name;
 				if (libraryName){
-					var avatars:Array = getItemsByType(Avatar);
-					var i:int = avatars.length;
+					var items:Array = collection;
+					var i:int = items.length;
 					while (i--){
-						avatarItem = avatars[i] as Avatar;
-						if (avatarItem.libraryName == libraryName){
+						avatarItem = items[i] as Avatar;
+						if (avatarItem && avatarItem.libraryName == libraryName){
 							avatarItem.library = libraryItem;
 						}
 					}
@@ -91,10 +87,13 @@ package com.myavatareditor.avatarcore {
 		 * Definition instances are typically created through
 		 * XML.
 		 */
-		public function Definitions() {
+		public function Definitions(xml:XML = null) {
 			xmlLoader.addEventListener(Event.COMPLETE, xmlCompleteHandler, false, 0, true);
 			xmlLoader.addEventListener(IOErrorEvent.IO_ERROR, xmlCompleteHandler, false, 0, true);
 			xmlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, xmlCompleteHandler, false, 0, true);
+			if (xml){
+				parse(xml);
+			}
 		}
 		
 		/**
@@ -108,7 +107,7 @@ package com.myavatareditor.avatarcore {
 		 * occured.
 		 * @param	request A URLRequest linking to the xml file to be loaded.
 		 */
-		public function loadXML(request:URLRequest):void {
+		public function load(request:URLRequest):void {
 			try {
 				xmlLoader.load(request);
 			}catch (error:Error){
@@ -133,7 +132,7 @@ package com.myavatareditor.avatarcore {
 					completeEvent.error = error;
 				}
 				
-				setXML(xml);
+				parse(xml);
 			}
 			
 			dispatchEvent(completeEvent);
@@ -145,11 +144,10 @@ package com.myavatareditor.avatarcore {
 		 * does not load the XML from a URL. Rather, it is passed directly
 		 * into this method.
 		 * @param	xml XML to be parsed into this Definitions object.
-		 * @throws Error Any error thrown by the XML object if parsing fails.
 		 */
-		public function setXML(xml:XML):void {
+		public function parse(xml:XML):void {
 			if (xml == null) return;
-			var definitions:XMLList = xml + xml.descendants("Definitions");
+			var definitions:XMLList = xml + xml..Definitions;
 		
 			if (definitions.length()){
 				clearCollection();
@@ -157,6 +155,40 @@ package com.myavatareditor.avatarcore {
 				parser.parseInto(definitions[0], this); // use the first if many
 			}else{
 				print("Definitions object cannot be derived from XML because no <Definitions> node exists", PrintLevel.WARNING, this);
+			}
+		}
+		
+		/**
+		 * Updates an avatar with Library objects within the Definition
+		 * collection with names that match the Avatar's libraryName
+		 * property. Matching Library objects are assigned to the Avatar's
+		 * library.  Unlike Avatar.updateFeature(), updateAvatar does not
+		 * validate the avatar as being a child of the Definitions to
+		 * function.
+		 * @param	avatar The Avatar to find a linked library from those
+		 * available in the Defifinitions collection.
+		 */
+		public function updateAvatar(avatar:Avatar):void {
+			if (avatar == null || avatar.libraryName == null) return;
+			var library:Library = getItemByName(avatar.libraryName) as Library;
+			if (library){
+				avatar.library = library;
+			}
+		}
+		
+		/**
+		 * Runs through all Avatar objects in the Definitions collection
+		 * calling Definitions.updateAvatar() for each.
+		 */
+		public function updateAvatars():void {
+			var avatarItem:Avatar;
+			var items:Array = collection;
+			var i:int = items.length;
+			while (i--){
+				avatarItem = items[i] as Avatar;
+				if (avatarItem){
+					updateAvatar(avatarItem);
+				}
 			}
 		}
 	}

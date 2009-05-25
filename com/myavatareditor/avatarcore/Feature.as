@@ -126,7 +126,7 @@ package com.myavatareditor.avatarcore {
 				// (or whatever is specified by defaultSetID)
 				var defaultArt:Art = _definition.artSet.collection[defaultSetID] as Art;
 				if (defaultArt){
-					print("Could not resolve an art name for "+this+"; using the first in the definition set as a default", PrintLevel.WARNING, this);
+					print("Could not resolve an art name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
 					return defaultArt.name;
 				}
 				
@@ -168,7 +168,7 @@ package com.myavatareditor.avatarcore {
 				// (or whatever is specified by defaultSetID)
 				var defaultColor:Color = _definition.colorSet.collection[defaultSetID] as Color;
 				if (defaultColor){
-					print("Could not resolve a color name for "+this+"; using the first in the definition set as a default", PrintLevel.WARNING, this);
+					print("Could not resolve a color name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
 					return defaultColor.name;
 				}
 				
@@ -209,7 +209,7 @@ package com.myavatareditor.avatarcore {
 				// (or whatever is specified by defaultSetID)
 				var defaultTransform:Transform = _definition.transformSet.collection[defaultSetID] as Transform;
 				if (defaultTransform){
-					print("Could not resolve a transform name for "+this+"; using the first in the definition set as a default", PrintLevel.WARNING, this);
+					print("Could not resolve a transform name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
 					return defaultTransform.name;
 				}
 				

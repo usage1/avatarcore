@@ -1,8 +1,6 @@
 ﻿= Release Notes =
 
 Avatar Core Framework - a free framework for creating and displaying avatars.
-Current version: 0.0.5.  This (beta) release is the fifth release of the
-Avatar Core framework.
 
 http://avatarcore.googlecode.com/
 
@@ -14,7 +12,23 @@ http://avatarcore.googlecode.com/
 
 == Change List ==
 
-=== 0.1.0 (May 3, 2009) ===
+=== 0.1.5 (May 25, 2009) ===
+
+Minor API changes, mostly to Definitions class.
+
+- Added xml parameter to Definitions constructor
+- Renamed Definitions.setXML() to parse()
+- Renamed Definitions.loadXML() to load()
+- Added Definitions.updateAvatar()
+- Added Definitions.updateAvatars()
+- Avatar.libraryName will return the name of any Library objects associated
+  with the avatar if available rather than the Avatar's own, internal
+  libraryName value
+- Changed a print WARNING to print NORMAL for features using a default
+  feature definition item (e.g. art.name not specified so first Art in a 
+  linked FeatureDefinition.artSet is used)
+
+=== 0.1.0 (May 5, 2009) ===
 
 This release is a quickfix for an outstanding issue related to content
 loading. It also signifies a change in version numbering, now using the
