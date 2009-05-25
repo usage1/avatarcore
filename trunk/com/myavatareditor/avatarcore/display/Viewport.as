@@ -127,13 +127,18 @@ package com.myavatareditor.avatarcore.display {
 		 * 100x100 px and scale is specified as 2, the returned BitmapData
 		 * would be 200x200 px.
 		 * @return A BitmapData containing the a capture of the viewport
-		 * contents.
+		 * contents. Null is returned on failure.
 		 */
 		public function capture(scale:Number = 1):BitmapData {
 			if (scale <= 0) scale = 1;
 			var bmp:BitmapData = new BitmapData(_width, _height, true, 0);
 			var scaleMatrix:Matrix = new Matrix(scale, 0, 0, scale, 0, 0);
-			bmp.draw(this, scaleMatrix, null, null, null, false);
+			try {
+				bmp.draw(this, scaleMatrix, null, null, null, false);
+			}catch (error:Error){
+				bmp.dispose();
+				bmp = null;
+			}
 			return bmp;
 		}
 		

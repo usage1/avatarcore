@@ -43,6 +43,14 @@ package com.myavatareditor.avatarcore {
 			
 		}
 		
+		/**
+		 * Custom addItem for Library objects that dispatches the appropriate
+		 * FEATURE_DEFINITION_ADDED or FEATURE_DEFINITION_ADDED events
+		 * depending on whether or not the item already exists within the
+		 * library collection.
+		 * @param	item
+		 * @return
+		 */
 		public override function addItem(item:*):* {
 			var eventType:String;
 			
@@ -62,6 +70,13 @@ package com.myavatareditor.avatarcore {
 			return added;
 		}
 		
+		/**
+		 * Custom removeItem for Library objects that dispatches the
+		 * FEATURE_DEFINITION_REMOVED event for FeatureDefinition objects
+		 * removed from the library collection.
+		 * @param	item
+		 * @return
+		 */
 		public override function removeItem(item:*):* {
 			var removed:* = super.removeItem(item);
 			if (removed is FeatureDefinition) {
