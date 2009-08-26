@@ -1,7 +1,7 @@
 #summary Simple code samples to get you started with the framework.
 #labels Featured
 #sidebar TableOfContents
-_(Last updated for ver 0.2.0)_
+_(Last updated for ver 0.1.5)_
 
 <wiki:toc />
 
