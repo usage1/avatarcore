@@ -22,7 +22,7 @@ The framework does not contain its own avatars or any avatar-related graphical a
 
 ==== Basic Design ====
 
-Avatar Core follows an MVC (Model-view-controller) pattern providing model and view components.  The details of the controller is left to the client implementing the framework.
+Avatar Core follows a MVC (Model-view-controller) pattern providing model and view components.  The details of the controller is left to the client implementing the framework.
 
 Avatar objects represent the model.  These can be constructed through code or described through XML.  Avatars consist of 0 or more Feature objects, each describing the individual avatar characteristics (eyes, nose, mouth, etc.) that make up the avatar.  Feature objects reference Art objects that link to your custom, graphical assets providing a visual context when displayed in the view.  These assets can be stored within the client, or be references to external content to be loaded at runtime.  Formats include JPEG, GIF, PNG, and SWF (internal graphics or external SWF files).
 
@@ -34,7 +34,7 @@ AvatarDisplay objects represent the view. They reference Avatar instances and re
 
 Because of the customizable nature of avatars, Avatar Core also supports library structures. Libraries are containers for collections of Feature data like Art objects.  Libraries specify possible Feature variations in FeatureDefinition objects.
 
-Whereas a Feature will specify one Art object to represent itself visually, FeatureDefinitions specify multiple Art objects from which a related Feature is able to select from.  Consider an avatar's mouth.  Options for that mouth may include a _smile_ or a _frown_.  FeatureDefinitions contains each of those variations and Features are able to pick from that list to decide which is to be used for the Avatar.
+Whereas a Feature will specify one Art object to represent itself visually, FeatureDefinitions specify multiple Art objects from which a related Feature is able to select from.  Consider an avatar's mouth.  Variations for that mouth may include a _smile_ and a _frown_.  FeatureDefinitions contains each of those variations and Features are able to pick from those to decide which is to be used for the Avatar.
 
 <img src="http://www.myavatareditor.com/avatarcore/images/uml_library_avatarart.jpg" alt="Avatar Class Diagram with Library" />
 
