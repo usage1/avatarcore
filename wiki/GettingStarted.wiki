@@ -68,3 +68,78 @@ Finally an AvatarDisplay object is created to display the Avatar visually.  This
 var avatarDisplay:AvatarDisplay = new AvatarDisplay(avatar);
 addChild(avatarDisplay);
 }}}
+
+
+== Hello World with XML ==
+
+One of the more important features of Avatar Core is the ability to describe avatars in XML.  This should be the more commonly used workflow when working with avatars in Avatar Core - defining avatars in XML and using a generic client application to load that XML and display the avatar character it describes.  This example takes the previous Hello World example and switches it over to use XML.  For the sake of simplicity, the XML will be included inline with the rest of the source code, but it would be more likely that this would be loaded in from an external source in practice.
+
+=== Sample Code ===
+{{{
+import com.myavatareditor.avatarcore.*;
+import com.myavatareditor.avatarcore.display.*;
+import com.myavatareditor.avatarcore.xml.*;
+
+var avatarXML:XML = 
+	<Avatar xmlns="com.myavatareditor.avatarcore">
+		<Feature>
+			<art src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png" />
+		</Feature>
+	</Avatar>;
+
+var xmlParser:XMLDefinitionParser = new XMLDefinitionParser();
+var avatar:Avatar = xmlParser.parse(avatarXML) as Avatar;
+
+var avatarDisplay:AvatarDisplay = new AvatarDisplay(avatar);
+addChild(avatarDisplay);
+}}}
+
+When published, the results are the same as before:
+
+<img src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world_swf.png" alt="Hello World SWF" />
+
+==== Walkthrough ====
+
+As before, the necessary imports are included. This time an extra import for com.myavatareditor.avatarcore.xml is added for the XML parser.
+{{{
+import com.myavatareditor.avatarcore.*;
+import com.myavatareditor.avatarcore.display.*;
+import com.myavatareditor.avatarcore.xml.*;
+}}}
+
+Next is the XML, here assigned to the avatarXML variable.  It mirrors the Avatar definition created within the source code before.  It consists of an Avatar node (the Avatar instance), a nested Feature node (Feature child item added to Avatar), and an art node which represents the Art instance assigned to the art property of the parent Feature.  The Art instance's src attribute is defined as the same URL passed into the Art constructor, which before, defined the src property for that Art instance.
+
+Note that the xml namespace specified within the XML is the same is the package path used by Avatar, Feature, and Art (com.myavatareditor.avatarcore).  This namespace is required since it's actually used to locate those definitions when the XML is being parsed.
+{{{
+var avatarXML:XML = 
+	<Avatar xmlns="com.myavatareditor.avatarcore">
+		<Feature>
+			<art src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png" />
+		</Feature>
+	</Avatar>;
+}}}
+
+With the XML defined, it can be converted to a tangible Avatar instance. This is done using the XMLDefinitionParser class.  Using it's parse method with the XML, the Avatar defined by that XML is created and saved to the avatar variable.
+
+The XMLDefinitionParser class contains all the logic necessary for converting the XML to runtime objects.  This includes automatically instantiating XML nodes as object instances, adding them to collections (Feature in Avatar) or assigning them as object properties (art in Feature).
+{{{
+var xmlParser:XMLDefinitionParser = new XMLDefinitionParser();
+var avatar:Avatar = xmlParser.parse(avatarXML) as Avatar;
+}}}
+
+Finally, as was the case before, an AvatarDisplay instance is created for the Avatar and added to the display list for viewing.
+{{{
+var avatarDisplay:AvatarDisplay = new AvatarDisplay(avatar);
+addChild(avatarDisplay);
+}}}
+
+
+== Where to go from here ==
+  * [AboutFeatures]
+  * [AboutArt]
+  * [AboutXMLParsing]
+  * [AboutLibraries]
+  * [AboutFeatureDefinitions]
+  * [AboutColors]
+  * [AboutAdjusts]
+  * [AboutBehaviors]
