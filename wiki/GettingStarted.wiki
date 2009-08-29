@@ -1,28 +1,25 @@
-#summary Simple code samples to get you started with the framework.
+#summary Start working with the Avatar Core framework.
 #labels Featured
 #sidebar TableOfContents
-_(Last updated for ver 0.1.5)_
+_(Last updated for ver 0.2.0)_
+
+First things first, download the Avatar Core if you haven't already. Instructions for doing that and setting up your authoring tool/IDE can be found on the [Installation] page. It may also be helpful to keep handy the [http://www.myavatareditor.com/avatarcore/docs/ API Documentation] as a reference for the samples covered here.  And if you're completely new to Avatar Core, be sure that you've read the [Introduction] as it will give you a nice overview of the framework as a whole.
 
 <wiki:toc />
 
-If you haven't already, be sure to [Installation install the framework] so you can work along with these examples.  It may also be helpful to keep the [http://www.myavatareditor.com/avatarcore/docs/ API Documentation] open for referencing the APIs of the classes used.
+== Avatar Core Hello World ==
 
+The Avatar Core framework doesn't support text directly, so a _Hello World!_ example (one which serves as a simple introduction to a new programming language or API) will have to be faked with an image.  The image being used will be the following:
 
-== Bare Bones Example ==
+<img src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png" alt="Hello World Example Image" />
 
-For a bare bones example, 4 classes from the framework are needed: Avatar (com.myavatareditor.avatarcore.Avatar), Feature (com.myavatareditor.avatarcore.Feature), Art (com.myavatareditor.avatarcore.Art), and AvatarArt (com.myavatareditor.avatarcore.display.AvatarArt). The Avatar will contain a Feature which in turn references an Art.  Then, that avatar is given to the AvatarArt display object so it can be drawn on the screen.  
-
-Avatars can contain any number of Feature objects, though Features can only reference a single, primary Art object (there can technically be more, but each of those is tied to the same primary Art object).  Art specify what is to be displayed visually.  When an AvatarArt is given an Avatar object to drawn, it automatically reads through its Feature objects and finds all the Art objects that it needs to show on the screen.
+In this example we'll use what will essentially be the bare minimum necessary for the framework to display this image on the screen. This requires 4 classes from the framework: Avatar (com.myavatareditor.avatarcore.Avatar), Feature (com.myavatareditor.avatarcore.Feature), Art (com.myavatareditor.avatarcore.Art), and AvatarDisplay (com.myavatareditor.avatarcore.display.AvatarDisplay). The Avatar will contain a Feature which in turn references an Art.  Then, that Avatar is given to the AvatarDisplay display object so it can be drawn on the screen.  
 
 <img src="http://www.myavatareditor.com/avatarcore/images/uml_avatar_avatarart.jpg" alt="Avatar Class Diagram" />
 
+Avatars can contain any number of Feature objects. Features in turn reference only one primary Art object.  Art specifies what is to be displayed visually for that Feature.  When an AvatarDisplay is given an Avatar object to be drawn, it automatically reads through its Feature objects and finds all the Art objects that it needs to displayed on the screen.
+
 === Sample Code ===
-
-The code below creates an Avatar instance with one Feature specifying Art which references the following image:
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_full_face.png" alt="Sample full face art asset" />
-
-If you would like to try this code for yourself, be sure to save the above image in the directory in which you are publishing your SWF.
 
 {{{
 import com.myavatareditor.avatarcore.*;
@@ -30,316 +27,44 @@ import com.myavatareditor.avatarcore.display.*;
 
 var avatar:Avatar = new Avatar();
 var feature:Feature = new Feature();
-feature.art = new Art("sample_full_face.png");
+var art:Art = new Art("http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png");
+
 avatar.addItem(feature);
+feature.art = art;
 
-var avatarArt:AvatarArt = new AvatarArt(avatar);
-addChild(avatarArt);
+var avatarDisplay:AvatarDisplay = new AvatarDisplay(avatar);
+addChild(avatarDisplay);
 }}}
 
-Here, you can see that new Avatar and Feature instances are initially created.  The Feature object is then given a new Art instance referencing the PNG image as an externally loaded art asset.  That feature is then given to the Avatar object.  Finally, to display the results, the Avatar is supplied to an AvatarArt display object which is added to the display list to be seen.
+When published, you end up with:
 
-When published, the SWF displays the image specified in the Art object.
+<img src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world_swf.png" alt="Hello World SWF" />
 
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_bare_bones_swf.png" alt="Sample SWF" />
+Note: For the image to display, you will need to be connected to the internet unless you change the URL used by the Art object.
 
+==== Walkthrough ====
 
-== Using Features ==
-
-Features represent individual, interchangable characteristics used by Avatars.  For any characteristic in an avatar that a user can change, a respective Feature object should exist for it.
-
-The art of a Feature is defined by the Art object value in the Feature.art property.  Since Avatar objects need to reference many Feature objects, not just one, Avatars implement the ICollection interface (com.myavatareditor.avatarcore.ICollection) storing Feature objects in their collection array.
-
-=== About Collections ===
-
-Collections are groups of multiple objects - usually just beefed up arrays.  The Avatar Core has its own implementation of collections (as do many frameworks) which is defined by the ICollection interface. That interface is implemented by the Collection class (com.myavatareditor.avatarcore.Collection) which many classes within the Avatar Core framework extend, notably Avatar.
-
-In Avatar Core, collections aren't much more than arrays.  These arrays can be accessed directly through the ICollection.collection property.  Additional methods exist in the interface for adding and removing items from this array (ICollection.addItem, ICollection.removeItem, etc.) to make it not only easier, but to set up some additional relationships in collections to allow objects to be referenced more easily.  More specifically, ICollection objects store items not only by indices in arrays, but also by name, allowing items to be easily referenced in a collection through a name using ICollection.getItemByName.  Any object added to a collection with a name property can be referenced in this manner.
-
-Additionally, and this is important in the context of avatar features, collections enforce uniquely named items.  In other words, if you add an item with a name that another item within the same collection already uses, that pre-existing item will be removed before the new item is added.  Avatar Core uses this to make it easy to change features of the same type (name) just by adding the new feature to the collection.  The old feature will automatically be replaced with the new.
-
-=== Sample Code ===
-
-This example separates a face into multiple images, each representative of an avatar characteristic.  In code, each of these are represented by Feature objects where each Feature references the art for that particular characteristic.  Three Features are being used, one for the head, one for the eyes (collectively), and one for the mouth.  The images for each are as follows:
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_head.png" alt="Sample head art asset" />
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_eyes.png" alt="Sample eyes art asset" />
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_mouth.png" alt="Sample mouth art asset" />
-
-If you would like to try this code for yourself, be sure to save the above images in the directory in which you are publishing your SWF.
-
+The first thing that is necessary is the is importing the classes being used.  Most of the core Avatar Core classes are defined directly in the com.myavatareditor.avatarcore.  AvatarDisplay, being a DisplayObject (the view), is contained within the com.myavatareditor.avatarcore.display package. 
 {{{
 import com.myavatareditor.avatarcore.*;
 import com.myavatareditor.avatarcore.display.*;
+}}}
 
-var eyes:Feature = new Feature();
-eyes.art = new Art("sample_face_eyes.png");
-
-var mouth:Feature = new Feature();
-mouth.art = new Art("sample_face_mouth.png");
-
-var head:Feature = new Feature();
-head.art = new Art("sample_face_head.png");
-
+Next, the objects that make up the avatar model are created, starting with the Avatar itself.  This needs at least one Feature and an Art instance to be referenced by that feature.  Here, the Art instance references the hello_world.png.
+{{{
 var avatar:Avatar = new Avatar();
-avatar.addItem(eyes);
-avatar.addItem(mouth);
-avatar.addItem(head);
-
-var avatarArt:AvatarArt = new AvatarArt(avatar);
-addChild(avatarArt);
+var feature:Feature = new Feature();
+var art:Art = new Art("http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png");
 }}}
 
-Here, individual Feature instances are created referencing each of the available images.  They are then added to the avatar and displayed in an AvatarArt.  The result:
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_bare_bones_swf.png" alt="Sample SWF" />
-
-=== Feature Ordering ===
-
-In the last example working with multiple Features, the order in which the features were added was important.  This is because the head PNG file needed to be displayed below the other PNG files.  AvatarArt will typically use the order of Features in an Avatar collection to determine the order in which they are displayed on the screen.  However, this ordering will change as new Features are added, removed, or replaced within the Avatar.  To ensure that ordering remains well-defined, you can use the zIndex property within the Art class.  
-
-The zIndex property dictates the order in which Art is drawn within an AvatarArt object.  Art with a higher zIndex gets displayed above those with a lower zIndex.
-
+Once the avatar objects have been created, they can be assembled.  Since Avatar objects can contain many Feature instances, they uses a function not unlike DisplayObjectContainer.addChild, addItem, to obtain Feature references.  Feature, on the other hand, can only contain one Art object, so it simply uses a property called art.  The addItem function is used quite a bit in Avatar Core as it is part of Avatar Core's Collection API used by many objects in the framework.
 {{{
-var artBelow:Art = new Art();
-artBelow.zIndex = 1;
-var artAbove:Art = new Art();
-artAbove.zIndex = 10;
+avatar.addItem(feature);
+feature.art = art;
 }}}
 
-It may be helpful to keep zIndex values far enough apart to allow room for new feautres should they be added later on.
-
-== Using XML ==
-
-One of the primary goals of the Avatar Core framework is to be able to define almost everything you would need to related to avatars in an external XML file.  Up to this point, everything has been defined directly in code. To make it more flexible, XML can be used to replace the Avatar (along with Feature and Art) definitions.
-
-XML representations of objects mirror their coded counterparts.  Object properties can be defined in XML through either attributes or child nodes of the same name as the property, and child elements not named after properties become definitions within the object's collection (assuming it's of the type ICollection).  The Avatar object in the last example can be defined as:
-
+Finally an AvatarDisplay object is created to display the Avatar visually.  This is added to the display list and allows us to see the avatar and all of its feature art.
 {{{
-<Avatar xmlns="com.myavatareditor.avatarcore">
-	<Feature>
-		<art src="sample_face_eyes.png" />
-	</Feature>
-	<Feature>
-		<art src="sample_face_mouth.png" />
-	</Feature>
-	<Feature>
-		<art src="sample_face_head.png" />
-	</Feature>
-</Avatar>
+var avatarDisplay:AvatarDisplay = new AvatarDisplay(avatar);
+addChild(avatarDisplay);
 }}}
-
-Notice:
-  * The namespace of the XML matches the package path of the classes within the XML
-  * Feature nodes in the Avatar node create Feature instances added to the Avatar collection
-  * Since art is a property of Feature, the Art instance specified is assigned to that property rather than added as a collection item
-  * The src attribute in the art nodes defines the src property of the Art instance
-
-More about how XML can be defined is covered in the [XMLFormat XMLFormat section].
-
-Once XML is defined, it needs to be parsed into its respective object accessible by code.  This is done within Avatar Core through the XMLDefinitionParser class (com.myavatareditor.avatarcore.xml.XMLDefinitionParser).  
-
-=== Sample Code ===
-
-This sample follows the multiple Features example above, only uses XML to specify the Avatar object.
-
-{{{
-import com.myavatareditor.avatarcore.*;
-import com.myavatareditor.avatarcore.display.*;
-import com.myavatareditor.avatarcore.xml.*;
-
-var avatarXML:XML = 
-}}}
-{{{
-<Avatar xmlns="com.myavatareditor.avatarcore">
-	<Feature>
-		<art src="sample_face_eyes.png" />
-	</Feature>
-	<Feature>
-		<art src="sample_face_mouth.png" />
-	</Feature>
-	<Feature>
-		<art src="sample_face_head.png" />
-	</Feature>
-</Avatar>;
-}}}
-{{{
-var parser:XMLDefinitionParser = new XMLDefinitionParser();
-var avatar:Avatar = parser.parse(avatarXML) as Avatar;
-
-var avatarArt:AvatarArt = new AvatarArt(avatar);
-addChild(avatarArt);
-}}}
-
-Here, the XMLDefinitionParser parses the XML into an Avatar instance, complete with all Feature and Art definitions within.  When published, the resulting SWF is as you would expect:
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_bare_bones_swf.png" alt="Sample SWF" />
-
-== Using Libraries ==
-
-Librarys (com.myavatareditor.avatarcore.Library) provide a means by which an avatar editor client can know what Feature and Art variations (among others) are available for Avatars to use.  The Features available to Avatars are represented by FeatureDefinition (com.myavatareditor.avatarcore.FeatureDefinition) objects within a Library's collection.  Each FeatureDefinition also outlines the possible Art values for a Feature within its artSet property - a collection for Art objects.
-
-<img src="http://www.myavatareditor.com/avatarcore/images/uml_library_avatarart.jpg" alt="Library Class Diagram" />
-
-So far, Feature objects within an Avatar defined Art objects which referenced a source asset - a PNG file.  With Librarys, a new convention is used where Feature objects no longer specify their own art assets through their Art, but rather link to one of the Art instances defined in the artSet of a respective FeatureDefinition.  Such links within the Avatar Core framework are handled through name properties.
-
-=== Linking Objects ===
-
-Most of the classes in the Avatar Core framework have name properties.  Name properties are used for objects within collections to allow those objects to be retrieved through ICollection methods like getItemByName. 
-
-The name property is also used to connect objects to one another such as Features in Avatars to FeatureDefinitions in a Library and Art in Features to Art in an artSet of a linked FeatureDefinitions.  Instead of Feature objects in an Avatar specifying fully-defined Art definitions, they can instead contain empty Art objects which specify nothing more than a name.  That name will then link to a fully-defined Art definition within the artSet of a FeatureDefinition.  Which FeatureDefinition depends on the name of the Feature.  Features and FeatureDefinitions with the same name are linked.  Same applies to a Feature's Art object and those within an FeatureDefinition's artSet.
-
-Linking is usually controlled by a parent object.  Linking between Features and FeatureDefinitions is handled by the Avatar object owning the Feature.  Avatars can target different Librarys through their library property.  Assigning a Library to an Avatar will link instruct the Avatar to link all of its Features to similarly named FeaureDefinitions within the Library specified.  When Features are linked with FeatureDefinitions, they in turn link their Art objects to those with similar names within the linked FeatureDefinition.
-
-=== Sample Code ===
-
-The following sample expands on the previous examples with the use of a Library.  For clarity, XML will continue to be used to set up Avatar (and Library) objects.  It contains two new art assets, using in total, the following:
-
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_head.png" alt="Sample head art asset" />
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_eyes.png" alt="Sample eyes art asset" />
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_eyes_star.png" alt="Sample eyes art asset" />
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_mouth.png" alt="Sample mouth art asset" />
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_face_mouth_o.png" alt="Sample mouth art asset" />
-
-
-
-{{{
-import com.myavatareditor.avatarcore.*;
-import com.myavatareditor.avatarcore.display.*;
-import com.myavatareditor.avatarcore.xml.*;
-
-var definitionsXML:XML =
-}}}
-{{{
-<Definitions xmlns="com.myavatareditor.avatarcore">
-	<Library>
-		<FeatureDefinition name="eyes">
-			<artSet>
-				<Art name="oval" src="sample_face_eyes.png" zIndex="2" />
-				<Art name="star" src="sample_face_eyes_star.png" zIndex="2" />
-			</artSet>
-		</FeatureDefinition>
-		<FeatureDefinition name="mouth">
-			<artSet>
-				<Art name="smile" src="sample_face_mouth.png" zIndex="1" />
-				<Art name="o" src="sample_face_mouth_o.png" zIndex="1" />
-			</artSet>
-		</FeatureDefinition>
-		<FeatureDefinition name="head">
-			<artSet>
-				<Art name="round" src="sample_face_head.png" zIndex="0" />
-			</artSet>
-		</FeatureDefinition>
-	</Library>
-	<Avatar>
-		<Feature name="eyes">
-			<art name="star" />
-		</Feature>
-		<Feature name="mouth">
-			<art name="o" />
-		</Feature>
-		<Feature name="head">
-			<art name="round" />
-		</Feature>
-	</Avatar>
-</Definitions>;
-}}}
-{{{
-var parser:XMLDefinitionParser = new XMLDefinitionParser();
-var avatar:Avatar = parser.parse(definitionsXML.elements()[1]) as Avatar;
-avatar.library = parser.parse(definitionsXML.elements()[0]) as Library;
-
-var avatarArt:AvatarArt = new AvatarArt(avatar);
-addChild(avatarArt);
-}}}
-
-In using a Library, Avatar definitions in XML are much more compact since they no longer need to specify their own definitions, but rather simply refer to those already in the Library by name.  Each feature is linked to a respective FeatureDefinition by name. The same applies to each Feature Art with a FeatureDefinition Art (within the artSet).
-
-When published, this example produces:
-
-<img src="http://www.myavatareditor.com/avatarcore/images/sample_library_swf.png" alt="Sample SWF" />
-
-Its only a matter of changing the art names within the Features of the Avatar to change what characteristics the Avatar displays.  It is the responsibility of an editor client to be able to read the available FeatureDefinition objects within a Library to know what Feature 
-FeatureDefinition objects are a reference for Feature instances. 
-
-
-== Definitions Parsing ==
-
-The previous Library example used a root XML node called Definitions to store both the Library and Avatar XML objects.  This was not an arbitrary name - it was used to represent a Definitions (com.myavatareditor.avatarcore.Definitions) object.
-
-The Definitions class exists to makes XML parsing a little easier by acting as a host container collection for storing Avatar and Library definitions.  The Definitions class is also unique in that it can automatically associate Avatars with Librarys when each are within its own collection.  This is handled much in the same way as Features and their respective FeatureDefinitions - using names.  Except with Definitions, an Avatar's libraryName property is used to link to a Library with the respective name value.  This is done because a Definitions collection could potentially hold any number of Avatars and each one of those Avatars could reference the same Library. If they were linked through names, each Avatar would require the same name and there would be a conflict.  So instead, to reference Librarys, Avatars use a libraryName property.
-
-=== Sample Code ===
-
-Using the previous Library example with a Definitions object, we would have:
-
-{{{
-import com.myavatareditor.avatarcore.*;
-import com.myavatareditor.avatarcore.display.*;
-import com.myavatareditor.avatarcore.xml.*;
-
-var definitionsXML:XML =
-}}}
-{{{
-<Definitions xmlns="com.myavatareditor.avatarcore">
-	<Library name="myLibrary">
-		<FeatureDefinition name="eyes">
-			<artSet>
-				<Art name="oval" src="sample_face_eyes.png" zIndex="2" />
-				<Art name="star" src="sample_face_eyes_star.png" zIndex="2" />
-			</artSet>
-		</FeatureDefinition>
-		<FeatureDefinition name="mouth">
-			<artSet>
-				<Art name="smile" src="sample_face_mouth.png" zIndex="1" />
-				<Art name="o" src="sample_face_mouth_o.png" zIndex="1" />
-			</artSet>
-		</FeatureDefinition>
-		<FeatureDefinition name="head">
-			<artSet>
-				<Art name="round" src="sample_face_head.png" zIndex="0" />
-			</artSet>
-		</FeatureDefinition>
-	</Library>
-	<Avatar name="myAvatar" libraryName="myLibrary">
-		<Feature name="eyes">
-			<art name="star" />
-		</Feature>
-		<Feature name="mouth">
-			<art name="o" />
-		</Feature>
-		<Feature name="head">
-			<art name="round" />
-		</Feature>
-	</Avatar>
-</Definitions>;
-}}}
-{{{
-var definitions:Definitions = new Definitions(definitionsXML);
-var avatar:Avatar = definitions.getItemByName("myAvatar") as Avatar;
-
-var avatarArt:AvatarArt = new AvatarArt(avatar);
-addChild(avatarArt);
-}}}
-
-There are a couple of things going on here:
-  * The Definitions object handles all the XML parsing
-  * Avatars (and other objects) are easily accessed by name using ICollection.getItemByName()
-  * Library associations are automatically made through Avatar.libraryName
-  
-  
-== Updating AvatarArt ==
-
-The definitions within an Avatar object are complex.  Changing the name property of an Art object in a Feature in an Avatar collection, for example, will not signal an AvatarArt being used to draw the Avatar to update itself.  You would need to explicitly signal the AvatarArt that it needs to be updated.  Avatars do attempt to do this on most cases.  In fact it is the responsibility of AvatarArt objects to listen to their assigned Avatar objects for updates (via events).  Avatar Features, however, also play a role since they too, at times, can tell the Avatar that they need to be updated. The Avatar will receive update notifications from their Features, then instruct the AvatarArt that it needs to be redrawn.
-
-The trick here is knowing when updates are required and how to invoke the update necessary.  More information about the methods available for this is available in the [http://www.myavatareditor.com/avatarcore/docs/ API Documentation].  The following is a quick overview:
-
-  * *Avatar.updateFeature(Feature)*: Signals that a feature may have been changed
-  * *Avatar.updateFeatures()*: Signals that all features may have been changed
-  * *Feature.update()*: Shortcut to Avatar.updateFeature(Feature)
-  * *Feature.artName*: Shortcut to Feature.art.name which also calls Avatar.updateFeature(Feature)
-  * *Avatar.rebuild()*: Forces a complete reconstruction of the AvatarArt
-
-Typically, a feature is changed and update()/updateFeature() is used to signal an update.  If a feature is only referencing a new Art within a FeatureDefinition, Feature.artName can be set and the update will occur automatically.
