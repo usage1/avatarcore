@@ -46,7 +46,6 @@ By having data in XML, developers or content creators have complete control over
 
 The following XML is an example of a simple Avatar:
 {{{
-{{{
 <Avatar>
 
 	<Feature name="Eyes">
