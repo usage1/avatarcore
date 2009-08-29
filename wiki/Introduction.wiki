@@ -1,5 +1,5 @@
 #summary An introduction to the Avatar Core framework.
-#labels Featured
+#labels Featured,Phase-Design
 #sidebar TableOfContents
 
 _(Last updated for ver 0.2.0)_
