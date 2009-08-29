@@ -26,7 +26,7 @@ package com.myavatareditor.avatarcore {
 	
 	/**
 	 * Base class for Feature and FeatureDefinition defining members
-	 * shared between both of those classes
+	 * shared between both of those classes.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class FeatureBase implements IXMLWritable {
@@ -44,7 +44,7 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Name of the parent feature from which this feature
-		 * inherits transformations such as position, scale and
+		 * inherits adjustments such as position, scale and
 		 * rotation.
 		 */
 		public function get parentName():String { return _parentName; }
@@ -54,30 +54,32 @@ package com.myavatareditor.avatarcore {
 		private var _parentName:String;
 		
 		/**
-		 * Base transformation on top of which other transformations
-		 * are applied. If both a feature and its definition specify
-		 * a base transform, only the definition's base transform will
-		 * be used.  Normally Feature.baseTransform is not necessary.
-		 * It only really useful to help maintain parity with 
-		 * tranformation combinations from feature definitions. For
-		 * example, when copying FeatureDefinition characteristics into
-		 * Feature objects, you would want both the transform and the
-		 * baseTransform objects so that the combined transform will
-		 * be used for the avatar when a library and it's related 
+		 * Base adjustment on top of which other adjustments are applied.
+		 * These are useful for starting adjustments for new features and
+		 * to serve as an offset that a FeatureDefinition can apply to a
+		 * feature's own adjust value.
+		 * If both a feature and its definition specify a base ajustment,
+		 * only the definition's base adjustment will be used.  Normally
+		 * Feature.baseAdjust is not necessary. It is only really useful
+		 * to help maintain parity with adjust combinations from feature 
+		 * definitions. For example, when copying FeatureDefinition
+		 * characteristics into Feature objects, you would want both the
+		 * adjust and the baseAdjust values so that the combined adjust
+		 * will be used for the avatar when a library and it's related
 		 * definitions are not available.
 		 */
-		public function get baseTransform():Transform { return _baseTransform; }
-		public function set baseTransform(value:Transform):void {
-			_baseTransform = value;
+		public function get baseAdjust():Adjust { return _baseAdjust; }
+		public function set baseAdjust(value:Adjust):void {
+			_baseAdjust = value;
 		}
-		private var _baseTransform:Transform;
+		private var _baseAdjust:Adjust;
 		
 		/**
 		 * A collection of custom behaviors that are used to help
 		 * determine the final render of an avatar feature.  Each
 		 * feature in the set is used when drawing the feature's art,
 		 * not just one as is the case with the artSets, colorSets,
-		 * and transformSets.
+		 * and adjustSets.
 		 */
 		public function get behaviors():Collection { return _behaviors; }
 		public function set behaviors(value:Collection):void {
@@ -105,16 +107,20 @@ package com.myavatareditor.avatarcore {
 			return "[" + className + " name: " + name + "]"; 
 		}
 		
+		public function getObjectAsXML():XML {
+			return null;
+		}
+		
 		public function getPropertiesAsAttributesInXML():Object {
-			return {name:1,parentName:1};
+			return {parentName:1, name:1};
 		}
 		
 		public function getPropertiesIgnoredByXML():Object {
 			return {};
 		}
 		
-		public function getObjectAsXML():XML {
-			return null;
+		public function getDefaultPropertiesInXML():Object {
+			return {};
 		}
 	}
 }

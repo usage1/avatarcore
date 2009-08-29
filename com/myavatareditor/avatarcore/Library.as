@@ -29,7 +29,7 @@ package com.myavatareditor.avatarcore {
 	 * object's Feature objects.  At any time an avatar can change its library to
 	 * another allowing it to completely change it's appearance.  Libraries are 
 	 * not required for avatars; avatars can optionally reference Art, Color, and 
-	 * Transform objects directly. Using library reduces redundancy between available
+	 * Adjust objects directly. Using library reduces redundancy between available
 	 * assets and those used by avatars.  Libraries also allow avatar editors to
 	 * know what characteristics are available to avatars as users modify them.
 	 * @author Trevor McCauley; www.senocular.com

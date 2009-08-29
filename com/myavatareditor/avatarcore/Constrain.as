@@ -23,59 +23,124 @@ package com.myavatareditor.avatarcore {
 
 	import com.myavatareditor.avatarcore.Feature;
 	import com.myavatareditor.avatarcore.Range;
-	import com.myavatareditor.avatarcore.Rect;
 	import com.myavatareditor.avatarcore.display.ArtSprite;
 	
 	/**
-	 * A transformation (position, scale, and rotation) constraint
-	 * behavior for feature art.  Constrains are applied to all art assets
-	 * in an art group as though they were one. 
+	 * An adjustment (position, scale, and rotation) constraint
+	 * behavior for features.  Constrains are applied to all art
+	 * assets in an art group as though they were one. 
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Constrain implements IBehavior {
 		
 		/**
-		 * A rectangular area to constrain the center position
-		 * of art sprites in an avatar art object.
+		 * The name of the Constrain instance so that it can be easily
+		 * referenced in a behaviors collection.
 		 */
-		public function get position():Rect { return _position; }
-		public function set position(value:Rect):void {
-			_position = value;
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
 		}
-		private var _position:Rect;
+		private var _name:String;
 		
 		/**
-		 * The possible scaleX values for art sprites. Scale
+		 * The possible range of x values for art sprites. When set
+		 * a clone of the original Range value is saved.
+		 */
+		public function get x():Range { return _x; }
+		public function set x(value:Range):void {
+			_x = value ? value.clone() : null;
+		}
+		private var _x:Range;
+		
+		/**
+		 * The possible range of y values for art sprites. When set
+		 * a clone of the original Range value is saved.
+		 */
+		public function get y():Range { return _y; }
+		public function set y(value:Range):void {
+			_y = value ? value.clone() : null;
+		}
+		private var _y:Range;
+		
+		/**
+		 * The possible range of scaleX values for art sprites. Scale
 		 * constraints are calculated based on absolute values
 		 * where both negative and positive scales are constrained
 		 * within the positive ranges of the range value
-		 * (with negative scales remaining negative).
+		 * (with negative scales remaining negative). When set
+		 * a clone of the original Range value is saved.
 		 */
-		public function get scaleX():Range { return _scaleX; }
+		public function get scaleX():Range { 
+			if (_scale != null) _scale = null;
+			return _scaleX;
+		}
 		public function set scaleX(value:Range):void {
-			_scaleX = value;
+			if (_scale != null) _scale = null;
+			_scaleX = value ? value.clone() : null;
 		}
 		private var _scaleX:Range;
 		
 		/**
-		 * The possible scaleY values for art sprites. Scale
+		 * The possible range of scaleY values for art sprites. Scale
 		 * constraints are calculated based on absolute values
 		 * where both negative and positive scales are constrained
 		 * within the positive ranges of the range value
-		 * (with negative scales remaining negative).
+		 * (with negative scales remaining negative). When set
+		 * a clone of the original Range value is saved.
 		 */
-		public function get scaleY():Range { return _scaleY; }
+		public function get scaleY():Range {
+			if (_scale != null) _scale = null;
+			return _scaleY;
+		}
 		public function set scaleY(value:Range):void {
-			_scaleY = value;
+			if (_scale != null) _scale = null;
+			_scaleY = value ? value.clone() : null;
 		}
 		private var _scaleY:Range;
 		
 		/**
-		 * The possible rotation values for art sprites.
+		 * An alternate Range object representing both the scaleX and scaleY
+		 * ranges to be used within a Constrain in place of scaleX and scaleY
+		 * when defined (non-null).  The scale is defined automatically, if not
+		 * already, whenever its value is accessed or set. When first
+		 * accessed in this manner, if both scaleX and scaleY is defined, scale
+		 * will be represent their averages. If only one is defined, scale will 
+		 * take on the value of that range which is defined. If both are not
+		 * defined (null), scale remains null until explicitly set. If at any 
+		 * point in time the value of scaleX or scaleY is set or accessed,
+		 * scale automatically becomes null.
+		 */
+		public function get scale():Range {
+			if (_scale == null){
+				if (_scaleX){
+					if (_scaleY){
+						_scale = new Range(
+							(_scaleX.min + _scaleY.min)/2,
+							(_scaleX.max + _scaleY.max)/2,
+							int((_scaleX.steps + _scaleY.steps)/2)
+						);
+					}else{
+						_scale = _scaleX.clone();
+					}
+				}else if (_scaleY){
+					_scale = _scaleY.clone();
+				}
+			}
+			return _scale;
+		}
+		public function set scale(value:Range):void {
+			_scale = value ? value.clone() : null;
+		}
+		private var _scale:Range;
+		
+		/**
+		 * The possible range of rotation values for art sprites. When set
+		 * a clone of the original Range value is saved.
 		 */
 		public function get rotation():Range { return _rotation; }
 		public function set rotation(value:Range):void {
-			_rotation = value;
+			_rotation = value ? value.clone() : null;
 		}
 		private var _rotation:Range;
 		
@@ -86,8 +151,9 @@ package com.myavatareditor.avatarcore {
 		 * @param	scaleY ScaleY range value.
 		 * @param	rotation Rotation range value.
 		 */
-		public function Constrain(position:Rect = null, scaleX:Range = null, scaleY:Range = null, rotation:Range = null) {
-			this.position = position;
+		public function Constrain(x:Range = null, y:Range = null, scaleX:Range = null, scaleY:Range = null, rotation:Range = null) {
+			this.x = x;
+			this.y = y;
 			this.scaleX = scaleX;
 			this.scaleY = scaleY;
 			this.rotation = rotation;
@@ -105,60 +171,93 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Confines sprites within the region specified by the 
-		 * constrain properties. 
+		 * constrain properties. This will only  work if the feature
+		 * is using its own adjust and not a feature definition's.
 		 * @param	artSprite The art sprite being drawn.
 		 */
 		public function drawArtSprite(artSprite:ArtSprite):void {
-			if (artSprite == null) return;
+			if (artSprite == null || artSprite.feature == null) return;
+			
+			// constraints will only
+			var feature:Feature = artSprite.feature;
+			var adjust:Adjust = feature.adjust;
+			var newValue:Number; // x, y, scaleX, scaleY, rotation
 			
 			// position
-			if (_position){
-				if (artSprite.x < _position.left){
-					artSprite.x = _position.left;
-				}else if (artSprite.x > _position.right){
-					artSprite.x = _position.right;
+			// x value
+			if (_x){
+				newValue = adjust.x;
+				
+				// steps/clamp
+				newValue = _x.stepValue(newValue);
+				// set
+				if (adjust.x != newValue){
+					adjust.x = newValue;
 				}
-				if (artSprite.y < _position.top){
-					artSprite.y = _position.top;
-				}else if (artSprite.y > _position.bottom){
-					artSprite.y = _position.bottom;
+			}
+			
+			// y value
+			if (_y){
+				newValue = adjust.y;
+				
+				// steps/clamp
+				newValue = _y.stepValue(newValue);
+				// set
+				if (adjust.y != newValue){
+					adjust.y = newValue;
 				}
 			}
 			
 			// rotation
 			if (_rotation){
-				if (artSprite.rotation > _rotation.max){
-					artSprite.rotation = _rotation.max;
-				}else if (artSprite.rotation < _rotation.min){
-					artSprite.rotation = _rotation.min;
+				newValue = adjust.rotation;
+				
+				// steps/clamp
+				newValue = _rotation.stepValue(newValue);
+				// set
+				if (adjust.rotation != newValue){
+					adjust.rotation = newValue;
 				}
 			}
 			
 			// scale
-			var absScale:Number;
-			var negScale:Boolean;
-			if (_scaleX){
-				absScale = Math.abs(artSprite.scaleX);
-				negScale = Boolean(artSprite.scaleX < 0);
-				if (artSprite.scaleX > _scaleX.max){
-					artSprite.scaleX = negScale ? -_scaleX.max : _scaleX.max;
-				}else if (absScale < _scaleX.min){
-					artSprite.scaleX = negScale ? -_scaleX.min : _scaleX.min;
+			// mirror properties used to handle negative scale values
+			// otherwise everything is treated as positive
+			// if scale is defined, it will be used over scaleX/Y
+			var scaleRange:Range;
+			
+			// scaleX
+			scaleRange = _scale ? _scale : _scaleX;
+			if (scaleRange){
+				newValue = Math.abs(adjust.scaleX);
+				
+				// steps/clamp
+				newValue = scaleRange.stepValue(newValue);
+				// set
+				if (adjust.scaleX != newValue){
+					adjust.scaleX = newValue;
 				}
 			}
-			if (_scaleY){
-				absScale = Math.abs(artSprite.scaleY);
-				negScale = Boolean(artSprite.scaleY < 0);
-				if (absScale > _scaleY.max){
-					artSprite.scaleY = negScale ? -_scaleY.max : _scaleY.max;
-				}else if (absScale < _scaleY.min){
-					artSprite.scaleY = negScale ? -_scaleY.min : _scaleY.min;
+			
+			// scaleY
+			scaleRange = _scale ? _scale : _scaleY;
+			if (scaleRange){
+				newValue = Math.abs(adjust.scaleY);
+				
+				// steps/clamp
+				newValue = scaleRange.stepValue(newValue);
+				// set
+				if (adjust.scaleY != newValue){
+					adjust.scaleY = newValue;
 				}
 			}
+			
+			// reapply transform matrix to show adjust changes
+			artSprite.transform.matrix = feature.getRenderedAdjust().getMatrix();
 		}
 		
 		public function clone():IBehavior {
-			var copy:Constrain = new Constrain(_position.clone() as Rect, _scaleX.clone(),  _scaleY.clone(), _rotation.clone());
+			var copy:Constrain = new Constrain(_x, _y, _scaleX, _scaleY, _rotation);
 			return copy;
 		}
 	}

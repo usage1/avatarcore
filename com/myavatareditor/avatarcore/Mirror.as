@@ -28,10 +28,9 @@ package com.myavatareditor.avatarcore {
 	/**
 	 * A behavior that creates a mirrored duplicate (along y axis) of a
 	 * feature's art.  This allows characteristics like eyes to be both
-	 * graphically similar and to be transformed in a synchronous fashion.
-	 * Mirror art is recreated to mirror the original transformation applied.
-	 * This is not a piece of the core framework, but an extension of it. As
-	 * such, if referenced only in XML, you will need to be sure to include
+	 * graphically similar and to be altered in a synchronous fashion. This is
+	 * not necessarily a piece of the core framework, but an extension of it.
+	 * As such, if referenced only in XML, you will need to be sure to include
 	 * a reference of the class in your SWF so that it gets compiled into
 	 * the SWF bytecode and is accessible when the XML is parsed.
 	 * @author Trevor McCauley; www.senocular.com

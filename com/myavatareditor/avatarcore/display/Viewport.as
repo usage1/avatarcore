@@ -105,6 +105,7 @@ package com.myavatareditor.avatarcore.display {
 		 * @param	height The starting height of the viewport.
 		 */
 		public function Viewport(width:Number = 100, height:Number = 100) {
+			mouseChildren = false;
 			this.width = width;
 			this.height = height;
 		}
@@ -117,6 +118,50 @@ package com.myavatareditor.avatarcore.display {
 			if (_content == null) return;
 			validateDisplayList();
 			validatedCenter();
+		}
+		
+		/**
+		 * Centers and resizes the content to fit exactly within the
+		 * bounds of viewport area without distortion.
+		 */
+		public function fitContent(padding:Number = 0):void {
+			if (_content == null) return;
+			validateDisplayList();
+			
+			var contentRect:Rectangle = _content.getBounds(contentSprite);
+			if (contentRect.width == 0 || contentRect.height == 0){
+				return;
+			}
+			
+			var scale:Number;
+			padding = (padding < 0) ? -padding * 2 : padding * 2;
+			if (padding >= _width || padding >= _height){
+				// padding crushes content into nothingness
+				scale = 0;
+			}else{
+				var wRatio:Number = (_width - padding)/contentRect.width;
+				var hRatio:Number = (_height - padding)/contentRect.height;
+				scale = (hRatio < wRatio) ? hRatio : wRatio;
+			}
+			
+			// set size; not using scaleX/Y incase content is rotated
+			_content.width = _content.width * scale;
+			_content.height = _content.height * scale;
+			
+			validatedCenter();
+		}
+		
+		/**
+		 * Sets the content's position to 0,0 and removes any
+		 * scaling previously applied to that content.
+		 */
+		public function resetContent():void {
+			if (_content == null) return;
+			validateDisplayList();
+			_content.x = 0;
+			_content.y = 0;
+			_content.scaleX = 1;
+			_content.scaleY = 1;
 		}
 		
 		/**
@@ -149,22 +194,6 @@ package com.myavatareditor.avatarcore.display {
 			var offset:Point = viewportCenter.subtract(contentCenter);
 			_content.x += offset.x;
 			_content.y += offset.y;
-		}
-		
-		public function fitContent():void {
-			if (_content == null) return;
-			validateDisplayList();
-			
-			var contentRect:Rectangle = _content.getBounds(contentSprite);
-			var wRatio:Number = _width/contentRect.width;
-			var hRatio:Number = _height/contentRect.height;
-			var scale:Number = (hRatio < wRatio) ? hRatio : wRatio;
-			
-			// set size; not using scaleX/Y incase content is rotated
-			_content.width = _content.width * scale;
-			_content.height = _content.height * scale;
-			
-			validatedCenter();
 		}
 		
 		private function drawMask():void {

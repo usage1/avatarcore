@@ -23,12 +23,11 @@ package com.myavatareditor.avatarcore {
 	
 	import com.myavatareditor.avatarcore.display.ArtSprite;
 	import com.myavatareditor.avatarcore.xml.IXMLWritable;
-	import flash.geom.Rectangle;
 	
 	/**
 	 * Defines characteristics to be referenced by avatar features.  Characteristics
-	 * include possible art, color selections, transformations and optional
-	 * constraints for transformations.  Features reference these characteristics
+	 * include possible art, color selections, adjustments and optional
+	 * constraints.  Features reference these characteristics
 	 * by name.  Features reference feature definitions when they share the same 
 	 * name.  This connection is made when an Avatar instance is associated with a 
 	 * Library instance.
@@ -62,17 +61,17 @@ package com.myavatareditor.avatarcore {
 		private var _colorSet:SetCollection = new SetCollection();
 		
 		/**
-		 * Variations of transformations that can be
-		 * applied to art within this definition.  A transformSet
+		 * Variations of adjusts that can be applied to
+		 * art within this definition.  A adjustSet
 		 * cannot be null.
 		 */
-		public function get transformSet():SetCollection { return _transformSet; }
-		public function set transformSet(value:SetCollection):void {
+		public function get adjustSet():SetCollection { return _adjustSet; }
+		public function set adjustSet(value:SetCollection):void {
 			if (value){
-				_transformSet = value;
+				_adjustSet = value;
 			}
 		}
-		private var _transformSet:SetCollection = new SetCollection();
+		private var _adjustSet:SetCollection = new SetCollection();
 		
 		/**
 		 * Constructor for creating new FeatureDefinition instances.
