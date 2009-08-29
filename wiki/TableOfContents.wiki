@@ -1,5 +1,4 @@
 #summary Table of contents
-#labels Deprecated
   * [http://code.google.com/p/avatarcore Project Home]
 ----
   * [Introduction]
@@ -13,6 +12,6 @@
     * [AboutColors]
     * [AboutAdjusts]
     * [AboutBehaviors] 
-  * [XMLFormat]
+  * [Demos]
 ----
   * [http://www.myavatareditor.com/avatarcore/docs/ API Documentation]
