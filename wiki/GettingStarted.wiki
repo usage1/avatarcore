@@ -81,12 +81,15 @@ import com.myavatareditor.avatarcore.display.*;
 import com.myavatareditor.avatarcore.xml.*;
 
 var avatarXML:XML = 
+}}}
+{{{
 	<Avatar xmlns="com.myavatareditor.avatarcore">
 		<Feature>
 			<art src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png" />
 		</Feature>
 	</Avatar>;
-
+}}}
+{{{
 var xmlParser:XMLDefinitionParser = new XMLDefinitionParser();
 var avatar:Avatar = xmlParser.parse(avatarXML) as Avatar;
 
@@ -112,6 +115,8 @@ Next is the XML, here assigned to the avatarXML variable.  It mirrors the Avatar
 Note that the xml namespace specified within the XML is the same is the package path used by Avatar, Feature, and Art (com.myavatareditor.avatarcore).  This namespace is required since it's actually used to locate those definitions when the XML is being parsed.
 {{{
 var avatarXML:XML = 
+}}}
+{{{
 	<Avatar xmlns="com.myavatareditor.avatarcore">
 		<Feature>
 			<art src="http://www.myavatareditor.com/avatarcore/images/tutorial/hello_world.png" />
