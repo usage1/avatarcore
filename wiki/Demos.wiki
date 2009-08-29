@@ -1,8 +1,12 @@
 #summary Examples of practical applications of the Avatar Core framework.
+#labels Phase-Implementation
 
+The following examples show uses of the Avatar Core framework. They demonstrate features and provide solutions to common (or uncommon) problems.
 
-== SimpleFeatureSelection ==
-The following demo was created using [http://www.adobe.com/products/flash/ Flash Professional CS4]. The interface consists of a group of standard Flash controls used to select the different features available to the avatar as defined in an external XML definition.
+All of these demos were built with [http://www.adobe.com/products/flash/ Flash Professional CS4], but their source code is external for inspection if you, yourself, are not using it.
+
+== Simple Feature Selection ==
+This demo covers the most common use case for Avatar Core.  You have an avatar character on the left and a set of options listed out on the left for changing the features of the character.  The interface consists of a group of standard Flash controls used to select the different features available to the avatar as defined in an external XML definition.
 
 <wiki:gadget url="http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionGadget.xml" width="600" height="300" border="1" />
 
@@ -11,3 +15,17 @@ Demo source files:
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionAvatar.as SimpleFeatureSelectionAvatar.as]
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionEditor.as SimpleFeatureSelectionEditor.as]
 Full demo download (including framework) available in [http://code.google.com/p/avatarcore/downloads/list downloads].
+
+== Adjust Features ==
+
+== Adjust Constrained Features ==
+
+View Live Demo:
+*  [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]
+
+== Drag Features ==
+
+== Drag Constrained Features ==
+
+View Live Demo:
+*  [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
