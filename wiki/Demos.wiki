@@ -1,0 +1,13 @@
+#summary Examples of practical applications of the Avatar Core framework.
+
+
+== SimpleFeatureSelection ==
+The following demo was created using [http://www.adobe.com/products/flash/ Flash Professional CS4]. The interface consists of a group of standard Flash controls used to select the different features available to the avatar as defined in an external XML definition.
+
+<wiki:gadget url="http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionGadget.xml" width="600" height="300" border="1" />
+
+Demo source files:
+  * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelection.xml SimpleFeatureSelection.xml]
+  * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionAvatar.as SimpleFeatureSelectionAvatar.as]
+  * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionEditor.as SimpleFeatureSelectionEditor.as]
+Full demo download (including framework) available in [http://code.google.com/p/avatarcore/downloads/list downloads].
