@@ -223,6 +223,11 @@ package com.myavatareditor.avatarcore.xml {
 			try {
 				instanceClass = getDefinitionByName(type) as Class;
 				instance = new instanceClass();
+				
+			}catch (error:ArgumentError){
+				print("Parsing XML; Class " + type + " cannot be instantiated because it contains required parameters", PrintLevel.WARNING, this);
+				return null;
+				
 			}catch (error:Error){
 				// likely to occur if the definition of the class
 				// does not exist within the application

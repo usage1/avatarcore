@@ -37,6 +37,7 @@ package com.myavatareditor.avatarcore.xml {
 			propertiesIgnoredByXML:1,
 			propertiesAsAttributesInXML:1
 		};
+		private var defaultDefaultPropertiesInXML:Object = {};
 		
 		public function XMLDefinitionWriter() {
 			
@@ -79,6 +80,7 @@ package com.myavatareditor.avatarcore.xml {
 			// are placed in the XML if placed there at all
 			var propertiesIgnoredByXML:Object = defaultPropertiesIgnoredByXML;
 			var propertiesAsAttributesInXML:Object = defaultPropertiesAsAttributesInXML;
+			var propertiesDefaults:Object = defaultDefaultPropertiesInXML;
 			
 			if (object is IXMLWritable){
 				var xmlWritable:IXMLWritable = object as IXMLWritable;
@@ -87,6 +89,8 @@ package com.myavatareditor.avatarcore.xml {
 				if (temp) propertiesIgnoredByXML = temp;
 				temp = xmlWritable.getPropertiesAsAttributesInXML();
 				if (temp) propertiesAsAttributesInXML = temp;
+				temp = xmlWritable.getDefaultPropertiesInXML();
+				if (temp) propertiesDefaults = temp;
 			}
 			
 			// define XML children and attributes
@@ -108,9 +112,11 @@ package com.myavatareditor.avatarcore.xml {
 				
 				// properties as elements or attributes
 				if (propName in propertiesAsAttributesInXML){
-					xml.@[propName] = value.toString();
+					if (value != propertiesDefaults[propName])
+						xml.@[propName] = value.toString();
 				}else if (isPrimitive(value)){
-					children += <{propName}>{value.toString()}</{propName}>;
+					if (value != propertiesDefaults[propName])
+						children += <{propName}>{value.toString()}</{propName}>;
 				}else if (value is XML || value is XMLList){
 					children += value;
 				}else{

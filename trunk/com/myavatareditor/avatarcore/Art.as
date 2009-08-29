@@ -69,7 +69,7 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Arrangement value to be used in determining the stacking
-		 * order of all the art composed within an AvatarArt instance.
+		 * order of all the art composed within an AvatarDisplay instance.
 		 * The higher the zIndex, the higher the art in the stacking
 		 * order.  If two objects share the same zIndex, there is no
 		 * guarantee as to the order of their arrangement.  You should
@@ -104,8 +104,8 @@ package com.myavatareditor.avatarcore {
 		 * The source of the thumbnail to be used for previewing the
 		 * art for the user. This can be either a class name or a
 		 * URL referencing a loaded asset. Management of a thumbnail
-		 * is handled by a custom editor; the framework does not 
-		 * internally depend on or otherwise use this value.
+		 * is handled independently by the developer; the framework does 
+		 * not necessarily internally depend on or otherwise use this value.
 		 */
 		public function get thumbnail():String { return _thumbnail; }
 		public function set thumbnail(value:String):void {
@@ -193,7 +193,12 @@ package com.myavatareditor.avatarcore {
 			obj.style = 1;
 			return obj;
 		}
-		
+		public override function getDefaultPropertiesInXML():Object {
+			var obj:Object = super.getPropertiesAsAttributesInXML();
+			obj.x = 0;
+			obj.y = 0;
+			return obj;
+		}
 		/**
 		 * Custom addItem that assigns default colorize and
 		 * zIndex values to added Art objects when their values are
@@ -232,7 +237,7 @@ package com.myavatareditor.avatarcore {
 			}
 			
 			if (isNaN(smoothing) == false && isNaN(_smoothing)) {
-				_colorize = smoothing;
+				_smoothing = smoothing;
 			}
 			
 			// assign defaults to child Art items in collection

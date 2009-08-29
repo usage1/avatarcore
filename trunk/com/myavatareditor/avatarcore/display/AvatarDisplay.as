@@ -33,17 +33,29 @@ package com.myavatareditor.avatarcore.display {
 	import flash.events.Event;
 	
 	/**
+	 * Dispatched when the AvatarDisplay redraws itself.  This usually occurs
+	 * after receiving events, such as an Avatar.REBUILD or
+	 * FeatureEvent.FEATURE_CHANGED from a referenced Avatar object.
+	 */
+	[Event(name="draw", type="flash.events.Event")]
+	
+	/**
 	 * A controller and container display object for all art used in an avatar. 
 	 * All avatar art exists as child sprite of this container, irrespective
 	 * of their feature parent hierarchies.  Layering of art is based 
 	 * solely on the defined zIndex values within the features' definitions.
 	 * Without a zIndex, their ordering is up to chance.  Art for avatars is
-	 * created in ArtSprite instances and added to the AvatarArt automatically
+	 * created in ArtSprite instances and added to the AvatarDisplay automatically
 	 * as the avatar being referenced is updated.  Most of the API is not needed
 	 * for normal use.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class AvatarArt extends Sprite {
+	public class AvatarDisplay extends Sprite {
+		
+		/**
+		 * Constant for draw event type.
+		 */
+		public static const DRAW:String = "draw";
 		
 		/**
 		 * The avatar associated with the avatar art. The avatar
@@ -69,16 +81,15 @@ package com.myavatareditor.avatarcore.display {
 		private var _avatar:Avatar;
 		
 		private var displayList:Array = [];
-		private var displayListSortKey:String = "zIndex";
 		private var artMapSortKey:String = "src";
 		private var featureArtMap:Object = {};
 		private var suppressDraw:Boolean = false;
 		
 		/**
-		 * Constructor for creating new AvatarArt instances.
+		 * Constructor for creating new AvatarDisplay instances.
 		 * @param	avatar
 		 */
-		public function AvatarArt(avatar:Avatar = null){
+		public function AvatarDisplay(avatar:Avatar = null){
 			this.avatar = avatar;
 		}
 		
@@ -95,18 +106,22 @@ package com.myavatareditor.avatarcore.display {
 			}
 			
 			suppressDraw = true;
+			try {
 			
-			var features:Array = _avatar.collection;
-			var feature:Feature;
-			
-			var i:int = features.length;
-			while (i--){
-				feature = features[i] as Feature;
-				if (feature){
-					addFeatureArtSprites(feature);
+				var features:Array = _avatar.collection;
+				var feature:Feature;
+				
+				var i:int = features.length;
+				while (i--){
+					feature = features[i] as Feature;
+					if (feature){
+						addFeatureArtSprites(feature);
+					}
 				}
+				
+			}catch (error:Error){
+				print("Avatar Rebuild; unknown error: " + error.message, PrintLevel.ERROR, this);
 			}
-			
 			suppressDraw = false;
 			
 			draw();
@@ -116,21 +131,34 @@ package com.myavatareditor.avatarcore.display {
 		 * Draws the art sprites in the avatar art updating their
 		 * transformations as defined in their respective features.
 		 * If a feature's art definition has changed, you should use
-		 * updateFeatureArt method to update that feature.
+		 * updateFeatureArt method to update that feature.  draw()
+		 * will automatically be called during those updates.
 		 */
 		public function draw():void {
 			if (suppressDraw) return;
-			
-			displayList.sortOn(displayListSortKey, Array.NUMERIC);
 			var artSprite:ArtSprite;
-			var i:int = displayList.length;
+			var i:int;
+			
+			// arrangement loop
+			displayList.sortOn("zIndex", Array.NUMERIC);
+			i = displayList.length;
 			while (i--){
 				artSprite = displayList[i] as ArtSprite;
-				artSprite.draw();
 				if (getChildIndex(artSprite) != i) {
 					setChildIndex(artSprite, i);
 				}
 			}
+			
+			// draw loop (parents drawn first)
+			displayList.sortOn("parentCount", Array.NUMERIC | Array.DESCENDING);
+			i = displayList.length;
+			while (i--){
+				artSprite = displayList[i] as ArtSprite;
+				//trace(artSprite.feature.name, artSprite.parentCount)
+				artSprite.draw();
+			}
+			
+			dispatchEvent(new Event(DRAW));
 		}
 		
 		/**
@@ -172,16 +200,30 @@ package com.myavatareditor.avatarcore.display {
 				return;
 			}
 			
-			addFeatureArtSprites(feature);
+			suppressDraw = true;
+			try {
+				
+				addFeatureArtSprites(feature);
+				
+			}catch (error:Error){
+				print("Avatar drawing; unknown error: " + error.message, PrintLevel.ERROR, this);
+			}
+			suppressDraw = false;
+			
 			draw();
 		}
 		
 		private function addFeatureArtSprites(feature:Feature):void {
+			
+			// a new sprite list is returned from validateFeatureArt
+			// if sprites returned by feature.getArtSprites doesn't
+			// match the sprites currently being used to display the
+			// feature (as dictated by src).  If those sprites differ
+			// the feature is rebuilt
 			var sprites:Array = validateFeatureArt(feature);
 			if (sprites){
-			
 				removeFeatureArtByName(feature.name);
-			
+				
 				var artSprite:ArtSprite;
 				var i:int = sprites.length;
 				while (i--){
@@ -250,6 +292,33 @@ package com.myavatareditor.avatarcore.display {
 			draw();
 		}
 		
+		/**
+		 * Returns all ArtSprite instances used by this ArtDisplay object
+		 * to display the feature provided.  Each time a feature is changed
+		 * these sprites may change as sprites used to represent features
+		 * are rebuilt.
+		 * @param	feature The feature for which to retrieve ArtSprites.
+		 * @return An array of ArtSprite instances whose feature matches the
+		 * one provided.
+		 */
+		public function getArtSpritesForFeature(feature:Feature):Array {
+			var artSprites:Array = [];
+			var artSprite:ArtSprite;
+			var i:int = displayList.length;
+			while (i--){
+				artSprite = displayList[i] as ArtSprite;
+				if (artSprite && artSprite.feature == feature){
+					artSprites.push(artSprite);
+				}
+			}
+			return artSprites;
+		}
+		
+		/**
+		 * Figures out if a feature's art has changed since the
+		 * last time that feature has been drawn using a map of
+		 * the feature's art sprites identified by src.
+		 */
 		private function validateFeatureArt(feature:Feature):Array {
 			if (feature == null) return null;
 			

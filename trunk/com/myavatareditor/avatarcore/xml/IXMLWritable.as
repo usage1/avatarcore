@@ -79,5 +79,19 @@ package com.myavatareditor.avatarcore.xml {
 		 * as attributes in the generated XML.
 		 */
 		function getPropertiesAsAttributesInXML():Object;
+		
+		/**
+		 * Specifies the default values of properties within an object.
+		 * When an object is being written to XML, if it's property
+		 * values match the default values defined by this call for that
+		 * property, that property will not be written to XML.  This 
+		 * reduces unnecessary XML elements and attributes which would
+		 * otherwise do nothing but specify a value which already exists
+		 * by default.
+		 * @return An object with name value pairs where the names
+		 * are the names of the class members and the values are the
+		 * default values of those members.
+		 */
+		function getDefaultPropertiesInXML():Object;
 	}
 }

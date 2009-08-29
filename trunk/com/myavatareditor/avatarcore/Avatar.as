@@ -24,10 +24,8 @@ package com.myavatareditor.avatarcore {
 	import com.myavatareditor.avatarcore.Collection;
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
-	import com.myavatareditor.avatarcore.display.AvatarArt;
 	import com.myavatareditor.avatarcore.events.FeatureEvent;
 	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
-	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
@@ -35,13 +33,13 @@ package com.myavatareditor.avatarcore {
 	 * Avatars contain the data describing avatar characters.
 	 * Physical (visible) characteristics are defined by Feature instances
 	 * contained within avatar collections. The visual representation 
-	 * of an Avatar object is controlled by an AvatarArt instance
+	 * of an Avatar object is controlled by an AvatarDisplay instance
 	 * which references the Avatar object to know what to display. Other
 	 * qualities such as age, creator, weight, etc. can be added separately
 	 * by developer's through subclassing Avatar. 
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Avatar extends Collection implements IXMLWritable {
+	public class Avatar extends Collection {
 		
 		/**
 		 * Rebuild event constant.
@@ -57,7 +55,8 @@ package com.myavatareditor.avatarcore {
 		 * The name of the library to be associated with this
 		 * avatar.  Associations with libraries through this
 		 * property are made when an Avatar instance is created
-		 * within a Definitions object.
+		 * within a Definitions object. Changing libraryName will
+		 * not invoke a new lookup for the related library.
 		 */
 		public function get libraryName():String { 
 			return _library ? _library.name : _libraryName;
@@ -110,7 +109,7 @@ package com.myavatareditor.avatarcore {
 		}
 		
 		public override function getPropertiesAsAttributesInXML():Object {
-			var obj:Object = super.getPropertiesIgnoredByXML();
+			var obj:Object = super.getPropertiesAsAttributesInXML();
 			obj.libraryName = 1;
 			return obj;
 		}
@@ -136,15 +135,24 @@ package com.myavatareditor.avatarcore {
 			var itemName:String = (Collection.nameKey in item) ? item[Collection.nameKey] : null;
 			if (itemName && super.removeItemByName(itemName)) { 
 				eventType = FeatureEvent.FEATURE_CHANGED;
-			}else {
+			}else{
 				eventType = FeatureEvent.FEATURE_ADDED;
 			}
 			
 			var added:* = super.addItem(item);
 			if (added is Feature) {
 				var feature:Feature = added as Feature;
+				
+				// remove feature from any previous avatar
+				var oldAvatar:Avatar = feature.avatar;
+				if (oldAvatar && oldAvatar != this){
+					oldAvatar.removeItem(feature);
+				}
+				
+				// link feature to this avatar
 				feature.avatar = this;
 				coupleFeatureToLibrary(feature);
+				updateParentHierarchy();
 				dispatchEvent(new FeatureEvent(eventType, false, false, feature));
 			}
 			return added;
@@ -171,50 +179,49 @@ package com.myavatareditor.avatarcore {
 			return removed;
 		}
 		
-		/**
-		 * Indicates to Avatar stakeholders (i.e. AvatarArt) that a feature
-		 * has been  changed.  This does not modify the Avatar instance itself,
-		 * just validates the feature as being a feature within this avatar and
-		 * then sends out the respective FEATURE_CHANGED event so that other
-		 * objects can react to data (feature) within the avatar being modified.
-		 * @param	feature The feature having been modified. If the
-		 * feature does not exist within the avatar, no action is taken.
-		 */
-		public function updateFeature(feature:Feature):void {
-			if (feature == null) return;
-			
-			// if feature has no defined name, feature.name should still
-			// exist since its enforced in Collection.addItem
-			if (feature != getItemByName(feature.name)) {
-				print(feature + " cannot be updated because it is not present in " + this, PrintLevel.WARNING, this);
-				return;
-			}
+		public function redrawFeature(feature:Feature):void {
+			if (feature == null || feature.avatar != this) return;
 			dispatchEvent(new FeatureEvent(FeatureEvent.FEATURE_CHANGED, false, false, feature));
 		}
 		
 		/**
-		 * Calls updateFeature() for all Feature instances within this 
+		 * Calls redrawFeature() for each Feature instance within this 
 		 * Avatar instance.
 		 */
-		public function updateFeatures():void {
+		public function redrawFeatures():void {
 			var feature:Feature;
 			var features:Array = this.collection;
 			var i:int = features.length;
 			while (i--){
-				feature = features[i] as Feature;
-				if (feature){
-					updateFeature(feature);
-				}
+				redrawFeature(features[i] as Feature);
 			}
 		}
+		
 		/**
-		 * Rebuilds an avatar definition by reassociating the
-		 * avatar's library with its feature definitions. After
-		 * rebuilding, a Avatar.REBUILD event is dispatched.
+		 * Updates the parent hierarchy used within the features of the
+		 * Avatar instance. If at any point in time, parents or parentName
+		 * values change, the parent hierarchy will need to be updated so 
+		 * that child features will be able to correctly reference their
+		 * parents and be drawn after their parents are done drawing.
 		 */
-		public function rebuild():void {
-			coupleLibrary();
-			dispatchEvent(new Event(REBUILD));
+		public function updateParentHierarchy():void {
+			var feature:Feature;
+			var features:Array = this.collection;
+			var i:int;
+			
+			// pass one: make sure all parent references are set
+			i = features.length;
+			while (i--){
+				feature = features[i] as Feature;
+				if (feature) feature.updateParent();
+			}
+			
+			// pass two: update parent counts for drawing order
+			i = features.length;
+			while (i--){
+				feature = features[i] as Feature;
+				if (feature) feature.updateParentCount();
+			}
 		}
 		
 		/**
@@ -229,10 +236,18 @@ package com.myavatareditor.avatarcore {
 			var i:int = features.length;
 			while (i--){
 				feature = features[i] as Feature;
-				if (feature){
-					feature.consolidate();
-				}
+				if (feature) feature.consolidate();
 			}
+		}
+		
+		/**
+		 * Rebuilds an avatar definition by reassociating the
+		 * avatar's library with its feature definitions. After
+		 * rebuilding, a Avatar.REBUILD event is dispatched.
+		 */
+		public function rebuild():void {
+			coupleLibrary();
+			dispatchEvent(new Event(REBUILD));
 		}
 		
 		private function coupleLibrary():void {
@@ -241,6 +256,7 @@ package com.myavatareditor.avatarcore {
 			while (i--){
 				coupleFeatureToLibrary(collection[i] as Feature);
 			}
+			updateParentHierarchy();
 		}
 		private function coupleFeatureToLibrary(feature:Feature):void {
 			if (feature == null || !feature.name) return;
@@ -267,7 +283,8 @@ package com.myavatareditor.avatarcore {
 				var feature:Feature = getItemByName(featureName) as Feature;
 				if (feature){
 					coupleFeatureToLibrary(feature);
-					updateFeature(feature);
+					updateParentHierarchy();
+					redrawFeature(feature);
 				}
 			}
 		}

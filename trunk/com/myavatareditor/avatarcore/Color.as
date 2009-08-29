@@ -43,22 +43,13 @@ package com.myavatareditor.avatarcore {
 		private var _name:String;
 		
 		/**
-		 * Constructor for creating new Color instances.
+		 * Constructor for creating new shade instances.
 		 */
 		public function Color(redMultiplier:Number = 1.0, greenMultiplier:Number = 1.0, blueMultiplier:Number = 1.0, alphaMultiplier:Number = 1.0,
 							redOffset:Number = 0, greenOffset:Number = 0, blueOffset:Number = 0, alphaOffset:Number = 0) {
 						
 			super(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier,
 				redOffset, greenOffset, blueOffset, alphaOffset);
-		}
-		
-		public function getPropertiesIgnoredByXML():Object {
-			return {};
-		}
-		
-		public function getPropertiesAsAttributesInXML():Object {
-			return {name:1, redMultiplier:1, greenMultiplier:1, blueMultiplier:1, alphaMultiplier:1,
-				redOffset:1, greenOffset:1, blueOffset:1, alphaOffset:1};
 		}
 		
 		public function getObjectAsXML():XML {
@@ -79,6 +70,19 @@ package com.myavatareditor.avatarcore {
 				if (alphaOffset != 0) xml.@alphaOffset = alphaOffset;
 			}
 			return xml;
+		}
+		
+		public function getPropertiesIgnoredByXML():Object {
+			return {};
+		}
+		
+		public function getPropertiesAsAttributesInXML():Object {
+			return {name:1, redMultiplier:1, greenMultiplier:1, blueMultiplier:1, alphaMultiplier:1,
+				redOffset:1, greenOffset:1, blueOffset:1, alphaOffset:1};
+		}
+		
+		public function getDefaultPropertiesInXML():Object {
+			return {};
 		}
 		
 		/**

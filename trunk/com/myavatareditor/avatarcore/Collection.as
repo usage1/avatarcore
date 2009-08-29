@@ -81,6 +81,10 @@ package com.myavatareditor.avatarcore {
 			return {name:1};
 		}
 		
+		public function getDefaultPropertiesInXML():Object {
+			return {};
+		}
+		
 		public function getObjectAsXML():XML {
 			return null;
 		}
@@ -209,6 +213,7 @@ package com.myavatareditor.avatarcore {
 		 * returns an array of those items.
 		 * @param	type The type of items to find in the collection.
 		 * @return An array of collection items of the type provided.
+		 * If no items are found, an empty array is returned.
 		 */
 		public function getItemsByType(type:Class):Array {
 			var items:Array = [];

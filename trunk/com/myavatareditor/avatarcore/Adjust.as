@@ -25,16 +25,16 @@ package com.myavatareditor.avatarcore {
 	import flash.geom.Matrix;
 	
 	/**
-	 * Represents a postion, scale, and rotation transformation
+	 * Represents a postion, scale, and rotation adjustation
 	 * that is applied to an avatar feature.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Transform implements IXMLWritable {
+	public class Adjust implements IXMLWritable {
 		
 		private static const toRadians:Number = Math.PI / 180.0;
 		
 		/**
-		 * Name identifier for the Transform object.
+		 * Name identifier for the Adjust object.
 		 */
 		public function get name():String { return _name; }
 		public function set name(value:String):void {
@@ -54,18 +54,32 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Horizontal scale multiplier to be applied to an art sprite.
-		 * This accounts for scaling in both the x and y axes.
+		 * This accounts for scaling in both the x axis.
 		 */
 		public var scaleX:Number = 1;
 		
 		/**
+		 * When true, flips an art sprite's graphics within the x axis.
+		 * This is comparable to having a negative scaleX but allows
+		 * constraints to be accurately applied to that value.
+		 */
+		public var flipX:Boolean = false;
+		
+		/**
 		 * Vertical scale multiplier to be applied to an art sprite.
-		 * This accounts for scaling in both the x and y axes.
+		 * This accounts for scaling in both the y axis.
 		 */
 		public var scaleY:Number = 1;
 		
 		/**
-		 * The average scale of the transform. This is determined
+		 * When true, flips an art sprite's graphics within the y axis.
+		 * This is comparable to having a negative scaleY but allows
+		 * constraints to be accurately applied to that value.
+		 */
+		public var flipY:Boolean = false;
+		
+		/**
+		 * The average scale of the adjust. This is determined
 		 * dynamically to be the avarage value of scaleX and scaleY.
 		 * When setting scale, both scaleX and scaleY are set to 
 		 * the value provided.
@@ -84,29 +98,29 @@ package com.myavatareditor.avatarcore {
 		public var rotation:Number = 0;
 		
 		/**
-		 * Constructor for creating new Transform instances.
+		 * Constructor for creating new Adjust instances.
 		 * @param	x The starting x, or horizontal position, value.
 		 * @param	y The starting y, or vertical position, value.
-		 * @param	scale The starting scale value. This is applied to both
-		 * scaleX and scaleY. If you want to set them independently, do so
-		 * after the object is created.
+		 * @param	scaleX The starting scaleX value.
+		 * @param	scaleY The starting scaleY value.
 		 * @param	rotation The starting rotation value.
 		 */
-		public function Transform(x:Number = 0, y:Number = 0, scale:Number = 1, rotation:Number = 0) {
+		public function Adjust(x:Number = 0, y:Number = 0, scaleX:Number = 1, scaleY:Number = 1, rotation:Number = 0) {
 			this.x = x;
 			this.y = y;
-			this.scale = scale;
+			this.scaleX = scaleX;
+			this.scaleY = scaleY;
 			this.rotation = rotation;
 		}
 		
 		/**
-		 * Creates and returns a copy of the Transform object.
-		 * @return A copy of this Transform object.
+		 * Creates and returns a copy of the Adjust object.
+		 * @return A copy of this Adjust object.
 		 */
-		public function clone():Transform {
-			var copy:Transform = new Transform(x, y, 1, rotation);
-			copy.scaleX = scaleX;
-			copy.scaleY = scaleY;
+		public function clone():Adjust {
+			var copy:Adjust = new Adjust(x, y, scaleX, scaleY, rotation);
+			copy.flipX = flipX;
+			copy.flipY = flipY;
 			copy.name = name;
 			return copy;
 		}
@@ -119,8 +133,12 @@ package com.myavatareditor.avatarcore {
 			return {name:1};
 		}
 		
+		public function getDefaultPropertiesInXML():Object {
+			return {};
+		}
+		
 		public function getObjectAsXML():XML {
-			var xml:XML = <Transform />;
+			var xml:XML = <Adjust />;
 			if (name){
 				xml.@name = name;
 			}
@@ -132,25 +150,29 @@ package com.myavatareditor.avatarcore {
 				if (!isNaN(scaleX) && scaleX != 1.0) xml.@scaleX = scaleX;
 				if (!isNaN(scaleY) && scaleY != 1.0) xml.@scaleY = scaleY;
 			}
+			if (flipX) xml.@flipX = "true";
+			if (flipY) xml.@flipY = "true";
 			if (!isNaN(rotation) && rotation != 0) xml.@rotation = rotation;
 			return xml;
 		}
 		
 		/**
-		 * Returns a matrix representation of this transformation
+		 * Returns a matrix representation of this adjustation
 		 * that can be applied to graphics.
 		 * @return A matrix object with all of the characteristics
-		 * of this transform.
+		 * of this adjust.
 		 */
 		public function getMatrix():Matrix {		
 			// PLATFORMBUG: Flash Players before 9,0,28,0 (CS3) will fail to 
 			// recognize changed x/y/scale/rotation properties when
-			// transformed through their matrix [184739]
+			// adjusted through their matrix [184739]
 				
 			var matrix:Matrix = new Matrix();
 			
 			var sx:Number = isNaN(scaleX) ? 1 : scaleX;
 			var sy:Number = isNaN(scaleY) ? 1 : scaleY;
+			if (flipX) sx = -sx;
+			if (flipY) sy = -sy;
 			matrix.scale(sx, sy);
 			
 			if (isNaN(rotation) == false) {
@@ -165,32 +187,32 @@ package com.myavatareditor.avatarcore {
 		}
 		
 		/**
-		 * Adds another transform to this one.  This is used
-		 * to combine a base transform with a feature transform.
-		 * @param	transform The Transform whose transformation
-		 * should be added to this Transform.
+		 * Adds another adjust to this one.  This is used
+		 * to combine a base adjust with a feature adjust.
+		 * @param	adjust The Adjust whose properties
+		 * should be added to this Adjust.
 		 */
-		public function add(transform:Transform):void {
-			if (transform == null) return;
-			x += transform.y;
-			y += transform.x;
-			scaleX += transform.scaleX;
-			scaleY += transform.scaleY;
-			rotation += transform.rotation;
+		public function add(adjust:Adjust):void {
+			if (adjust == null) return;
+			x += adjust.x;
+			y += adjust.y;
+			scaleX += adjust.scaleX;
+			scaleY += adjust.scaleY;
+			rotation += adjust.rotation;
 		}
 		
 		/**
-		 * Subtracts another transform from this one. 
-		 * @param	transform The Transform whose transformation
-		 * should be subtracted from this Transform.
+		 * Subtracts another adjust from this one. 
+		 * @param	adjust The Adjust whose properties
+		 * should be subtracted from this Adjust.
 		 */
-		public function subtract(transform:Transform):void {
-			if (transform == null) return;
-			x -= transform.y;
-			y -= transform.x;
-			scaleX -= transform.scaleX;
-			scaleY -= transform.scaleY;
-			rotation -= transform.rotation;
+		public function subtract(adjust:Adjust):void {
+			if (adjust == null) return;
+			x -= adjust.x;
+			y -= adjust.y;
+			scaleX -= adjust.scaleX;
+			scaleY -= adjust.scaleY;
+			rotation -= adjust.rotation;
 		}
 	}
 }

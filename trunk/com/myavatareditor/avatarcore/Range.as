@@ -35,8 +35,8 @@ package com.myavatareditor.avatarcore {
 		public function get min():Number {
 			return _min;
 		}
-		public function set min(n:Number):void {
-			_min = n;
+		public function set min(value:Number):void {
+			_min = value;
 			updateSpan();
 		}
 		private var _min:Number;
@@ -47,17 +47,55 @@ package com.myavatareditor.avatarcore {
 		public function get max():Number {
 			return _max;
 		}
-		public function set max(n:Number):void {
-			_max = n;
+		public function set max(value:Number):void {
+			_max = value;
 			updateSpan();
 		}
 		private var _max:Number;
 		
-		private var span:Number;
+		/**
+		 * The difference between min and max
+		 */
+		public function get span():Number {
+			return _span;
+		}
+		private var _span:Number;
 		
-		public function Range(min:Number = 0, max:Number = 0) {
+		/**
+		 * Number of steps allowable between the min and max
+		 * values of the range. Steps are calculated only when 
+		 * getting a range value through stepValue(). When less 
+		 * than 1, the range is considered to have no steps.  When
+		 * equal to 1, the range as a whole is considered to be 
+		 * representative of one step and stepValue() will not
+		 * restrict inputs to the range.  When more than 1, calling
+		 * stepValue() will restrict within the range boundaries
+		 * and restict to the values of that range as divided evenly
+		 * by the specified number of steps.
+		 */
+		public function get steps():int {
+			return _steps;
+		}
+		public function set steps(value:int):void {
+			_steps = value;
+			updateStepSpan();
+		}
+		private var _steps:int = 0;
+		
+		/**
+		 * The span for each step given the set number of steps.
+		 * If steps is not set, or is less than 1, 0 is returned.
+		 * If steps is 1, stepSpan will equal span.
+		 */
+		public function get stepSpan():Number {
+			return _stepSpan;
+		}
+		private var _stepSpan:Number = 0;
+		
+		public function Range(min:Number = 0, max:Number = 1, steps:int = 0) {
 			_min = min;
 			_max = max;
+			_steps = steps;
 			updateSpan();
 		}
 		
@@ -70,16 +108,20 @@ package com.myavatareditor.avatarcore {
 			return copy;
 		}
 		
+		public function getObjectAsXML():XML {
+			return null;
+		}
+		
 		public function getPropertiesIgnoredByXML():Object {
-			return {};
+			return {span:1, stepSpan:1};
 		}
 		
 		public function getPropertiesAsAttributesInXML():Object {
-			return {min:1, max:1};
+			return {min:1, max:1, steps:1};
 		}
 		
-		public function getObjectAsXML():XML {
-			return null;
+		public function getDefaultPropertiesInXML():Object {
+			return {min:0, max:1, steps:0}; 
 		}
 		
 		/**
@@ -115,7 +157,7 @@ package com.myavatareditor.avatarcore {
 		 * passed percent within the range.
 		 */
 		public function valueAt(percent:Number):Number {
-			return clamp(_min + span * percent);
+			return clamp(_min + _span * percent);
 		}
 		
 		/**
@@ -123,31 +165,49 @@ package com.myavatareditor.avatarcore {
 		 * passed value exists within the range.
 		 */
 		public function percentAt(value:Number):Number {
-			if (span == 0) return 0;
+			if (_span == 0) return 0;
 			value = clamp(value);
-			return (value - _min)/span;
+			return (value - _min)/_span;
 		}
 		
 		/**
-		 * Returns the step value of the value passed
-		 * within the range or the value closest to the
-		 * division with the range divided steps times.
+		 * Returns the stepped value of the range, or the value
+		 * closest to the division with the range divided steps
+		 * times.  This method will use the steps property of the
+		 * current Range instance to determine the step value.  If
+		 * that value has not been set or is less than 1, no stepping
+		 * occurs.  When 1, the range represents one step and values
+		 * are not restricted to the range. When steps is greater than
+		 * 1, stepValue automatically clamps the value to the range
+		 * and the values of the range as divided evenly
+		 * by the specified number of steps.
+		 * @param value The value to convert into a stepped value.
+		 * @return A stepped value of the range.
 		 */
-		public function stepValue(value:Number, steps:int):Number {
-			var clamped:Number = clamp(value);
-			if (value != clamped) return clamped;
-				
-			if (steps < 2) {
-				steps = 2;
+		public function stepValue(value:Number):Number {
+			if (_steps != 1) {
+				var clamped:Number = clamp(value);
+				if (value != clamped) return clamped;
 			}
-				
-			var div:Number = span/(steps-1);
-			var pos:Number = Math.round((value - _min)/div);
-			return _min + pos * div;
+			if (_steps < 1) return value;
+			
+			var pos:Number = Math.round((value - _min)/_stepSpan);
+			return _min + pos * _stepSpan;
 		}
 		
 		private function updateSpan():void {
-			span = _max - _min;
+			_span = _max - _min;
+			updateStepSpan();
+		}
+		
+		private function updateStepSpan():void {
+			if (_steps < 1){
+				_stepSpan = 0;
+			}else if (_steps == 1){
+				_stepSpan = _span;
+			}else{
+				_stepSpan = _span/(_steps - 1);
+			}
 		}
 	}
 }

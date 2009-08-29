@@ -128,6 +128,7 @@ package com.myavatareditor.avatarcore {
 				
 				try {
 					xml = new XML(xmlLoader.data);
+					xmlLoader.data = xml;
 				}catch (error:Error){
 					completeEvent.error = error;
 				}
@@ -162,11 +163,9 @@ package com.myavatareditor.avatarcore {
 		 * Updates an avatar with Library objects within the Definition
 		 * collection with names that match the Avatar's libraryName
 		 * property. Matching Library objects are assigned to the Avatar's
-		 * library.  Unlike Avatar.updateFeature(), updateAvatar does not
-		 * validate the avatar as being a child of the Definitions to
-		 * function.
+		 * library.
 		 * @param	avatar The Avatar to find a linked library from those
-		 * available in the Defifinitions collection.
+		 * available in the Definitions collection.
 		 */
 		public function updateAvatar(avatar:Avatar):void {
 			if (avatar == null || avatar.libraryName == null) return;

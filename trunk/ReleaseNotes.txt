@@ -12,6 +12,53 @@ http://avatarcore.googlecode.com/
 
 == Change List ==
 
+=== 0.2.0 (August 28, 2009) ===
+
+There have been a number of new API changes, as well as a reworking
+of how parenting is handled.  The new approach allows Constrain behaviors
+to work better with parenting. In addition some rendering changes have
+been made that change the effects of parent transforms on their children.
+
+- Added Viewport.resetContent()
+- Added a padding parameter to Viewport.fitContent()
+- Added ThumbnailArtSprite class
+- Added SourceLoaderSprite class as a base class for ArtSprite and
+  ThumbnailArtSprite
+- Renamed AvatarArt to AvatarDisplay to prevent confusion with with the
+  Art/ArtSprite classes
+- ArtSprites no longer redraw themselves (i.e. their feature) when their
+  feature property is set. This was creating many more calls to draw() than
+  was necessary, though may require additional manual calls for updates
+- Scaling a parent feature no longer scales its children; child position,
+  however, is still affected by scale
+- Renamed Transform to Adjust to prevent confusion with flash.geom.Transform
+- Instead of mirroring features with a negative scale, flipX and flipY
+  properties have been added to the Adjust (Transform) class 
+- Fixed a bug in Adjust.add and Adjust.subtract where x and y were flipped
+- Renamed "update"-related API in Feature and Avatar to "redraw"
+- Changed parent-related API in Feature (removed getParentFeature, added
+  parent, [internal]parentCount, [internal]updateParent)
+- Features are no longer hidden if their parent cannot be found. They are
+  instead left visible and treated as though they have no parent
+- Added Feature.getConcatenatedParentMatrix()
+- Added Avatar.updateParentHierarchy(). This is called frequently through
+  other APIs but may be necessary to call to make sure the parent 
+  hierarchy of an avatar is accurate
+- Added getDefaultPropertiesInXML to IXMLWritable, helping to reduce the 
+  inclusion of default values in generated XML
+- Range class now has a steps property
+- Separated Constrain.position (Rect) to Constrain.x (Range) and 
+  Constrain.y (Range)
+- Removed Rect class (was only used by Constrain before)
+- Constrain uses its Ranges' steps, if provided, to apply stepping
+  to constrained values
+- Constrain is now applied to feature adjusts (transforms) rather than
+  directly to art sprites to allow child adjusts to honor the
+  constrain
+- Added Constrain.name, making it more convenient to access Contrain
+  behaviors in a feature
+- Other minor bug fixes
+
 === 0.1.5 (May 25, 2009) ===
 
 Minor API changes, mostly to Definitions class.

@@ -28,17 +28,9 @@ package com.myavatareditor.avatarcore.display {
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.LoaderInfo;
 	import flash.display.DisplayObject;
-	import flash.display.Loader;
 	import flash.display.MovieClip;
-	import flash.display.Sprite;
-	import flash.events.ErrorEvent;
 	import flash.events.Event;
-	import flash.events.IOErrorEvent;
-	import flash.events.SecurityErrorEvent;
-	import flash.net.URLRequest;
-	import flash.utils.getDefinitionByName;
 	
 	/**
 	 * Represents an individual sprite within an avatar art.  Art
@@ -46,10 +38,10 @@ package com.myavatareditor.avatarcore.display {
 	 * of one or more art sprites to visually represent a feature.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class ArtSprite extends Sprite {
+	public class ArtSprite extends SourceLoaderSprite {
 		
 		/**
-		 * The Avatar instance associated with the AvatarArt
+		 * The Avatar instance associated with the AvatarDisplay
 		 * object that contains this art sprite.
 		 */
 		public function get avatar():Avatar {
@@ -66,9 +58,7 @@ package com.myavatareditor.avatarcore.display {
 		}
 		public function set feature(value:Feature):void {
 			if (value == _feature) return;
-			
 			_feature = value;
-			draw();
 		}
 		private var _feature:Feature;
 		
@@ -91,7 +81,7 @@ package com.myavatareditor.avatarcore.display {
 		
 		/**
 		 * Z-index, or location within sorted arrangement
-		 * of the art within an AvatarArt object as defined
+		 * of the art within an AvatarDisplay object as defined
 		 * by the linked Art instance.
 		 */
 		public function get zIndex():Number {
@@ -107,40 +97,17 @@ package com.myavatareditor.avatarcore.display {
 		}
 		
 		/**
-		 * The art source as defined by the linked Art object.
-		 * This is generally not set directly, instead relying
-		 * on the src defined in the linked Art object.
+		 * The number of parents as reported by the art sprite's
+		 * feature.  The more parents an ArtSprite has, the later
+		 * it gets drawn during an AvatarDisplay.draw.
 		 */
-		public function get src():String {
-			return _src;
+		public function get parentCount():int {
+			return _feature ? _feature.parentCount : 0;
 		}
-		public function set src(value:String):void {
-			if (value == null){
-				_src = null;
-				_srcFrame = null;
-			}else{
-				
-				// separate any frame values from src
-				var parts:Array = value.split("#");
-				if (parts.length > 1){
-					_src = parts[0];
-					_srcFrame = parts[1];
-				}else{
-					_src = value;
-					_srcFrame = null;
-				}
-			}
-			
-			loadSourceContent();
-		}
-		private var _src:String;
-		private var _srcFrame:String;
-		
-		private var loader:Loader;
 			
 		/**
 		 * Constructor for creating new ArtSprite instances. ArtSprite
-		 * instances are created automatically by AvatarArt instances
+		 * instances are created automatically by AvatarDisplay instances
 		 * when drawing an avatar.
 		 * @param	art Graphic Art object associated with this sprite.
 		 * A single feature may use multiple art sprites if it is using
@@ -150,9 +117,12 @@ package com.myavatareditor.avatarcore.display {
 		 * @param	feature The feature being rendered through this sprite.
 		 */
 		public function ArtSprite(art:Art = null, feature:Feature = null) {
+			super(null);
+			
+			addEventListener(Event.COMPLETE, contentCompleteHandler, false, 0, true);
 			
 			// we're going under the assumption here that you'll want to
-			// be able to select individual AvatarArt objects when picking
+			// be able to select individual AvatarDisplay objects when picking
 			// a feature to change through mouse interaction, and for that
 			// the target of the click event should target this instance
 			// rather than some child
@@ -167,47 +137,15 @@ package com.myavatareditor.avatarcore.display {
 		 * its art source and then calling draw.
 		 */
 		public function rebuild():void {
-			loadSourceContent();
+			reloadContent();
 			draw();
-		}
-		
-		private function loadSourceContent():void {
-			clearContent();
-			
-			if (_src == null) return;
-			
-			// try loading source as a class definition
-			try {
-				
-				var displayClass:Class = getDefinitionByName(_src) as Class;
-				var content:* = new displayClass();
-				
-				// class can be for bitmaps or display objects
-				content = (content is BitmapData)
-					? new Bitmap(content as BitmapData)
-					: DisplayObject(content);
-				
-				applyContentProperties(content);
-				addChild(content);
-				return;
-				
-			}catch (error:Error){
-				print("Art Generation; class definition for asset '"+_src+"' not found ("+error+"). Attempting to load as external asset...", PrintLevel.DEBUG, this);
-			}
-			
-			// try loading source as a URL
-			try {
-				loaderSetup();
-				loader.load(new URLRequest(_src));
-			}catch (error:Error){
-				loaderCleanup();
-				print("Art Generation; failure trying to load asset '"+_src+"' ("+error+")", PrintLevel.ERROR, this);
-			}
 		}
 		
 		/**
 		 * Updates the transformation of the art as defined
-		 * by the feature referenced by the art sprite.
+		 * by the feature referenced by the art sprite. This is
+		 * automatically called from AvatarDisplay when it
+		 * draws.
 		 */
 		public function draw():void {
 			if (_feature == null) {
@@ -220,7 +158,9 @@ package com.myavatareditor.avatarcore.display {
 		
 		/**
 		 * Clears all art content from the art sprite object
-		 * and removes any references to other objects.
+		 * and removes any references to other objects. This is
+		 * automatically called when an AvatarDisplay removes
+		 * the ArtSprite from its display list.
 		 */
 		public function deconstruct():void {
 			clearContent();
@@ -232,40 +172,13 @@ package com.myavatareditor.avatarcore.display {
 			_art = null;
 		}
 		
-		/**
-		 * Clears the art content within the art sprite.
-		 */
-		public function clearContent():void {
-			while (numChildren){
-				var playable:MovieClip = removeChildAt(0) as MovieClip;
-				// if a movie clip, prevent additional playback
-				if (playable){
-					playable.stop();
-				}
-			}
-			
-			loaderCleanup();
-		}
-		
-		private function loaderCompleteHandler(event:Event):void {
-			
-			// make sure this complete handler is for 
-			// the current loader and not some rogue loader
-			// for content that got replaced during loading
-			if (loader == null || event.currentTarget != loader.contentLoaderInfo){
-				print("Content loaded but no longer valid; aborting", PrintLevel.WARNING, this);
-				return;
-			}
-			
-			// loader isn't added until after it's loaded
-			addChild(loader);
-			
+		private function contentCompleteHandler(event:Event):void {
 			// update visually
-			applyContentProperties(loader.content);
+			applyContentProperties();
 			applyArtTransforms();
 		}
 		
-		private function applyContentProperties(content:DisplayObject):void {
+		private function applyContentProperties():void {
 			
 			// smooth bitmaps?
 			if (_art && content is Bitmap){
@@ -273,57 +186,21 @@ package com.myavatareditor.avatarcore.display {
 			}
 			
 			// go to specified content frame
-			if (_srcFrame && content is MovieClip){
-				MovieClip(content).gotoAndStop(_srcFrame);
+			if (srcFrame && content is MovieClip){
+				MovieClip(content).gotoAndStop(srcFrame);
 			}
 		}
 		
 		private function applyArtTransforms():void {
 			if (_art == null) return;
 			if (numChildren){
-				var content:DisplayObject = getChildAt(0);
-				content.x = _art.x;
-				content.y = _art.y;
+				
+				// first child will be either an instantiated
+				// display object or a Loader instance
+				var mainContent:DisplayObject = getChildAt(0);
+				mainContent.x = _art.x;
+				mainContent.y = _art.y;
 			}
-		}
-		
-		private function loaderErrorHandler(errorEvent:ErrorEvent):void {
-			print("Art Generation; failure while loading an asset URL ("+errorEvent.text+")", PrintLevel.ERROR, this);
-			loaderCleanup();
-		}
-		
-		private function loaderSetup():void {
-			loaderCleanup();
-			
-			loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleteHandler, false, 0, true);
-			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loaderErrorHandler, false, 0, true);
-			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, loaderErrorHandler, false, 0, true);
-		}
-		
-		private function loaderCleanup():void {
-			if (loader == null) return;
-			
-			try {
-				loader.close();
-			}catch (error:Error){}
-			
-			// if a movie clip, prevent additional playback
-			var playable:MovieClip = loader.content as MovieClip;
-			if (playable){
-				playable.stop();
-			}
-			
-			loader.unload();
-			if (loader.parent){
-				loader.parent.removeChild(loader);
-			}
-			
-			loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loaderCompleteHandler, false);
-			loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, loaderErrorHandler, false);
-			loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, loaderErrorHandler, false);
-			
-			loader = null;
 		}
 	}
 }
