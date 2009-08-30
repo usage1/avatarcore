@@ -4,6 +4,10 @@ _(Last updated for ver 0.2.0)_
 
 Features represent individual, interchangeable characteristics used by Avatars.  For any characteristic in an avatar that a user has the ability to change, a respective Feature object should exist for it.  Features typically include things like eyes, noses, ears, and mouths - in fact anything that is visible in an avatar will have a Feature object associated with it.
 
+
+API: [http://www.myavatareditor.com/avatarcore/docs/index.html?com/myavatareditor/avatarcore/Feature.html&com/myavatareditor/avatarcore/class-list.html Feature Class]
+
+*In This Document:*
 <wiki:toc />
 
 
