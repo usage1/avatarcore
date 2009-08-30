@@ -1,0 +1,31 @@
+#summary Learn more about using Features in Avatar Core.
+#labels Phase-Implementation
+#sidebar TableOfContents
+_(Last updated for ver 0.2.0)_
+
+Features represent individual, interchangable characteristics used by Avatars.  For any characteristic in an avatar that a user has the ability to change, a respective Feature object should exist for it.  Features typically include things like eyes, noses, ears, and mouths - in fact anything that is visible in an avatar will have a Feature object associated with it.
+
+== Features in Avatars ==
+
+Avatar objects are containers for Feature objects.  They can contain any number of Features.  To facilitate this, Avatar objects are collections; they either extend the Collection class (com.myavatareditor.avatarcore.Collection) - which is the case with Avatar - and/or implement the ICollection interface (com.myavatareditor.avatarcore.ICollection).  Features are added to Avatar objects through ICollection.addItem, and can be respectively removed using ICollection.removeItem. When using XML, XMLDefinitionParser will call addItem automatically when parsing your XML.
+
+Features can only exist within one Avatar at a time, just like DisplayObjects in DisplayObjectContainers.  Once a Feature is added to an Avatar, it recieves a reference to that Avatar through its Feature.avatar property, just like DisplayObject.parent. 
+
+{{{
+var parentAvatar:Avatar = new Avatar();
+var childFeature:Feature = new Feature();
+parentAvatar.addItem(childFeature);
+trace(childFeature.avatar == parentAvatar); // true
+}}}
+
+
+== Feature Features == 
+
+Feature objects define the characteristics of an Avatar.  Specifically, what Features define includes:
+
+  * Art - the visuals of a feature (Feature.art)
+  * Color - additional color to be applied to the art (Feature.color)
+  * Visual adjustmensts - changes to the position, rotation, or scale of the art (Feature.adjust)
+  * Parenting - an association with another feature to inherit positioning and rotation (Feature.parentName)
+
+Features should always include an Art object, otherwise they would never be visible when the avatar is drawn within an AvatarDisplay object.  Other properties are applied on top of that Art.  Additionally, Art objects themselves have their own properties which can affect Feature rendering.
