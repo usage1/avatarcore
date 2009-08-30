@@ -1,31 +1,102 @@
 #summary Learn more about using Features in Avatar Core.
 #labels Phase-Implementation
-#sidebar TableOfContents
 _(Last updated for ver 0.2.0)_
 
-Features represent individual, interchangable characteristics used by Avatars.  For any characteristic in an avatar that a user has the ability to change, a respective Feature object should exist for it.  Features typically include things like eyes, noses, ears, and mouths - in fact anything that is visible in an avatar will have a Feature object associated with it.
+Features represent individual, interchangeable characteristics used by Avatars.  For any characteristic in an avatar that a user has the ability to change, a respective Feature object should exist for it.  Features typically include things like eyes, noses, ears, and mouths - in fact anything that is visible in an avatar will have a Feature object associated with it.
+
+<wiki:toc />
+
+
+== Feature Features == 
+
+Features define the following for a specific feature of an Avatar:
+
+  * Art - the visuals of a feature (Feature.art). For more information see [AboutArt]
+  * Color - additional color to be applied to the art (Feature.color). For more information see [AboutColor]
+  * Visual adjustmensts - changes to the position, rotation, or scale of the art (Feature.adjust). For more information see [AboutAdjust]
+  * Parenting - an association with another feature to inherit positioning and rotation (Feature.parentName)
+
+Features should always include an Art object, otherwise they would never be visible when the containing Avatar is drawn within an AvatarDisplay object.  Other properties are applied on top of that Art. 
+
 
 == Features in Avatars ==
 
 Avatar objects are containers for Feature objects.  They can contain any number of Features.  To facilitate this, Avatar objects are collections; they either extend the Collection class (com.myavatareditor.avatarcore.Collection) - which is the case with Avatar - and/or implement the ICollection interface (com.myavatareditor.avatarcore.ICollection).  Features are added to Avatar objects through ICollection.addItem, and can be respectively removed using ICollection.removeItem. When using XML, XMLDefinitionParser will call addItem automatically when parsing your XML.
 
-Features can only exist within one Avatar at a time, just like DisplayObjects in DisplayObjectContainers.  Once a Feature is added to an Avatar, it recieves a reference to that Avatar through its Feature.avatar property, just like DisplayObject.parent. 
+Features can only exist within one Avatar at a time, just like DisplayObjects in DisplayObjectContainers.  Once a Feature is added to an Avatar, it receives a reference to that Avatar through its Feature.avatar property, just like DisplayObject.parent. 
 
 {{{
-var parentAvatar:Avatar = new Avatar();
-var childFeature:Feature = new Feature();
-parentAvatar.addItem(childFeature);
-trace(childFeature.avatar == parentAvatar); // true
+var avatar:Avatar = new Avatar();
+var feature:Feature = new Feature();
+avatar.addItem(feature);
+trace(feature.avatar == avatar); // true
 }}}
 
 
-== Feature Features == 
+== Names ==
 
-Feature objects define the characteristics of an Avatar.  Specifically, what Features define includes:
+In collections, individual items, such as Feature objects in an Avatar, can be referenced by their name properties using ICollection.getItemByName.  
 
-  * Art - the visuals of a feature (Feature.art)
-  * Color - additional color to be applied to the art (Feature.color)
-  * Visual adjustmensts - changes to the position, rotation, or scale of the art (Feature.adjust)
-  * Parenting - an association with another feature to inherit positioning and rotation (Feature.parentName)
+{{{
+var avatar:Avatar = new Avatar();
+var feature:Feature = new Feature();
+feature.name = "foo";
+avatar.addItem(feature);
+trace(avatar.getItemByName("foo") == feature); // true
+}}}
 
-Features should always include an Art object, otherwise they would never be visible when the avatar is drawn within an AvatarDisplay object.  Other properties are applied on top of that Art.  Additionally, Art objects themselves have their own properties which can affect Feature rendering.
+For Features, names are also used to make connections with FeatureDefinition objects in libraries (if used) as well as identifying Feature parents.  Names not only make these connections possible but also make it easier to reference different, individual Feature objects within an Avatar.  You will usually want to make sure each Feature has its own unique name.
+
+=== Name Shortcuts ===
+
+Features contain a number of shortcuts for naming the various objects they contain.  These include:
+
+  * Feature.artName
+  * Feature.colorName
+  * Feature.adjustName
+  * Feature.parentName*
+  
+With the exception of parentName (*) setting these properties will set the names of the objects they represent.  For example, setting artName is actually a shortcut to setting Feature.art.name.  The advantage of name shortcuts is that they automatically handle the null object case.  In the case of art, for example, if art is null, setting artName will automatically create a new Art instance for Feature.art before setting its name to the value provided for artName.  This becomes an important convenience when working with libraries.
+
+{{{
+var feature:Feature = new Feature();
+trace(feature.art); // null
+feature.artName = "foo";
+trace(feature.art); // [object Art]
+}}}
+
+The use of libraries can have influence over the values of artName, colorName, and adjustName.  If a Feature is associated with a FeatureDefinition from a Library and the Feature does not have its own Art object, for example, then accessing the value of artName can return FeatureDefinition.artSet.defaultName, or if that's not available, the name of the default Art object within FeatureDefinition.artSet (usually the Art at the first index of the artSet collection).  In this respect, access of these name properties represent the name of the object which would be used to render the Feature visually.
+
+Feature.parentName is unique in that it is used to reference other external values (Features) in the Avatar.  Instead of it affecting a value owned by feature, parentName is actually used to look up the correct parent to apply adjustments for rendering.  As such, parentName is not actually a shortcut; it's simply the way parents are specified.
+
+
+== Parenting ==
+
+Features can specify other features as parents.  Parent associations are made through Feature.name (defined for the target parent Feature) and Feature.parentName (defined for the child Feature).  Setting a Feature's parentName property will automatically reference the Feature within the same Avatar whose name matches the value given to parentName as the parent Feature.
+
+{{{
+var avatar:Avatar = new Avatar();
+var parentFeature:Feature = new Feature();
+var childFeature:Feature = new Feature();
+
+parentFeature.name = "foo";
+childFeature.parentName = "foo";
+
+avatar.addItem(parentFeature);
+avatar.addItem(childFeature);
+
+trace(childFeature.parent == parentFeature); // true
+}}}
+
+If a situation occurs where the parent hierarchy of an Avatar is corrupt, for example if underhandedly change the name of a Feature to equal another Feature's parentName when before it had no parent, then you can call Avatar.updateParentHierarchy() to update it.
+
+When a Feature has another Feature as a parent, it is positioned within it's parent Feature's coordinate space and is rotated, but not scaled, with that parent.  Though scaling isn't inherited, scaling within the parent will affect positioning of the child.  Color is not inherited.  Parenting is best used when you have Features that are "attached" to other features. For example, eyes, noses, ears, etc. are all attached to the face.  Similarly, an ear ring may be attached to an ear.  If the ear ever moves, the earring should follow. Same applies to facial features on the face.  You may find parenting unnecessary if, for example, the face is never allowed to move or is intended to move independently of all other features. 
+
+
+== Where to go from here ==
+  * [AboutArt]
+  * [AboutXMLParsing]
+  * [AboutLibraries]
+  * [AboutColors]
+  * [AboutAdjusts]
+  * [AboutBehaviors]
