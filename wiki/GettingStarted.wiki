@@ -144,7 +144,6 @@ addChild(avatarDisplay);
   * [AboutArt]
   * [AboutXMLParsing]
   * [AboutLibraries]
-  * [AboutFeatureDefinitions]
   * [AboutColors]
   * [AboutAdjusts]
   * [AboutBehaviors]
