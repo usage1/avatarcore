@@ -1,6 +1,5 @@
 #summary Examples of practical applications of the Avatar Core framework.
 #labels Phase-Implementation
-#sidebar TableOfContents
 
 The following examples show uses of the Avatar Core framework. They demonstrate features and provide solutions to common (or uncommon) problems.
 
