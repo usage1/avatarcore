@@ -1,6 +1,5 @@
 #summary Start working with the Avatar Core framework.
 #labels Featured
-#sidebar TableOfContents
 _(Last updated for ver 0.2.0)_
 
 First things first, download the Avatar Core if you haven't already. Instructions for doing that and setting up your authoring tool/IDE can be found on the [Installation] page. It may also be helpful to keep handy the [http://www.myavatareditor.com/avatarcore/docs/ API Documentation] as a reference for the samples covered here.  And if you're completely new to Avatar Core, be sure that you've read the [Introduction] as it will give you a nice overview of the framework as a whole.
