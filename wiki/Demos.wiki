@@ -1,5 +1,6 @@
 #summary Examples of practical applications of the Avatar Core framework.
 #labels Phase-Implementation
+#sidebar TableOfContents
 
 The following examples show uses of the Avatar Core framework. They demonstrate features and provide solutions to common (or uncommon) problems.
 
@@ -10,7 +11,7 @@ This demo covers the most common use case for Avatar Core.  You have an avatar c
 
 <wiki:gadget url="http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionGadget.xml" width="600" height="300" border="1" />
 
-Demo source files:
+Demo source files (ver 0.2.0):
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelection.xml SimpleFeatureSelection.xml]
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionAvatar.as SimpleFeatureSelectionAvatar.as]
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionEditor.as SimpleFeatureSelectionEditor.as]
@@ -18,14 +19,22 @@ Full demo download (including framework) available in [http://code.google.com/p/
 
 == Adjust Features ==
 
+_Coming soon..._
+
 == Adjust Constrained Features ==
 
 View Live Demo:
 *  [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]
 
+_More coming soon..._
+
 == Drag Features ==
+
+_Coming soon..._
 
 == Drag Constrained Features ==
 
 View Live Demo:
 *  [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
+
+_More coming soon..._
