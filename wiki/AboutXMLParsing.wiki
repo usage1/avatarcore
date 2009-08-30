@@ -119,3 +119,12 @@ trace(xmlWriter.write(avatar));
 }}}
 
 To provide more control over how an object is converted to XML by XMLDefinitionWriter, a class can implement the IXMLWritable interface.  It includes methods used by XMLDefinitionWriter to generate XML.
+
+
+== Where to go from here ==
+  * [AboutFeatures]
+  * [AboutArt]
+  * [AboutLibraries]
+  * [AboutColors]
+  * [AboutAdjusts]
+  * [AboutBehaviors]
