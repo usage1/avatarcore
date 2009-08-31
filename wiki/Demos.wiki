@@ -21,13 +21,13 @@ Find the full demo download (including FLA and complete Avatar Core framework) i
 This demo shows how the Adjust objects used by Features can be modified to alter the appearance of the Feature.  Select a Feature by clicking on it, then use the control bar at the bottom of the screen to modify it's Adjust.
 
 View live demo:
-  * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.html AdjustFeatures.html]
+  * *[http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.html AdjustFeatures.html]*
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.fla AdjustFeatures.fla] (graphical assets only)
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.as AdjustFeatures.as]
 
 View live demo using Constrain behaviors:
-  * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]
+  * *[http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]*
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.fla AdjustConstrainedFeatures.fla] (graphical assets only)
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.as AdjustConstrainedFeatures.as]
@@ -39,16 +39,14 @@ This demo shows how Features can be moved (via Adjust) by dragging them with the
 
 
 View live demo:
-  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
-
+  * *[http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]*
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.as DragConstrainedFeatures.as]
 
 
 View live demo using Constrain behaviors:
-  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
-
+  * *[http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]*
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.as DragConstrainedFeatures.as]
