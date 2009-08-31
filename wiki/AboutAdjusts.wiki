@@ -1,0 +1,30 @@
+#summary Learn more about using Adjusts in Avatar Core.
+#labels Phase-Implementation
+_(Last updated for ver 0.2.0)_
+
+Adjust objects represent visual transforms used for Feature Art, not too unlike flash.geom.Transform.matrix.  Adjusts determine the position, size and rotation Art used in Features.
+
+API: [http://www.myavatareditor.com/avatarcore/docs/index.html?com/myavatareditor/avatarcore/Adjust.html&com/myavatareditor/avatarcore/class-list.html Adjust Class]
+
+*In This Document:*
+<wiki:toc />
+
+
+== Adjusting Art ==
+
+_Coming soon..._
+
+
+== Inherited Adjusts ==
+
+_Coming soon..._
+
+
+== Where to go from here ==
+  * [AboutFeatures]
+  * [AboutArt]
+  * [AboutXMLParsing]
+  * [AboutLibraries]
+  * [AboutColors]
+  * [AboutAdjusts]
+  * [AboutBehaviors]
