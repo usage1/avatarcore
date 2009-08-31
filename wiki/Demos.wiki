@@ -14,26 +14,41 @@ Demo source files (ver 0.2.0):
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelection.xml SimpleFeatureSelection.xml]
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionAvatar.as SimpleFeatureSelectionAvatar.as]
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionEditor.as SimpleFeatureSelectionEditor.as]
-Full demo download (including framework) available in [http://code.google.com/p/avatarcore/downloads/list downloads].
+Find the full demo download (including FLA and complete Avatar Core framework) in the [http://code.google.com/p/avatarcore/downloads/list Downloads section].
 
 == Adjust Features ==
 
-_Coming soon..._
+This demo shows how the Adjust objects used by Features can be modified to alter the appearance of the Feature.  Select a Feature by clicking on it, then use the control bar at the bottom of the screen to modify it's Adjust.
 
-== Adjust Constrained Features ==
+View live demo:
+  * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.html AdjustFeatures.html]
+Source files:
+  * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.fla AdjustFeatures.fla] (graphical assets only)
+  * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.as AdjustFeatures.as]
 
-View Live Demo:
+View live demo using Constrain behaviors:
 *  [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]
+Source files:
+  * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.fla AdjustConstrainedFeatures.fla] (graphical assets only)
+  * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.as AdjustConstrainedFeatures.as]
 
-_More coming soon..._
 
 == Drag Features ==
 
-_Coming soon..._
+This demo shows how Features can be moved (via Adjust) by dragging them with the mouse.  Making this work can be a little unintuitive, especially when it comes to parenting and behaviors like Mirror.  This approach takes into account those complications.
 
-== Drag Constrained Features ==
 
-View Live Demo:
+View live demo:
 *  [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
 
-_More coming soon..._
+Source files:
+  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
+  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.as DragConstrainedFeatures.as]
+
+
+View live demo using Constrain behaviors:
+*  [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
+
+Source files:
+  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
+  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.as DragConstrainedFeatures.as]
