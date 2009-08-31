@@ -16,10 +16,11 @@ By default, Art for Features is un-scaled, un-rotated, and is positioned at 0,0 
 
 Feature position is defined by Adjust.x and Adjust.y.  Rotation is handled by Adjust.rotation.  Size is handled relatively by percent (scale) where 1 is 100% scale.  Scale can be set uniformly through Adjust.scale or separately for both the x and y axis using scaleX and scaleY.
 
+The following example moves the feature represented by image.jpg to 25,25 within an AvatarDisplay object, and scales it 200% of its normal size.
 {{{
 <Feature>
 	<Art src="image.jpg" />
-	<Adjust x="25" y="25" scale="200" />
+	<Adjust x="25" y="25" scale="2" />
 <Feature>
 }}}
 
