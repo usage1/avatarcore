@@ -27,7 +27,7 @@ Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustFeatures.as AdjustFeatures.as]
 
 View live demo using Constrain behaviors:
-*  [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]
+  * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.html AdjustConstrainedFeatures.html]
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.fla AdjustConstrainedFeatures.fla] (graphical assets only)
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.as AdjustConstrainedFeatures.as]
@@ -39,7 +39,7 @@ This demo shows how Features can be moved (via Adjust) by dragging them with the
 
 
 View live demo:
-*  [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
+  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
 
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
@@ -47,7 +47,7 @@ Source files:
 
 
 View live demo using Constrain behaviors:
-*  [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
+  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]
 
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
