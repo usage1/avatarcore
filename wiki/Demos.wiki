@@ -39,10 +39,10 @@ This demo shows how Features can be moved (via Adjust) by dragging them with the
 
 
 View live demo:
-  * *[http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.html DragConstrainedFeatures.html]*
+  * *[http://www.myavatareditor.com/avatarcore/demo/DragFeatures.html DragFeatures.html]*
 Source files:
-  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
-  * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.as DragConstrainedFeatures.as]
+  * [http://www.myavatareditor.com/avatarcore/demo/DragFeatures.fla DragFeatures.fla] (graphical assets only)
+  * [http://www.myavatareditor.com/avatarcore/demo/DragFeatures.as DragFeatures.as]
 
 
 View live demo using Constrain behaviors:
