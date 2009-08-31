@@ -25,10 +25,10 @@ Color can be set directly using the Color.color property or through the individu
 
 When Color is applied to Art assets, the following formula is used for each pixel used to render the graphics.
 
-  * New red value = (old red value * redMultiplier) + redOffset
-  * New green value = (old green value * greenMultiplier) + greenOffset
-  * New blue value = (old blue value * blueMultiplier) + blueOffset
-  * New alpha value = (old alpha value * alphaMultiplier) + alphaOffset
+  * New red value = (old red value `*` redMultiplier) + redOffset
+  * New green value = (old green value `*` greenMultiplier) + greenOffset
+  * New blue value = (old blue value `*` blueMultiplier) + blueOffset
+  * New alpha value = (old alpha value `*` alphaMultiplier) + alphaOffset
 
 
 == Where to go from here ==
