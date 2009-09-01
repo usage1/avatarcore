@@ -77,9 +77,9 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * A collection of custom behaviors that are used to help
 		 * determine the final render of an avatar feature.  Each
-		 * feature in the set is used when drawing the feature's art,
-		 * not just one as is the case with the artSets, colorSets,
-		 * and adjustSets.
+		 * behavior in this collection is used when drawing the feature's
+		 * art, not just one as is the case with the Art, Color,
+		 * and Adjust.
 		 */
 		public function get behaviors():Collection { return _behaviors; }
 		public function set behaviors(value:Collection):void {

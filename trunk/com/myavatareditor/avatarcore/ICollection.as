@@ -95,6 +95,12 @@ package com.myavatareditor.avatarcore {
 		function clearCollection():void;
 		
 		/**
+		 * Returns a count of all items in the collection.
+		 * @return The number of items in the collection.
+		 */
+		function get itemCount():int;
+		
+		/**
 		 * Collection array where items are stored.  Items are
 		 * stored both by index and by name if available.
 		 */

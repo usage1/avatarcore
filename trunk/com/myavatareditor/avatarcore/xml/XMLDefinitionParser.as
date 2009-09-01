@@ -27,7 +27,6 @@ package com.myavatareditor.avatarcore.xml {
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
-	import flash.utils.getQualifiedClassName;
 	
 	/**
 	 * A generic XML parser for parsing XML into an object of its respective
@@ -113,13 +112,13 @@ package com.myavatareditor.avatarcore.xml {
 				// that property
 				if (elemName in target){
 					memberType = targetMembers.(attribute("name") == elemName).@type.toString();
-				
+					
 					// ----------------------------------------------
 					// referencing a pre-created object
 					// in the XML if defined
 					ref = lookup[element.@ref] as Object;
 					if (ref == null && element.@ref != undefined){
-						print("Parsing XML; couldn't find referenced object named '"+element.@ref+"' for "+elemName, PrintLevel.ERROR, this);
+						print("Parsing XML; couldn't find referenced object named '"+element.@ref+"' for "+elemName, PrintLevel.WARNING, this);
 					}
 					if (ref) {
 						

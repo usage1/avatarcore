@@ -38,6 +38,18 @@ package com.myavatareditor.avatarcore {
 	public class Mirror implements IBehavior {
 		
 		/**
+		 * Specifies which axis to be used when mirroring. By default
+		 * this is the y axis.  The possible values are "x" and "y".
+		 */
+		public function get axis():String {
+			return _axis;
+		}
+		public function set axis(value:String):void {
+			_axis = (value == null || value.toLowerCase() == "x") ? "x" : "y";
+		}
+		private var _axis:String = "y";
+		
+		/**
 		 * Constructor for creating new Mirror instances.
 		 */
 		public function Mirror() {
@@ -61,8 +73,13 @@ package com.myavatareditor.avatarcore {
 		public function drawArtSprite(artSprite:ArtSprite):void {
 			var mirrorArt:MirroredArtSprite = artSprite as MirroredArtSprite;
 			if (mirrorArt){
-				mirrorArt.x = -mirrorArt.x;
-				mirrorArt.scaleX = -mirrorArt.scaleX;
+				if (_axis == "y"){
+					mirrorArt.x = -mirrorArt.x;
+					mirrorArt.scaleX = -mirrorArt.scaleX;
+				}else{
+					mirrorArt.y = -mirrorArt.y;
+					mirrorArt.scaleY = -mirrorArt.scaleY;
+				}
 				mirrorArt.rotation = -mirrorArt.rotation;
 			}
 		}

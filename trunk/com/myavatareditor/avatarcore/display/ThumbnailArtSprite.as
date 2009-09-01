@@ -79,11 +79,14 @@ package com.myavatareditor.avatarcore.display {
 		 * Constructor for new ThumbnailArtSprite instances.
 		 * @param	art The art instance to render a thumbnail for.
 		 */
-		public function ThumbnailArtSprite(art:Art = null) {
+		public function ThumbnailArtSprite(art:Art = null, autoLoad:Boolean = false) {
 			super(null);
 			
 			mouseChildren = false;
-			this.art = art;
+			if (art) {
+				this.art = art;
+				if (autoLoad) load();
+			}
 		}
 		
 		private function generateAvatarContent():void {

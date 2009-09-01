@@ -73,8 +73,16 @@ package com.myavatareditor.avatarcore {
 		}
 		private var _collection:Array = [];
 		
+		/**
+		 * Returns a count of all items in the collection.
+		 * @return The number of items in the collection.
+		 */
+		public function get itemCount():int {
+			return _collection.length;
+		}
+		
 		public function getPropertiesIgnoredByXML():Object {
-			return {requireUniqueNames:1, collection:1};
+			return {requireUniqueNames:1, collection:1, itemCount:1};
 		}
 		
 		public function getPropertiesAsAttributesInXML():Object {

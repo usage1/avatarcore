@@ -77,7 +77,7 @@ package com.myavatareditor.avatarcore {
 		function drawArtSprite(artSprite:ArtSprite):void;
 		
 		/**
-		 * Creates a copy of the behavior. 
+		 * Creates a copy of the behavior.
 		 * @return A copy of the current IBehavior instance.
 		 */
 		function clone():IBehavior;
