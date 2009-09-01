@@ -3,9 +3,15 @@
 
 The following examples show uses of the Avatar Core framework. They demonstrate features and provide solutions to common (or uncommon) problems.
 
-All of these demos were built with [http://www.adobe.com/products/flash/ Flash Professional CS4], but their source code is external for inspection if you, yourself, are not using it.
+*In This Document:*
+<wiki:toc />
 
-== Simple Feature Selection ==
+
+== Live Demos ==
+
+All of these demos were built with [http://www.adobe.com/products/flash/ Flash Professional CS4], but their source code is external for viewing outside of Flash.
+
+=== Simple Feature Selection ===
 This demo covers the most common use case for Avatar Core.  You have an avatar character on the left and a set of options listed out on the left for changing the features of the character.  The interface consists of a group of standard Flash controls used to select the different features available to the avatar as defined in an external XML definition.
 
 <wiki:gadget url="http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionGadget.xml" width="600" height="300" border="1" />
@@ -16,7 +22,7 @@ Demo source files (ver 0.2.0):
   * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionEditor.as SimpleFeatureSelectionEditor.as]
 Find the full demo download (including FLA and complete Avatar Core framework) in the [http://code.google.com/p/avatarcore/downloads/list Downloads section].
 
-== Adjust Features ==
+=== Adjust Features ===
 
 This demo shows how the Adjust objects used by Features can be modified to alter the appearance of the Feature.  Select a Feature by clicking on it, then use the control bar at the bottom of the screen to modify it's Adjust.
 
@@ -33,7 +39,7 @@ Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/AdjustConstrainedFeatures.as AdjustConstrainedFeatures.as]
 
 
-== Drag Features ==
+=== Drag Features ===
 
 This demo shows how Features can be moved (via Adjust) by dragging them with the mouse.  Making this work can be a little unintuitive, especially when it comes to parenting and behaviors like Mirror.  This approach takes into account those complications.
 
@@ -50,3 +56,48 @@ View live demo using Constrain behaviors:
 Source files:
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.fla DragConstrainedFeatures.fla] (graphical assets only)
   * [http://www.myavatareditor.com/avatarcore/demo/DragConstrainedFeatures.as DragConstrainedFeatures.as]
+
+
+== Copy And Paste Demos ==
+
+These examples can each be run and tested, as is, so long as your compiler/authoring tool is able to reference the Avatar Core framework (as explained in [Installation]).
+
+=== Simple Smiley ===
+
+This is a simple implementation of an Avatar defined in XML using loaded SWF art in Features positioned with Adjust objects.
+
+{{{
+import com.myavatareditor.avatarcore.*;
+import com.myavatareditor.avatarcore.display.*;
+import com.myavatareditor.avatarcore.xml.*;
+
+var avatarXML:XML =
+}}}
+{{{
+	<Avatar xmlns="com.myavatareditor.avatarcore">
+		<Feature>
+			<art src="http://www.myavatareditor.com/avatarcore/demo/images/smiley_eye.swf" />
+			<adjust x="-20" y="-20" />
+		</Feature>
+		<Feature>
+			<art src="http://www.myavatareditor.com/avatarcore/demo/images/smiley_eye.swf" />
+			<adjust x="20" y="-20" />
+		</Feature>
+		<Feature>
+			<art src="http://www.myavatareditor.com/avatarcore/demo/images/smiley_mouth.swf" />
+			<adjust y="20" />
+		</Feature>
+		<Feature>
+			<art zIndex="-1" src="http://www.myavatareditor.com/avatarcore/demo/images/smiley_head.swf" />
+		</Feature>
+	</Avatar>;
+}}}
+{{{
+var xmlParser:XMLDefinitionParser = new XMLDefinitionParser();
+var avatar:Avatar = xmlParser.parse(avatarXML) as Avatar;
+
+var avatarDisplay:AvatarDisplay = new AvatarDisplay(avatar);
+avatarDisplay.x = 100;
+avatarDisplay.y = 100;
+addChild(avatarDisplay);
+}}}
