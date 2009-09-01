@@ -116,7 +116,7 @@ package com.myavatareditor.avatarcore.display {
 		 * single Art reference of the feature)
 		 * @param	feature The feature being rendered through this sprite.
 		 */
-		public function ArtSprite(art:Art = null, feature:Feature = null) {
+		public function ArtSprite(art:Art = null, feature:Feature = null, autoLoad:Boolean = false) {
 			super(null);
 			
 			addEventListener(Event.COMPLETE, contentCompleteHandler, false, 0, true);
@@ -128,17 +128,11 @@ package com.myavatareditor.avatarcore.display {
 			// rather than some child
 			mouseChildren = false;
 			
-			this.art = art;
-			this.feature = feature;
-		}
-		
-		/**
-		 * Rebuilds the art sprite from scratch refreshing
-		 * its art source and then calling draw.
-		 */
-		public function rebuild():void {
-			reloadContent();
-			draw();
+			if (art) {
+				this.art = art;
+				if (autoLoad) load();
+			}
+			if (feature) this.feature = feature;
 		}
 		
 		/**
@@ -152,6 +146,7 @@ package com.myavatareditor.avatarcore.display {
 				print("Cannot draw art sprite because feature is not defined", PrintLevel.WARNING, this);
 				return;
 			}
+			load();
 			_feature.drawArtSprite(this);
 		}
 		
@@ -183,11 +178,6 @@ package com.myavatareditor.avatarcore.display {
 			// smooth bitmaps?
 			if (_art && content is Bitmap){
 				Bitmap(content).smoothing = isNaN(_art.smoothing) || Boolean(_art.smoothing);
-			}
-			
-			// go to specified content frame
-			if (srcFrame && content is MovieClip){
-				MovieClip(content).gotoAndStop(srcFrame);
 			}
 		}
 		

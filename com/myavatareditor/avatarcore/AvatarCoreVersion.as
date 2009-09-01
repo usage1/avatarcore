@@ -27,7 +27,7 @@ package com.myavatareditor.avatarcore {
 	 */
 	public class AvatarCoreVersion {
 		
-		public static const CURRENT_VERSION:String = "0.2.0";
+		public static const CURRENT_VERSION:String = "0.2.1";
 		
 	}
 	

@@ -26,7 +26,6 @@ package com.myavatareditor.avatarcore {
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import com.myavatareditor.avatarcore.display.ArtSprite;
 	import com.myavatareditor.avatarcore.events.FeatureEvent;
-	import com.myavatareditor.avatarcore.xml.IXMLWritable;
 	import flash.display.Sprite;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
@@ -44,6 +43,19 @@ package com.myavatareditor.avatarcore {
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Feature extends FeatureBase {
+		
+		/**
+		 * Setting the name of Features automatically calls
+		 * updateParentHierarchy() in the associated Avatar instance
+		 * and redraws the feature.
+		 */
+		override public function set name(value:String):void {
+			super.name = value;
+			if (_avatar){
+				_avatar.updateParentHierarchy();
+			}
+			redraw();
+		}
 		
 		/**
 		 * A specific Art object to be applied to an avatar. This can contain
@@ -186,7 +198,7 @@ package com.myavatareditor.avatarcore {
 				// (or whatever is specified by defaultSetID)
 				var defaultAdjust:Adjust = _definition.adjustSet.collection[defaultSetID] as Adjust;
 				if (defaultAdjust){
-					print("Could not resolve a adjust name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
+					print("Could not resolve an adjust name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
 					return defaultAdjust.name;
 				}
 				
@@ -259,21 +271,22 @@ package com.myavatareditor.avatarcore {
 			}
 			_parent = value;
 			super.parentName = (_parent) ? _parent.name : null; // super set to prevent re-update
+			redraw();
 		}
 		private var _parent:Feature;
 		
 		/**
 		 * Setting the parent name for Features automatically calls
-		 * updateParentHierarchy() in the associated Avatar instance.
+		 * updateParentHierarchy() in the associated Avatar instance
+		 * and redraws the feature.
 		 */
 		override public function set parentName(value:String):void {
 			super.parentName = value;
 			if (_avatar){
 				_avatar.updateParentHierarchy();
 			}
+			redraw();
 		}
-		// use inherited version
-		//override public function get parentName():String {}
 		
 		/**
 		 * Identifies how many parents this feature has as specified
@@ -293,6 +306,7 @@ package com.myavatareditor.avatarcore {
 		}
 		public function set avatar(value:Avatar):void {
 			_avatar = value;
+			
 			// the avatar will need to update its parent
 			// hierarchy to update the feature's parents
 			_parent = null;

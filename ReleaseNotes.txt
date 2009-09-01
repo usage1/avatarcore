@@ -12,6 +12,27 @@ http://avatarcore.googlecode.com/
 
 == Change List ==
 
+=== 0.2.1 (September 1, 2009) ===
+
+- Setting Feature.name and Feature.parentName now redraws (as was/is the
+  case with the other members in Feature)
+- Art.src can now reference Class or Function definitions. This does not apply
+  to XML since XML will always specify a string.  For Classes, an instance of
+  the class will be used for the src (as with a class name string) while 
+  function return values will be used when a function is specified
+- Added ICollection.itemCount
+- Added Mirror.axis for specifying which axis to mirror on
+- Added Range.valueAtStepIndex
+- Added Range.stepIndex
+- Added SourceLoaderSprite.load
+- Added an autoLoad parameter to the SourceLoaderSprite, ArtSprite and 
+  ThumbnailArtSprite constructors.  Referenced content won't be loaded into
+  the sprite unless this is true or SourceLoaderSprite.load is called.
+- SourceLoaderSprite (and ArtSprites, etc.) no longer loads their source 
+  content immediately upon setting the source (SourceLoaderSprite.src). This
+  corrected situation where Art was being loaded repeatedly and unnecessarily
+  every time an AvatarDisplay was being drawn
+
 === 0.2.0 (August 28, 2009) ===
 
 There have been a number of new API changes, as well as a reworking
@@ -55,7 +76,7 @@ been made that change the effects of parent transforms on their children.
 - Constrain is now applied to feature adjusts (transforms) rather than
   directly to art sprites to allow child adjusts to honor the
   constrain
-- Added Constrain.name, making it more convenient to access Contrain
+- Added Constrain.name, making it more convenient to access Constrain
   behaviors in a feature
 - Other minor bug fixes
 

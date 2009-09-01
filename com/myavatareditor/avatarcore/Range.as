@@ -161,6 +161,15 @@ package com.myavatareditor.avatarcore {
 		}
 		
 		/**
+		 * Returns the value within the range at the
+		 * step index provided.  If there are no steps
+		 * in the range, min is returned.
+		 */
+		public function valueAtStepIndex(index:int):Number {
+			return _min + _stepSpan * index;
+		}
+		
+		/**
 		 * Returns the percent within the range that the
 		 * passed value exists within the range.
 		 */
@@ -193,6 +202,18 @@ package com.myavatareditor.avatarcore {
 			
 			var pos:Number = Math.round((value - _min)/_stepSpan);
 			return _min + pos * _stepSpan;
+		}
+		
+		/**
+		 * Provides the step index, or the number of steps from min using
+		 * stepSpen to reach the step value of the value provided.
+		 * @param	value A value within the range to 
+		 * @return The step index for the value passed. If a step index
+		 * does not apply, -1 is returned.
+		 */
+		public function stepIndex(value:Number):int {
+			if (_steps < 1) return -1;
+			return Math.round((stepValue(value) - _min)/_stepSpan);
 		}
 		
 		private function updateSpan():void {

@@ -50,29 +50,36 @@ package com.myavatareditor.avatarcore.display {
 		 * This is generally not set directly, instead relying
 		 * on the src defined in the linked Art object.
 		 */
-		public function get src():String {
+		public function get src():Object {
 			return _src;
 		}
-		public function set src(value:String):void {
-			if (value == null){
-				_src = null;
-				_srcFrame = null;
-			}else{
+		public function set src(value:Object):void {
+			var origSrc:Object = _src;
+			
+			_src = value;
+			_srcFrame = null;
 				
-				// separate any frame values from src
-				var parts:Array = value.split("#");
+			// separate any frame values from src
+			if (_src is String){
+				var parts:Array = _src.split("#");
 				if (parts.length > 1){
 					_src = parts[0];
 					_srcFrame = parts[1];
-				}else{
-					_src = value;
-					_srcFrame = null;
 				}
 			}
 			
-			loadSourceContent();
+			// this is compared against the original
+			// src value since its possible the only
+			// change in the value is a new frame number
+			// at which case the content doesn't need
+			// to be reloaded
+			if (_src != origSrc){
+				_loaded = false;
+			}
+			
 		}
-		private var _src:String;
+		private var _src:Object;
+		private var _loaded:Boolean;
 		
 		/**
 		 * The frame defined by src.  This can be numeric in nature
@@ -110,48 +117,112 @@ package com.myavatareditor.avatarcore.display {
 		 * single Art reference of the feature)
 		 * @param	feature The feature being rendered through this sprite.
 		 */
-		public function SourceLoaderSprite(src:String = null) {
-			this.src = src;
+		public function SourceLoaderSprite(src:String = null, autoLoad:Boolean = false) {
+			if (src) {
+				this.src = src;
+				load();
+			}
 		}
 		
 		/**
 		 * Reloads or reinstantiates the source (src) of the sprite.
 		 */
-		public function reloadContent():void {
+		public function reload():void {
 			loadSourceContent();
+		}
+		/**
+		 * Loads the source content into the SourceLoaderSprite.  If the
+		 * content has already been loaded, it won't be loaded again.
+		 * @param	src New source content to replace the existing
+		 * src value.  This is optional. If not provided, the existing
+		 * src value is loaded.
+		 */
+		public function load(src:String = null):void {
+			if (src) this.src = src;
+			if (!_loaded){
+				loadSourceContent();
+			}
 		}
 		
 		private function loadSourceContent():void {
 			clearContent();
-			
-			if (_src == null) return;
+			if (!_loaded) _loaded = true;
+			addSourceContent(_src);
+		}
+		
+		private function addSourceContent(source:*):void {
+			if (source == null) return;
 			
 			// try loading source as a class definition
+			if (source is String){
+					
+				try {
+					
+					var displayClass:Class = getDefinitionByName(source) as Class;
+					addInstance(new displayClass());
+					return;
+					
+				}catch (error:Error){
+					print("Art Generation; class definition for asset '"+source+"' not found ("+error+"). Attempting to load as external asset...", PrintLevel.DEBUG, this);
+				}
+				
+				// try loading source as a URL
+				try {
+					loaderSetup();
+					loader.load(new URLRequest(source));
+				}catch (error:Error){
+					loaderCleanup();
+					print("Art Generation; failure trying to load asset '"+source+"' ("+error+")", PrintLevel.ERROR, this);
+				}
+				
+			}else if (source is Class){
+				
+				try {
+					addInstance(new source());
+				}catch (error:Error){
+					print("Art Generation; invalid class definition for art source ("+source+")", PrintLevel.DEBUG, this);
+				}
+				
+			}else if (source is Function){
+				
+				try {
+					addSourceContent(source());
+				}catch (error:Error){
+					print("Art Generation; failure in generating content ("+error+")", PrintLevel.DEBUG, this);
+				}
+				
+			}else{
+				
+				try {
+					addInstance(source);
+				}catch (error:Error){
+					print("Art Generation; failure in adding content ("+error+")", PrintLevel.DEBUG, this);
+				}
+				
+			}
+		}
+		
+		private function addInstance(newContent:Object):void {
+			
+			// class can be for bitmaps or display objects
 			try {
-				
-				var displayClass:Class = getDefinitionByName(_src) as Class;
-				var newContent:* = new displayClass();
-				
-				// class can be for bitmaps or display objects
 				_content = (newContent is BitmapData)
 					? new Bitmap(newContent as BitmapData)
 					: DisplayObject(newContent);
-				
+					
+				setContentFrame();
 				addChild(_content);
-				dispatchEvent(new Event(Event.COMPLETE));
-				return;
 				
-			}catch (error:Error){
-				print("Art Generation; class definition for asset '"+_src+"' not found ("+error+"). Attempting to load as external asset...", PrintLevel.DEBUG, this);
-			}
+			}catch (error:Error){}
 			
-			// try loading source as a URL
-			try {
-				loaderSetup();
-				loader.load(new URLRequest(_src));
-			}catch (error:Error){
-				loaderCleanup();
-				print("Art Generation; failure trying to load asset '"+_src+"' ("+error+")", PrintLevel.ERROR, this);
+			dispatchEvent(new Event(Event.COMPLETE));
+		}
+		
+		private function setContentFrame():void {
+			// go to specified content frame
+			var playable:MovieClip = _content as MovieClip
+			if (playable && _srcFrame){
+				playable.gotoAndStop(_srcFrame);
 			}
 		}
 		
@@ -183,8 +254,12 @@ package com.myavatareditor.avatarcore.display {
 			
 			// loader isn't added until after it's loaded
 			addChild(loader);
+			
 			try {
+				
 				_content = loader.content;
+				setContentFrame();
+				
 			}catch (error:Error){
 				// likely a security error because access content 
 				// (from untrusting domain?) is not allowed.
@@ -217,8 +292,8 @@ package com.myavatareditor.avatarcore.display {
 				loader.close();
 			}catch (error:Error){}
 			
-			// if a movie clip, prevent additional playback
 			var playable:MovieClip = loader.content as MovieClip;
+			// if a movie clip, prevent additional playback
 			if (playable){
 				playable.stop();
 			}

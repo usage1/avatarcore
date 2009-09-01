@@ -94,11 +94,11 @@ package com.myavatareditor.avatarcore {
 		 * that fails, eyes.swf will be loaded as an external asset.
 		 * When complete, it will goto and stop at frame 12.
 		 */
-		public function get src():String { return _src; }
-		public function set src(value:String):void {
+		public function get src():Object { return _src; }
+		public function set src(value:Object):void {
 			_src = value;
 		}
-		private var _src:String;
+		private var _src:Object;
 		
 		/**
 		 * The source of the thumbnail to be used for previewing the
@@ -115,9 +115,13 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Indicates whether or not the art is colorized when
-		 * a color is applied to the art's feature. Zero (0)
-		 * or NaN means no coloring, One (1) means coloring is
-		 * applied.
+		 * a color is applied to the art's feature. Any non-zero
+		 * value means that coloring will be applied.  The default
+		 * is NaN which allows it.  The value of colorize is a 
+		 * Number rather than a Boolean to facilitate the inheritance
+		 * of the colorize value to child Art objects.  If a container
+		 * Art object has a non-NaN value, that value is copied to the
+		 * child Art objects within its collection.
 		 */
 		public function get colorize():Number { return _colorize; }
 		public function set colorize(value:Number):void {
@@ -156,7 +160,7 @@ package com.myavatareditor.avatarcore {
 		 * Constructor for creating new Art instances.
 		 * @param src Source of the art content.
 		 */
-		public function Art(src:String = null) {
+		public function Art(src:Object = null) {
 			this.src = src;	
 		}
 		

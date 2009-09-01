@@ -154,7 +154,6 @@ package com.myavatareditor.avatarcore.display {
 			i = displayList.length;
 			while (i--){
 				artSprite = displayList[i] as ArtSprite;
-				//trace(artSprite.feature.name, artSprite.parentCount)
 				artSprite.draw();
 			}
 			
