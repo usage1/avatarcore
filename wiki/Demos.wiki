@@ -61,7 +61,7 @@ Source files:
 
 == Copy And Paste Demos ==
 
-Copy and paste these code samples directly into your favorite Flash authoring tool to test them without modification.  Information on how to set up your compiler/tool to recognize the Avatar Core framework is available on the [Installation page].  These examples work easiest with [http://www.adobe.com/products/flash/ Flash Authoring].
+Copy and paste these code samples directly into a new file to test them without any (or little) modification.  Information on how to set up your compiler/tool to recognize the Avatar Core framework is available on the [Installation page].  These examples work easiest with [http://www.adobe.com/products/flash/ Flash Professional], pasting the code into the first frame of a new FLA document.
 
 === Simple Smiley ===
 
