@@ -60,7 +60,7 @@ Source files:
 
 == Copy And Paste Demos ==
 
-These examples can each be run and tested, as is, so long as your compiler/authoring tool is able to reference the Avatar Core framework (as explained in [Installation]).
+Copy and paste these code samples directly into your favorite Flash authoring tool to test them without modification.  Information on how to set up your compiler/tool to recognize the Avatar Core framework is available on the [Installation page].
 
 === Simple Smiley ===
 
