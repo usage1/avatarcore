@@ -125,7 +125,7 @@ var avatarXML:XML =
 
 With the XML defined, it can be converted to a tangible Avatar instance. This is done using the XMLDefinitionParser class.  Using it's parse method with the XML, the Avatar defined by that XML is created and saved to the avatar variable.
 
-The XMLDefinitionParser class contains all the logic necessary for converting the XML to runtime objects.  This includes automatically instantiating XML nodes as object instances, adding them to collections (Feature in Avatar) or assigning them as object properties (art in Feature).
+The XMLDefinitionParser class contains all the logic necessary for converting the XML to runtime objects.  This includes automatically instantiating XML nodes as object instances, adding them to collections (Feature in Avatar) or assigning them as object properties (art in Feature). Because XMLDefinitionParser can make any kind of object, it returns a value of a non-specific type. Notice how the as operator was used to cast this value returned by parse() to the Avatar type when assigned to the avatar variable (typed as Avatar).
 {{{
 var xmlParser:XMLDefinitionParser = new XMLDefinitionParser();
 var avatar:Avatar = xmlParser.parse(avatarXML) as Avatar;
