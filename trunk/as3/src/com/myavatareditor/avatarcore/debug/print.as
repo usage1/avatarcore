@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -22,8 +22,11 @@ SOFTWARE.
 package com.myavatareditor.avatarcore.debug {
 	
 	/**
-	 * Prints a message to the terminal (standard out) and/or
-	 * a PrintWindow instance if one has been created.
+	 * Prints a message to the terminal (standard out) via trace() 
+	 * and/or a PrintWindow instance if one has been created. The print
+	 * function does nothing if the printed message specifies a level
+	 * that is less than the value of PrintLevel.reporting.
+	 * @see PrintLevel#reporting
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public function print(message:*, level:int = 0, source:* = null):void {

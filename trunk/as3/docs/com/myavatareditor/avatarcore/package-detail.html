@@ -10,19 +10,21 @@
 				
 					if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("com.myavatareditor.avatarcore"); titleBar_setSubNav(false,false,false	,false,false,false,false,false,false	,false,false,true,true,false);}	
 				-->
-			</script><div class="MainContent"><br><p>Core set of classes that make up the bulk of the framework.  Any classes represented by XML would be found here.</p><br><hr><a name="interfaceSummary"></a><div class="summaryTableTitle">Interfaces</div><table cellpadding="3" cellspacing="0" class="summaryTable"><tr><th>&nbsp;</th><th width="30%">Interface</th><th width="70%">Description</th></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><i><a href="IBehavior.html">IBehavior</a></i></td><td class="summaryTableLastCol">
+			</script><div class="MainContent"><br><p>Core set of classes that make up the bulk of the framework.  Most if not all framework classes represented by XML would be found here.</p><br><hr><a name="interfaceSummary"></a><div class="summaryTableTitle">Interfaces</div><table cellpadding="3" cellspacing="0" class="summaryTable"><tr><th>&nbsp;</th><th width="30%">Interface</th><th width="70%">Description</th></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><i><a href="IBehavior.html">IBehavior</a></i></td><td class="summaryTableLastCol">
 	 Interface for behaviors used to modify or otherwise influence
-	 the presentation of an avatar on the screen.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><i><a href="ICollection.html">ICollection</a></i></td><td class="summaryTableLastCol">
+	 the presentation of an avatar on the screen.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><i><a href="IClonable.html">IClonable</a></i></td><td class="summaryTableLastCol">
+	 Interface for AvatarCore objects that implement
+	 cloning.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><i><a href="ICollection.html">ICollection</a></i></td><td class="summaryTableLastCol">
 	 Interface for objects containing collections, namely
 	 those used within a definition XML that can contain
 	 a dynamic number of instances of various types.</td></tr></table><a name="classSummary"></a><div class="summaryTableTitle">Classes</div><table cellpadding="3" cellspacing="0" class="summaryTable"><tr><th>&nbsp;</th><th width="30%">Class</th><th width="70%">Description</th></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Adjust.html">Adjust</a></td><td class="summaryTableLastCol">
-	 Represents a postion, scale, and rotation adjustation
-	 that is applied to an avatar feature.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Art.html">Art</a></td><td class="summaryTableLastCol">
+	 Represents a postion, scale, and rotation adjustation that is applied to
+	 the Art of an avatar feature.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Art.html">Art</a></td><td class="summaryTableLastCol">
 	 Represents the characteristics of the visual art used
 	 to graphically represent the different features of an
 	 avatar.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="ArtSet.html">ArtSet</a></td><td class="summaryTableLastCol">
 	 A collection of Art objects for feature definitions.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Avatar.html">Avatar</a></td><td class="summaryTableLastCol">
-	 Avatars contain the data describing avatar characters.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="AvatarCoreVersion.html">AvatarCoreVersion</a></td><td class="summaryTableLastCol">
+	 Avatar instances are the primary components of the Avatar Core framework.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="AvatarCoreVersion.html">AvatarCoreVersion</a></td><td class="summaryTableLastCol">
 	 Contains version information for the Avatar Core framework.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Collection.html">Collection</a></td><td class="summaryTableLastCol">
 	 Standard ICollection implementation.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Color.html">Color</a></td><td class="summaryTableLastCol">
 	 Used to describe color transformations applied to avatar art.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Constrain.html">Constrain</a></td><td class="summaryTableLastCol">
@@ -35,9 +37,11 @@
 	 shared between both of those classes.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="FeatureDefinition.html">FeatureDefinition</a></td><td class="summaryTableLastCol">
 	 Defines characteristics to be referenced by avatar features.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Library.html">Library</a></td><td class="summaryTableLastCol">
 	 A collection of FeatureDefinition objects to be associated with an Avatar
-	 object's Feature objects.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Mirror.html">Mirror</a></td><td class="summaryTableLastCol">
+	 object's Feature objects.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Metadata.html">Metadata</a></td><td class="summaryTableLastCol">
+	 A utility class that's simply a generic object that implements
+	 IClonable.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Mirror.html">Mirror</a></td><td class="summaryTableLastCol">
 	 A behavior that creates a mirrored duplicate (along y axis) of a
-	 feature's art.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Range.html">Range</a></td><td class="summaryTableLastCol">
+	 feature's art.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Range.html">Range</a></td><td class="summaryTableLastCol">
 	 Defines a numeric rannge by which a number
-	 can be constrained between a min and max value.</td></tr><tr class="prow0"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="SetCollection.html">SetCollection</a></td><td class="summaryTableLastCol">
-	 A common base class for collections used in feature definitions.</td></tr></table><p></p><div><p></p><center class="copyright"><footer></footer><br/>Tue Sep 8 2009, 09:08 AM -07:00  </center></div></div></body></html><!--<br/>Tue Sep 8 2009, 09:08 AM -07:00  -->
+	 can be constrained between a min and max value.</td></tr><tr class="prow1"><td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="SetCollection.html">SetCollection</a></td><td class="summaryTableLastCol">
+	 A common base class for collections used in feature definitions.</td></tr></table><p></p><div><p></p><center class="copyright"><footer></footer><br/>Sun Feb 7 2010, 10:25 PM -08:00  </center></div></div></body></html><!--<br/>Sun Feb 7 2010, 10:25 PM -08:00  -->

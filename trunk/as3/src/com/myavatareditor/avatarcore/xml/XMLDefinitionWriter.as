@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -21,8 +21,11 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore.xml {
 	
+	import com.myavatareditor.avatarcore.debug.print;
+	import com.myavatareditor.avatarcore.debug.PrintLevel;
 	import com.myavatareditor.avatarcore.ICollection;
 	import flash.utils.describeType;
+	import flash.utils.Dictionary;
 	
 	/**
 	 * Writes an object to XML based on XML formatting that
@@ -31,19 +34,41 @@ package com.myavatareditor.avatarcore.xml {
 	 */
 	public class XMLDefinitionWriter {
 		
+		// defaults for IXMLWritable properties
 		private var defaultPropertiesIgnoredByXML:Object = {};
 		private var defaultPropertiesAsAttributesInXML:Object = {
-			name:1,
-			propertiesIgnoredByXML:1,
-			propertiesAsAttributesInXML:1
+			name:1
 		};
 		private var defaultDefaultPropertiesInXML:Object = {};
 		
+		// TODO: recursion objects need to be removed 
+		// once the object has been written
+		private var recursionLookup:Dictionary;
+		
+		/**
+		 * Constructor for creating new XMLDefinitionWriter instances.
+		 */
 		public function XMLDefinitionWriter() {
-			
+			super();
 		}
 		
 		public function write(object:Object):XML {
+			if (object == null) return new XML();
+			
+			recursionLookup = new Dictionary(true);
+			var result:XML = writeObject(object);
+			recursionLookup = null;
+			
+			return result || new XML();
+		}
+		
+		private function writeObject(object:Object):XML {
+			
+			if (object in recursionLookup){
+				print("Recursion found when generating XML. Ignoring: " + object + ".", PrintLevel.NORMAL, this);
+				return null;
+			}
+			recursionLookup[object] = true;
 			
 			// type information about object
 			var xml:XML;
@@ -75,6 +100,7 @@ package com.myavatareditor.avatarcore.xml {
 				xml.setNamespace(new Namespace("*"));
 			}
 			
+			delete recursionLookup[object];
 			return xml;
 		}
 		
@@ -125,7 +151,10 @@ package com.myavatareditor.avatarcore.xml {
 				}else if (value is XML || value is XMLList){
 					children += value;
 				}else{
-					childElem = write(value);
+					childElem = writeObject(value);
+					if (childElem == null){
+						continue;
+					}
 					
 					// only add property XML if non-empty
 					if (childElem.elements().length() || childElem.attributes().length()){
@@ -151,9 +180,13 @@ package com.myavatareditor.avatarcore.xml {
 			if (object is ICollection){
 				var collector:ICollection = object as ICollection;
 				var collection:Array = collector.collection;
+				var child:XML;
 				var i:int, n:int = collection.length;
 				for (i=0; i<n; i++){
-					children += write(collection[i]);
+					child = writeObject(collection[i]);
+					if (child != null){
+						children += child;
+					}
 				}
 			}
 			

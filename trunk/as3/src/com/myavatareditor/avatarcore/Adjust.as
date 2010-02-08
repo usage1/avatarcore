@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -25,11 +25,27 @@ package com.myavatareditor.avatarcore {
 	import flash.geom.Matrix;
 	
 	/**
-	 * Represents a postion, scale, and rotation adjustation
-	 * that is applied to an avatar feature.
+	 * Represents a postion, scale, and rotation adjustation that is applied to
+	 * the Art of an avatar feature. Adjusts are very similar to the Matrix object,
+	 * ultimately being used to alter the DisplayObject.transform.matrix of ArtSprite
+	 * instances, but their behavior is slightly different.  Adjusts, for example do 
+	 * not allow changes to object skew or distortion outside of position, scale, and 
+	 * rotation. For negative scaling (horizontal or vertical flipping), it is also 
+	 * recommended that the flipX and flipY properties be used instead of negative
+	 * values for scaleX and scaleY.
+	 * <p>
+	 * The parenting of Features relates directly to the application of changes defined
+	 * by Adjusts.  When one Feature is the child of another Feature through parenting
+	 * the child Feature's Adjust inherits certain properties from the parent.  These 
+	 * properties include position and rotation, but not scale. Parent scaling does
+	 * affect child positioning, but it does not affect child scaling.  All ArtSprite
+	 * instances are direct DisplayObject children of their container AvatarDisplay 
+	 * parent so these transformations are handled independantly of the standard display
+	 * list transformations (where scale is inherited).
+	 * </p>
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Adjust implements IXMLWritable {
+	public class Adjust implements IXMLWritable, IClonable {
 		
 		private static const toRadians:Number = Math.PI / 180.0;
 		
@@ -105,38 +121,66 @@ package com.myavatareditor.avatarcore {
 		 * @param	scaleY The starting scaleY value.
 		 * @param	rotation The starting rotation value.
 		 */
-		public function Adjust(x:Number = 0, y:Number = 0, scaleX:Number = 1, scaleY:Number = 1, rotation:Number = 0) {
+		public function Adjust(name:String = null, x:Number = 0, y:Number = 0, scaleX:Number = 1, scaleY:Number = 1, rotation:Number = 0) {
 			this.x = x;
 			this.y = y;
 			this.scaleX = scaleX;
 			this.scaleY = scaleY;
 			this.rotation = rotation;
+			if (name) this.name = name;
 		}
+		
+		/**
+		 * @inheritDoc
+		 */
+		public function toString():String {
+			return "[Adjust name=\"" + _name + "\" x=" + x + " y=" + y + " scaleX=" + scaleX + " scaleY=" + scaleY +" rotation=" + rotation + "]";
+		}
+		
 		
 		/**
 		 * Creates and returns a copy of the Adjust object.
 		 * @return A copy of this Adjust object.
 		 */
-		public function clone():Adjust {
-			var copy:Adjust = new Adjust(x, y, scaleX, scaleY, rotation);
+		public function clone(copyInto:Object = null):Object {
+			var copy:Adjust = (copyInto) ? copyInto as Adjust : new Adjust();
+			if (copy == null) return null;
+			
+			copy.x = x;
+			copy.y = y;
+			copy.scaleX = scaleX;
+			copy.scaleY = scaleY;
+			copy.rotation = rotation;
 			copy.flipX = flipX;
 			copy.flipY = flipY;
-			copy.name = name;
+			copy._name = _name;
 			return copy;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesIgnoredByXML():Object {
-			return {};
+			return null;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesAsAttributesInXML():Object {
-			return {name:1};
+			return null;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getDefaultPropertiesInXML():Object {
-			return {};
+			return null;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getObjectAsXML():XML {
 			var xml:XML = <Adjust />;
 			if (name){
@@ -189,7 +233,8 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * Adds another adjust to this one.  This is used to combine
 		 * a base adjust with a feature adjust. All values except
-		 * scale are added. Scale values are multiplied.
+		 * scale are added. Scale values are multiplied. For flip values
+		 * the value is toggled if adjust being added is flipped.
 		 * @param	adjust The Adjust whose properties
 		 * should be added to this Adjust.
 		 */
@@ -200,11 +245,14 @@ package com.myavatareditor.avatarcore {
 			scaleX *= adjust.scaleX;
 			scaleY *= adjust.scaleY;
 			rotation += adjust.rotation;
+			if (adjust.flipX) flipX = !flipX;
+			if (adjust.flipY) flipY = !flipY;
 		}
 		
 		/**
 		 * Subtracts another adjust from this one. All values except
-		 * scale are subtracted. Scale values are divided.
+		 * scale are subtracted. Scale values are divided. For flip values
+		 * the value is toggled if adjust being added is flipped.
 		 * @param	adjust The Adjust whose properties
 		 * should be subtracted from this Adjust.
 		 */
@@ -215,6 +263,8 @@ package com.myavatareditor.avatarcore {
 			scaleX = adjust.scaleX ? scaleX/adjust.scaleX : 0;
 			scaleY = adjust.scaleY ? scaleY/adjust.scaleY : 0;
 			rotation -= adjust.rotation;
+			if (adjust.flipX) flipX = !flipX;
+			if (adjust.flipY) flipY = !flipY;
 		}
 	}
 }

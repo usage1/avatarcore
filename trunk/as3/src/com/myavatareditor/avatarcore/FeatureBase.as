@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -29,7 +29,31 @@ package com.myavatareditor.avatarcore {
 	 * shared between both of those classes.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class FeatureBase implements IXMLWritable {
+	public class FeatureBase implements IXMLWritable, IClonable {
+		
+		protected var suppressDraw:Boolean = false; // prevents redraws
+		
+		/**
+		 * Generic object for storing custom data (metadata). This
+		 * can be, but doesn't have to be a Metadata instance. The
+		 * advantage of using a Metadata instance is that it 
+		 * implements IClonable and can be cloned.
+		 */
+		public function get meta():Object { return _meta; }
+		public function set meta(value:Object):void {
+			_meta = value;
+		}
+		private var _meta:Object;
+		
+		/**
+		 * When true, redraw() is automatically called when properties
+		 * are set on this instance.
+		 */
+		public function get autoRedraw():Boolean { return _autoRedraw; }
+		public function set autoRedraw(value:Boolean):void {
+			_autoRedraw = value;
+		}
+		private var _autoRedraw:Boolean = true;
 		
 		/**
 		 * Identifies the feature object by name. Features in 
@@ -38,7 +62,9 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get name():String { return _name; }
 		public function set name(value:String):void {
+			if (_name == value) return;
 			_name = value;
+			if (_autoRedraw) redraw();
 		}
 		private var _name:String;
 		
@@ -49,7 +75,9 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get parentName():String { return _parentName; }
 		public function set parentName(value:String):void {
+			if (_parentName == value) return;
 			_parentName = value;
+			if (_autoRedraw) redraw();
 		}
 		private var _parentName:String;
 		
@@ -70,7 +98,9 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get baseAdjust():Adjust { return _baseAdjust; }
 		public function set baseAdjust(value:Adjust):void {
+			if (_baseAdjust == value) return;
 			_baseAdjust = value;
+			if (_autoRedraw) redraw();
 		}
 		private var _baseAdjust:Adjust;
 		
@@ -83,8 +113,10 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get behaviors():Collection { return _behaviors; }
 		public function set behaviors(value:Collection):void {
+			if (_behaviors == value) return;
 			if (value){
 				_behaviors = value;
+				if (_autoRedraw) redraw();
 			}
 		}
 		private var _behaviors:Collection = new Collection();
@@ -103,15 +135,6 @@ package com.myavatareditor.avatarcore {
 		private var _thumbnail:String;
 		
 		/**
-		 * Generic object for storing custom data (metadata).
-		 */
-		public function get meta():Object { return _meta; }
-		public function set meta(value:Object):void {
-			_meta = value;
-		}
-		private var _meta:Object;
-		
-		/**
 		 * Constructor for FeatureBase.  FeatureBase instances are not meant
 		 * to be instantiated.  Rather, FeatureBase exists as a base class
 		 * for the FeatureDefinition and Feature classes.
@@ -126,21 +149,57 @@ package com.myavatareditor.avatarcore {
 			if (index != -1){
 				className = className.substr(index + 2);
 			}
-			return "[" + className + " name:" + name + "]"; 
+			return "[" + className + " name=\"" + name + "\"]"; 
 		}
 		
+		/**
+		 * Overridden by subclasses to redraw the feature.
+		 */
+		public function redraw(originalName:String = null):void {
+			// to be overidden
+		}
+		
+		/**
+		 * Creates a FeatureBase copy.
+		 * @return A copy of this FeatureBase instance.
+		 */
+		public function clone(copyInto:Object = null):Object {
+			var copy:FeatureBase = (copyInto) ? copyInto as FeatureBase : new FeatureBase();
+			if (copy == null) return null;
+			
+			copy._name = _name;
+			copy._parentName = _parentName;
+			copy._thumbnail = _thumbnail;
+			copy._autoRedraw = _autoRedraw;
+			if (_baseAdjust) copy._baseAdjust = _baseAdjust.clone() as Adjust;
+			copy._behaviors.copyCollectionFrom(_behaviors);
+			return copy;
+		}
+		
+		/**
+		 * @inheritDoc
+		 */
 		public function getObjectAsXML():XML {
 			return null;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesAsAttributesInXML():Object {
 			return {parentName:1, name:1};
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesIgnoredByXML():Object {
-			return {};
+			return {autoRedraw:1};
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getDefaultPropertiesInXML():Object {
 			return {};
 		}

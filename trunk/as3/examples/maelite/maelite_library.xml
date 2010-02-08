@@ -25,7 +25,9 @@
 	</SetCollection>
 	
 	<FeatureDefinition name="head" thumbnail="FeatureIcons#2">
-		<meta thumbnailColor="1" />
+		<meta>
+			<Metadata thumbnailColor="1" />
+		</meta>
 		<behaviors>
 			<custom:SourceToStyle targetFeatureName="face" />
 			<custom:SourceToStyle targetFeatureName="beard" />
@@ -581,7 +583,9 @@
 		</artSet>
 	</FeatureDefinition>
 	<FeatureDefinition name="eyes" thumbnail="FeatureIcons#6">
-		<meta thumbnailColor="4" />
+		<meta>
+			<Metadata thumbnailColor="4" />
+		</meta>
 		<defaultAdjust x="-2" y="-5.5" />
 		<behaviors>
 			<Constrain name="constrain">
@@ -898,7 +902,9 @@
 		</artSet>
 	</FeatureDefinition>
 	<FeatureDefinition name="nose" thumbnail="FeatureIcons#8">
-		<meta thumbnailColor="1" />
+		<meta>
+			<Metadata thumbnailColor="1" />
+		</meta>
 		<defaultAdjust y="22" />
 		<colorSet xml:ref="skinColors" />
 		<behaviors>

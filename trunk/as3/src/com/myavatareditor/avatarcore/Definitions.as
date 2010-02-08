@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -33,6 +33,12 @@ package com.myavatareditor.avatarcore {
 	import flash.net.URLRequest;
 	
 	/**
+	 * Dispatched when xml has been loaded into a Definitions instance
+	 * or when there was an error in the process of loading the xml.
+	 */
+	[Event(name="complete", type="com.myavatareditor.avatarcore.events.SimpleDataEvent")]
+	
+	/**
 	 * A collection of definitions such as Library and Avatar instances 
 	 * to be used with the Avatar Core framework. These are typically 
 	 * definitions acquired from XML.  One specific feature of the Definitions
@@ -54,8 +60,6 @@ package com.myavatareditor.avatarcore {
 		 * @return The item added to the collection.
 		 */
 		public override function addItem(item:*):* {
-			var avatarItem:Avatar;
-			
 			if (item is Avatar){
 				
 				// associate avatar with library
@@ -65,18 +69,7 @@ package com.myavatareditor.avatarcore {
 				
 				// work the other way around, associating
 				// new libraries with any avatars
-				var libraryItem:Library = item as Library;
-				var libraryName:String = libraryItem.name;
-				if (libraryName){
-					var items:Array = collection;
-					var i:int = items.length;
-					while (i--){
-						avatarItem = items[i] as Avatar;
-						if (avatarItem && avatarItem.libraryName == libraryName){
-							avatarItem.library = libraryItem;
-						}
-					}
-				}
+				updateAvatarFromLibrary(item as Library);
 			}
 			
 			return super.addItem(item);
@@ -97,13 +90,25 @@ package com.myavatareditor.avatarcore {
 		}
 		
 		/**
+		 * Creates and returns a copy of the Definitions object.
+		 * @return A copy of this Definitions object.
+		 */
+		override public function clone(copyInto:Object = null):Object {
+			var copy:Definitions = (copyInto) ? copyInto as Definitions : new Definitions();
+			if (copy == null) return null;
+			super.clone(copy);
+			
+			return copy;
+		}
+		
+		/**
 		 * Loads and parses an XML file into the Definitions object. 
 		 * When loaded, all collection content in this object are cleared
 		 * and the first Definitions node in the XML file is found and
 		 * parsed into this object.  A SimpleDataEvent of the type
 		 * Event.COMPLETE is dispatched when this process is complete. If 
 		 * there was an error, the COMPLETE event is still dispatched, but
-		 * the DataEvent.error property will contain the error that
+		 * the SimpleDataEvent.error property will contain the error that
 		 * occured.
 		 * @param	request A URLRequest linking to the xml file to be loaded.
 		 */
@@ -167,7 +172,7 @@ package com.myavatareditor.avatarcore {
 		 * @param	avatar The Avatar to find a linked library from those
 		 * available in the Definitions collection.
 		 */
-		public function updateAvatar(avatar:Avatar):void {
+		private function updateAvatar(avatar:Avatar):void {
 			if (avatar == null || avatar.libraryName == null) return;
 			var library:Library = getItemByName(avatar.libraryName) as Library;
 			if (library){
@@ -179,7 +184,7 @@ package com.myavatareditor.avatarcore {
 		 * Runs through all Avatar objects in the Definitions collection
 		 * calling Definitions.updateAvatar() for each.
 		 */
-		public function updateAvatars():void {
+		private function updateAvatars():void {
 			var avatarItem:Avatar;
 			var items:Array = collection;
 			var i:int = items.length;
@@ -187,6 +192,27 @@ package com.myavatareditor.avatarcore {
 				avatarItem = items[i] as Avatar;
 				if (avatarItem){
 					updateAvatar(avatarItem);
+				}
+			}
+		}
+		
+		/**
+		 * Updates avatars within the Definition collection with 
+		 * the Library objects passed
+		 * @param	library The Library object to use to assocate any
+		 * avatars within the collection that might relate to it.
+		 */
+		private function updateAvatarFromLibrary(library:Library):void {
+			var libraryName:String = library.name;
+			if (libraryName){
+				var avatarItem:Avatar;
+				var items:Array = collection;
+				var i:int = items.length;
+				while (i--){
+					avatarItem = items[i] as Avatar;
+					if (avatarItem && avatarItem.libraryName == libraryName){
+						avatarItem.library = library;
+					}
 				}
 			}
 		}

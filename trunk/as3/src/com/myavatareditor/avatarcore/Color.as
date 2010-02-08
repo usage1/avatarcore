@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -31,7 +31,7 @@ package com.myavatareditor.avatarcore {
 	 * property to allow Color objects to be referenced in collections.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Color extends ColorTransform implements IXMLWritable {
+	public class Color extends ColorTransform implements IXMLWritable, IClonable {
 		
 		/**
 		 * Name identifier for the Color object.
@@ -86,13 +86,17 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * Constructor for creating new shade instances.
 		 */
-		public function Color(redMultiplier:Number = 1.0, greenMultiplier:Number = 1.0, blueMultiplier:Number = 1.0, alphaMultiplier:Number = 1.0,
+		public function Color(name:String = null, redMultiplier:Number = 1.0, greenMultiplier:Number = 1.0, blueMultiplier:Number = 1.0, alphaMultiplier:Number = 1.0,
 							redOffset:Number = 0, greenOffset:Number = 0, blueOffset:Number = 0, alphaOffset:Number = 0) {
 						
 			super(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier,
 				redOffset, greenOffset, blueOffset, alphaOffset);
+			if (name) this.name = name;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getObjectAsXML():XML {
 			var xml:XML = <Color />;
 			if (name){
@@ -113,15 +117,24 @@ package com.myavatareditor.avatarcore {
 			return xml;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesIgnoredByXML():Object {
 			return {};
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesAsAttributesInXML():Object {
 			return {name:1, redMultiplier:1, greenMultiplier:1, blueMultiplier:1, alphaMultiplier:1,
 				redOffset:1, greenOffset:1, blueOffset:1, alphaOffset:1};
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getDefaultPropertiesInXML():Object {
 			return {};
 		}
@@ -130,9 +143,19 @@ package com.myavatareditor.avatarcore {
 		 * Creates and returns a copy of the Color object.
 		 * @return A copy of this Color object.
 		 */
-		public function clone():Color {
-			var copy:Color = new Color(redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier, redOffset, greenOffset, blueOffset, alphaOffset);
-			copy.name = name;
+		public function clone(copyInto:Object = null):Object {
+			var copy:Color = (copyInto) ? copyInto as Color : new Color();
+			if (copy == null) return null;
+			
+			copy.redMultiplier = redMultiplier;
+			copy.greenMultiplier = greenMultiplier;
+			copy.blueMultiplier = blueMultiplier;
+			copy.alphaMultiplier = alphaMultiplier;
+			copy.redOffset = redOffset;
+			copy.greenOffset = greenOffset;
+			copy.blueOffset = blueOffset;
+			copy.alphaOffset = alphaOffset;
+			copy._name = _name;
 			return copy;
 		}
 	}

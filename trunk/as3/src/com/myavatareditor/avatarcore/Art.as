@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -158,30 +158,39 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Constructor for creating new Art instances.
+		 * @param name Name of the instance. This is used to relate
+		 * Feature art and FeatureDefinition art.
 		 * @param src Source of the art content.
 		 */
-		public function Art(src:Object = null) {
-			this.src = src;	
+		public function Art(name:String = null, src:Object = null) {
+			if (name) this.name = name;	
+			if (src) this.src = src;	
+		}
+		
+		override public function toString():String {
+			return "[Art name=\"" + name + "\"]";
 		}
 		
 		/**
 		 * Creates and returns a copy of the Art object.
 		 * If the Art object has any Art children in its
 		 * collection, they are also cloned and placed
-		 * within the cloned Art's collection
+		 * within the cloned Art's collection.
 		 * @return A copy of this Color object.
 		 */
-		public function clone():Art {
-			var copy:Art = new Art(src);
-			copy.name = name;
-			copy.x = x;
-			copy.y = y;
-			copy.zIndex = zIndex;
-			copy.thumbnail = thumbnail;
-			copy.colorize = colorize;
-			copy.smoothing = smoothing;
-			copy.style = style;
-			copy.copyCollectionFrom(this);
+		override public function clone(copyInto:Object = null):Object {
+			var copy:Art = (copyInto) ? copyInto as Art : new Art();
+			if (copy == null) return null;
+			super.clone(copy);
+			
+			copy._x = _x;
+			copy._y = _y;
+			copy._zIndex = _zIndex;
+			copy._src = _src;
+			copy._thumbnail = _thumbnail;
+			copy._colorize = _colorize;
+			copy._smoothing = _smoothing;
+			copy._style = _style;
 			return copy;
 		}
 		

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -36,7 +36,7 @@ package com.myavatareditor.avatarcore {
 	 * The one exception is with parent-related adjustments which occur after.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public interface IBehavior {
+	public interface IBehavior extends IClonable {
 		
 		/**
 		 * A callback used by AvatarDisplay objects in creating the ArtSprite
@@ -75,13 +75,5 @@ package com.myavatareditor.avatarcore {
 		 * @param	artSprite The art sprite being drawn.
 		 */
 		function drawArtSprite(artSprite:ArtSprite):void;
-		
-		/**
-		 * Creates a copy of the behavior.  This would be used when copying
-		 * behavior collections from one Feature to another through
-		 * ICollection.copyCollectionFrom().
-		 * @return A copy of the current IBehavior instance.
-		 */
-		function clone():IBehavior;
 	}
 }

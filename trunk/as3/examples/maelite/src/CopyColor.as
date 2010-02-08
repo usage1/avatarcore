@@ -61,8 +61,10 @@ package {
 		 * the same properties as the current.
 		 * @return A new CopyColor instance.
 		 */
-		public function clone():IBehavior {
-			return new CopyColor(targetFeatureName);
+		public function clone(copyInto:Object = null):Object {
+			var copy:CopyColor = (copyInto) ? copyInto as CopyColor : new CopyColor();
+			copy.targetFeatureName = targetFeatureName;
+			return copy;
 		}
 	}
 }

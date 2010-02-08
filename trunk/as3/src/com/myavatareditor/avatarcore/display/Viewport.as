@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -32,10 +32,12 @@ package com.myavatareditor.avatarcore.display {
 	import flash.geom.Rectangle;
 	
 	/**
-	 * A cropped (masked) area for viewing display objects.  Viewports
-	 * make it easy to fit and/or center content within its boundaries
-	 * as well as provide an easy means to produce a bitmap (BitmapData)
-	 * of that content.
+	 * A cropped (masked) area for viewing display objects such as 
+	 * AvatarDisplay instances.  Viewports make it easy to fit and/or
+	 * center content within its boundaries as well as provide an easy
+	 * means to produce a bitmap (BitmapData) of that content if, for
+	 * example, it was needed for saving snapshots of avatars for later
+	 * reference.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class Viewport extends Sprite {

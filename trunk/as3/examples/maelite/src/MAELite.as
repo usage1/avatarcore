@@ -11,7 +11,7 @@
 	
 	// force inclusion of some classes that may only
 	// have been referenced in XML
-	Mirror; Constrain; SourceToStyle; CopyColor;
+	Mirror; Constrain; SourceToStyle; CopyColor; Metadata;
 	
 	/**
 	 * Document class for My Avatar Editor Lite (built with the
@@ -37,59 +37,38 @@
 		// depending on a library for visual assets. Some names are numeric
 		// since these are the identifiers given to collection objects if
 		// not given explicit names (0-based indices are used)
+		// Adjust objects are kept in the avatar.  Art and color are
+		// referenced through definitions in the library.
 		private var defaultAvatarXML:XML = 
 			<Avatar xmlns="com.myavatareditor.avatarcore">
-				<Feature name="glasses">
-					<color name="0"/>
+				<Feature name="glasses" artName="0" colorName="0">
 					<adjust y="1" scale="1"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="nose">
+				<Feature name="nose" artName="0">
 					<adjust y="30" scale="0.6"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="mustache">
+				<Feature name="mustache" artName="0">
 					<adjust y="53.75" scale="0.63"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="hairOrnaments">
-					<art name="0"/>
-				</Feature>
-				<Feature name="hair">
-					<color name="1"/>
-					<art name="0"/>
-				</Feature>
-				<Feature name="eyebrows">
-					<color name="1"/>
+				<Feature name="hairOrnaments" artName="0" />
+				<Feature name="hair" artName="0" colorName="1"/>
+				<Feature name="eyebrows" artName="0" colorName="1">
 					<adjust x="8.75" y="-19.8" scale="0.625" rotation="56.82"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="eyes">
-					<color name="0"/>
+				<Feature name="eyes" artName="0" colorName="0">
 					<adjust x="9" y="0.33" scale="0.68" rotation="34.93"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="mouth">
-					<color name="0"/>
+				<Feature name="mouth" artName="0" colorName="0">
 					<adjust y="61.22" scale="0.61"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="mole">
+				<Feature name="mole" artName="0">
 					<adjust x="-53.25" y="46.67" scale="0.83"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="beard">
-					<color name="0"/>
+				<Feature name="beard" artName="0" colorName="0">
 					<adjust y="92"/>
-					<art name="0"/>
 				</Feature>
-				<Feature name="face">
-					<art name="0"/>
-				</Feature>
-				<Feature name="head">
-					<color name="0"/>
-					<art name="0"/>
-				</Feature>
+				<Feature name="face" artName="0" />
+				<Feature name="head" artName="0" colorName="0" />
 			</Avatar>;
 			
 		/**

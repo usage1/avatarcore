@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -23,7 +23,9 @@ package com.myavatareditor.avatarcore.events {
 	import flash.events.Event;
 	
 	/**
-	 * Event occuring when a data transaction occurs.
+	 * Event occuring when a simple data transaction occurs.  SimpleDataEvents
+	 * are simple in that a single event can be used to represent a successful
+	 * data transaction and/or represent an instance where an error occurred.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class SimpleDataEvent extends Event {
@@ -70,6 +72,9 @@ package com.myavatareditor.avatarcore.events {
 			this.error = error;
 		} 
 		
+		/**
+		 * @inheritDoc
+		 */
 		public override function clone():Event { 
 			return new SimpleDataEvent(type, bubbles, cancelable, data, error);
 		}

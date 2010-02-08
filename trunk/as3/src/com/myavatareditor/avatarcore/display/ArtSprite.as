@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -34,9 +34,17 @@ package com.myavatareditor.avatarcore.display {
 	import flash.events.Event;
 	
 	/**
-	 * Represents an individual sprite within an avatar art.  Art
-	 * variations represent one feature's appearance and can consist
-	 * of one or more art sprites to visually represent a feature.
+	 * Represents an individual graphic element within an AvatarDisplay
+	 * instance.  Each Art instance (unless acting as a container for other
+	 * individual Art instances) being used by an Avatar in an AvatarDisplay
+	 * will be represented by an ArtSprite.  All ArtSprite instances reside
+	 * directly within the display list of the AvatarDisplay.
+	 * <p>
+	 * AvatarDisplay instances automatically generate ArtSprite instances
+	 * when associated with Avatar instances. You would generally never have
+	 * to create or work with ArtSprite instances yourself.
+	 * </p>
+	 * @see AvatarDisplay
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class ArtSprite extends SourceLoaderSprite {
@@ -54,9 +62,7 @@ package com.myavatareditor.avatarcore.display {
 		 * is used to draw the art sprite after the art has
 		 * been loaded from the src.  
 		 */
-		public function get feature():Feature {
-			return _feature;
-		}
+		public function get feature():Feature { return _feature; }
 		public function set feature(value:Feature):void {
 			if (value == _feature) return;
 			_feature = value;
@@ -69,9 +75,7 @@ package com.myavatareditor.avatarcore.display {
 		 * the art for this sprite is changed so that they
 		 * remain congruent.
 		 */
-		public function get art():Art {
-			return _art;
-		}
+		public function get art():Art { return _art; }
 		public function set art(value:Art):void {
 			if (value == _art) return;
 			
@@ -118,7 +122,7 @@ package com.myavatareditor.avatarcore.display {
 		 * @param	feature The feature being rendered through this sprite.
 		 */
 		public function ArtSprite(art:Art = null, feature:Feature = null, autoLoad:Boolean = false) {
-			super(null);
+			super(null, false);
 			
 			addEventListener(SourceEvent.COMPLETE, contentCompleteHandler, false, 0, true);
 			
@@ -142,7 +146,7 @@ package com.myavatareditor.avatarcore.display {
 		 * automatically called from AvatarDisplay when it
 		 * draws.
 		 */
-		public function draw():void {
+		public function redraw():void {
 			if (_feature == null) {
 				print("Cannot draw art sprite because feature is not defined", PrintLevel.WARNING, this);
 				return;

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -42,7 +42,7 @@ package com.myavatareditor.avatarcore.display {
 	 * Dispatched when content loads or is added to the display list
 	 * from the library.
 	 */
-	[Event(name="artComplete", type="com.myavatareditor.avatarcore.events.SourceEvent")]
+	[Event(name="sourceEventComplete", type="com.myavatareditor.avatarcore.events.SourceEvent")]
 	
 	/**
 	 * Sprite class which contains a src property for loading content
@@ -131,7 +131,7 @@ package com.myavatareditor.avatarcore.display {
 		public function SourceLoaderSprite(src:String = null, autoLoad:Boolean = false) {
 			if (src) {
 				this.src = src;
-				load();
+				if (autoLoad) load();
 			}
 		}
 		
@@ -232,7 +232,9 @@ package com.myavatareditor.avatarcore.display {
 					
 				// try to set content for Loader.content if possible
 				try {
-					_content = Loader(_content).content;
+					if (_content is Loader){
+						_content = Loader(_content).content;
+					}
 				}catch (error:Error){
 					// _content not a Loader or security restricts
 					// direct access to Loader.content

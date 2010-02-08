@@ -8,10 +8,76 @@ http://avatarcore.googlecode.com
 
 == Known issues ==
 
-- None
+- None.
 
 
 == Change List ==
+
+=== 0.5.5 (February 7, 2010) ===
+
+A set of small API changes and bug fixes.  Largest change includes the
+addition of clone() methods to many of the Avatar Core core classes.
+
+- Separated some drawArtSprite functionality into separate functions that
+  make it easier to intercept these operations with Feature subclasses
+  This new API consists of the protected Feature methods: 
+  setArtSpriteColor(), setArtSpriteMatrix(), applyArtSpriteBehavior(),
+  and applyArtSpriteParentTransform()
+- Added clone() methods to the Avatar, Feature, Library, FeatureDefinition, 
+  and Definitions classes.
+- Added IClonable interface for classes that implement clone()
+- The IBehavior interface no longer includes a clone method. Instead it
+  extends the new IClonable interface (the clone signature is slightly
+  different than the original)
+- Fixed some bugs with some existing implementations of clone()
+- Added Metadata class, a cloneable, generic object class
+- Added a meta property to the Collection class.
+- Added the axis parameter to the Mirror behavior constructor
+- Added the name property to the Mirror and Range classes
+- Added the name parameter to the Adjust, Art, Avatar, Color and Library
+  class constructors
+- Removed AvatarDisplay.ART_COMPLETE since it wasn't being used
+- Improved some documentation (such as documenting more events)
+- The artName, colorName, and adjustName properties on the Feature object
+  now work like the libraryName property on Avatar; they exist as 
+  independent values that will be overridden by the name properties of
+  their respective associated references if present (i.e. for artName, if
+  an Art value exists for the Feature, art.name will be used when finding a
+  reference in a respective FeatureDefinition).
+- The artName, colorName, and adjustName properties on the Feature object
+  are now written to XML generated for Feature objects.
+- Fixed issue where autoLoad was not being respected in SourceLoaderSprite
+- Removed (made private) updateAvatar/updateAvatars methods in the
+  Definitions class. To associate avatars with Library objects in a 
+  Definitions, simply add them to the Definitions with addItem()
+- Renamed Avatar.redrawFeatures to simply Avatar.redraw() to be more
+  consistent with other APIs
+- Renamed draw() in AvatarSprite and AvatarDisplay to redraw() to be more
+  consistent with other APIs
+- Feature.definition is now read-only and instead of being assigned a
+  value, now consists of a dynamic lookup of a respective FeatureDefinition
+  in the associated Avatar's library
+- Added FeatureBase.redraw(). This is called whenever a 
+  FeatureDefinition property is set and, as with Feature instances, translates
+  into a CHANGED event in a linked Library. The redraw() method for both
+  Feature and FeatureDefinition also now include an originalName property that
+  is included in FeatureEvents and FeatureDefinitionEvents to help identify
+  old references if the name changed.
+- Added FeatureBase.autoRedraw. When false, this will prevent automatic 
+  calls to FeatureDefinition.redraw(), Feature.redraw(), and 
+  Feature.avatar.updateParentHierarchy() during property sets
+- Feature defaults (from FeatureDefinition instances) are now assigned when a
+  Feature is added to an Avatar or when a Library is set for an Avatar
+- Added AvatarDisplay.updateFeatureArtByName()
+- Adjust add() and subtract() now affect flipX and flipY
+- Added X_AXIS and Y_AXIS constants to the Mirror behavior class
+- Included recursion safety in XMLDefinitionWriter
+
+=== 0.5.1 (September 15, 2009) ===
+
+- Additional error checking in Collection.copyCollectionFrom()
+- The parent hierarchy of an Avatar is automatically updated when setting 
+  Feature.parent
 
 === 0.5.0 (September 10, 2009) ===
 
@@ -43,7 +109,7 @@ some classes to provide better compatibility.
   (an xmlns of "*" can be used to target classes not in a package)
 - XMLDefinitionParser now attempts to assign dynamic properties for instances
   of dynamic classes where child node values are not present in the class's
-  own definition\
+  own definition
 - Made a significant improvement in performance for XMLDefinitionParser.parse
 - Added meta property (Object) to FeatureBase for storing dynamic information
   within a Feature or FeatureDefinition
@@ -64,6 +130,14 @@ some classes to provide better compatibility.
 - ThumbnailArtSprite now uses a generic "target" reference instead of a 
   reference to an Art instance so that it can work with Feature and 
   FeatureDefinition instances
+- Added FeatureDefinition.library linking a FeatureDefinition to its 
+  respective library. With this is the restriction that FeatureDefinition
+  objects can only exist within one library at a time
+- Added FeatureDefinition.redraw(). This works much like Feature.redraw()
+  does for Features in an Avatar.  FeatureDefinition.redraw will dispatch
+  an event from the library which will be picked up by avatars that are
+  linked to it which in turn will allow those avatars to redraw any
+  feature linked to the FeatureDefinition being redrawn.
 
 === 0.2.1 (September 1, 2009) ===
 
@@ -279,7 +353,6 @@ more consistent.
 - Added Feature.consildate() and Avatar.consolidateFeatures()
 - Changed behavior of Transform to write Transform properties as attributes
   when written to XML by XMLDefinitionWriter rather than child elements
-
 
 === 0.0.2 (April 14, 2009) === 
 

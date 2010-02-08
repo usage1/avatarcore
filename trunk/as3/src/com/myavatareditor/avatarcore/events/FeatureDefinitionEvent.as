@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -25,17 +25,17 @@ package com.myavatareditor.avatarcore.events {
 	import flash.events.Event;
 	
 	/**
-	 * Event class for feature definition-specific events.  In addition
-	 * to standard event properties, this class includes a feature
-	 * definition member representing the feature for which the event
-	 * is associated.
+	 * Event class for FeatureDefinition-specific events.  In addition
+	 * to standard event properties, this class includes a featureDefinition 
+	 * member representing the FeatureDefinition for which the event is 
+	 * associated.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class FeatureDefinitionEvent extends Event {
 		
-		public static const ADDED:String = "featureDefinitionAdded";
-		public static const REMOVED:String = "featureDefinitionRemoved";
-		public static const CHANGED:String = "featureDefinitionChanged";
+		public static const ADDED:String = "featureDefinitionEventAdded";
+		public static const REMOVED:String = "featureDefinitionEventRemoved";
+		public static const CHANGED:String = "featureDefinitionEventChanged";
 		
 		/**
 		 * The FeatureDefinition object associated with this event.
@@ -46,13 +46,32 @@ package com.myavatareditor.avatarcore.events {
 		}
 		private var _featureDefinition:FeatureDefinition;
 		
-		public function FeatureDefinitionEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, featureDefinition:FeatureDefinition = null) {
+		/**
+		 * Associations are made through names, so when a name changes, an
+		 * original name can be included to help reference objects that
+		 * made references using the old name.
+		 */
+		public function get originalName():String { return _originalName; }
+		public function set originalName(value:String):void {
+			_originalName = value;
+		}
+		private var _originalName:String;
+		
+		/**
+		 * Constructor for creating new FeatureDefinitionEvent instances.
+		 */
+		public function FeatureDefinitionEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, 
+				featureDefinition:FeatureDefinition = null, originalName:String = null) {
 			super(type, bubbles, cancelable);
 			this.featureDefinition = featureDefinition;
+			this.originalName = originalName;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public override function clone():Event {
-			return new FeatureDefinitionEvent(type, bubbles, cancelable, _featureDefinition);
+			return new FeatureDefinitionEvent(type, bubbles, cancelable, _featureDefinition, _originalName);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -25,10 +25,8 @@ package com.myavatareditor.avatarcore.events {
 	import flash.events.Event;
 	
 	/**
-	 * Event class for feature definition-specific events.  In addition
-	 * to standard event properties, this class includes a feature
-	 * definition member representing the feature for which the event
-	 * is associated.
+	 * Event class for source-related events.  This includes when
+	 * source content is loaded into a loader display object.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class SourceEvent extends Event {
@@ -36,7 +34,7 @@ package com.myavatareditor.avatarcore.events {
 		/**
 		 * Static variable for the containerComplete event type.
 		 */
-		public static const COMPLETE:String = "sourceComplete";
+		public static const COMPLETE:String = "sourceEventComplete";
 		
 		/**
 		 * The container object associated with this event.
@@ -47,11 +45,17 @@ package com.myavatareditor.avatarcore.events {
 		}
 		private var _container:DisplayObjectContainer;
 		
+		/**
+		 * Constructor for creating new SourceEvent instances.
+		 */
 		public function SourceEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, container:DisplayObjectContainer = null) {
 			super(type, bubbles, cancelable);
 			this.container = container;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public override function clone():Event {
 			return new SourceEvent(type, bubbles, cancelable, _container);
 		}

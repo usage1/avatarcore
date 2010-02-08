@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -25,21 +25,35 @@ package com.myavatareditor.avatarcore {
 	import flash.events.EventDispatcher;
 	
 	/**
-	 * Standard ICollection implementation.  When possible
-	 * collection objects should extend Collection.  Collection
-	 * classes contain a collection array for storing generic
-	 * data of non-specific types.  Collections are also used in XML
-	 * to store objects as children objects in which their XML node
-	 * exists.
+	 * Standard ICollection implementation.  When possible collection objects should
+	 * extend Collection.  Collection classes contain a collection array for storing
+	 * generic data of non-specific types.  Collections are key components in being
+	 * able to represent child objects in XML.  Non-property XML nodes within an XML
+	 * element, represent collection items within the parent element's respective
+	 * instance.  Avatar, for example, extends Collection to allow an arbitrary number
+	 * of child Feature items to be associated with the Avatar to make up an avatar
+	 * character.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
-	public class Collection extends EventDispatcher implements ICollection, IXMLWritable {
+	public class Collection extends EventDispatcher implements ICollection, IXMLWritable, IClonable {
 		
 		/**
 		 * The name of the property used to reference values
 		 * within the collection by string key (as a hash).
 		 */
 		public static const nameKey:String = "name";
+		
+		/**
+		 * Generic object for storing custom data (metadata). This
+		 * can be, but doesn't have to be a Metadata instance. The
+		 * advantage of using a Metadata instance is that it 
+		 * implements IClonable and can be cloned.
+		 */
+		public function get meta():Object { return _meta; }
+		public function set meta(value:Object):void {
+			_meta = value;
+		}
+		private var _meta:Object;
 		
 		/**
 		 * The name identifier for the Collection object. Within
@@ -66,11 +80,11 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * Collection array where items are stored.  Items are
-		 * stored both by index and by name.
+		 * stored both by index and by name.  This array should
+		 * not be modified directly. Instead, use the add and
+		 * remove APIs.
 		 */
-		public function get collection():Array {
-			return _collection;
-		}
+		public function get collection():Array { return _collection; }
 		private var _collection:Array = [];
 		
 		/**
@@ -81,22 +95,6 @@ package com.myavatareditor.avatarcore {
 			return _collection.length;
 		}
 		
-		public function getPropertiesIgnoredByXML():Object {
-			return {requireUniqueNames:1, collection:1, itemCount:1};
-		}
-		
-		public function getPropertiesAsAttributesInXML():Object {
-			return {name:1};
-		}
-		
-		public function getDefaultPropertiesInXML():Object {
-			return {};
-		}
-		
-		public function getObjectAsXML():XML {
-			return null;
-		}
-		
 		/**
 		 * Constructor for creating new Collection instances. 
 		 * Usually the Collection class is used as a superclass;
@@ -104,15 +102,29 @@ package com.myavatareditor.avatarcore {
 		 * Collection instance.
 		 */
 		public function Collection() {
-			
+			super();
 		}
 		
 		/**
+		 * Creates and returns a copy of the Collection object.
+		 * @return A copy of this Collection object.
+		 */
+		public function clone(copyInto:Object = null):Object {
+			var copy:Collection = (copyInto) ? copyInto as Collection : new Collection();
+			if (copy == null) return null;
+			
+			copy._name = _name;
+			copy._requireUniqueNames = _requireUniqueNames;
+			copy._meta = Metadata.copyValue(_meta);
+			copy.copyCollectionFrom(this);
+			return copy;
+		}
+		/**
 		 * Copies the collection from one ICollection into this
 		 * Collection, creating clones of any object that supports
-		 * the clone member. Objects that don't contain a clone
+		 * the clone() member function. Objects that don't contain a clone
 		 * method are copied by reference. Any objects within the
-		 * current collection are removed before the new copy is made.
+		 * current collection are removed before the copy is made.
 		 * @param	source The ICollection from which to make a copy.
 		 */
 		public function copyCollectionFrom(source:ICollection):void {
@@ -123,10 +135,19 @@ package com.myavatareditor.avatarcore {
 			var i:int, n:int = sourceCollection.length;
 			for (i=0; i<n; i++){
 				item = sourceCollection[i];
-				// clone item into copied collection
-				// otherwise include a reference
+				
+				// clone item into copied collection otherwise
+				// include a reference
+				// IClonable is not checked because other native
+				// objects (e.g. flash.geom::Point) implements
+				// a clone but does not implement the Avatar Core
+				// IClonable interface
 				if ("clone" in item){
-					addItem(item.clone());
+					try {
+						addItem(item.clone());
+					}catch (error:Error){
+						addItem(item);
+					}
 				}else{
 					addItem(item);
 				}
@@ -213,7 +234,7 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function getItemByName(key:String):* {
 			if (!key) return null;
-			return _collection[key] as Object;
+			return _collection[key];
 		}
 		
 		/**
@@ -284,6 +305,42 @@ package com.myavatareditor.avatarcore {
 			for (key in _collection){
 				delete _collection[key];
 			}
+		}
+		
+		/**
+		 * Implementation for IXMLWritable for XML generation. Collections do not
+		 * include requireUniqueNames, collection, or itemCount in XML.
+		 * @inheritDoc
+		 */
+		public function getPropertiesIgnoredByXML():Object {
+			return {requireUniqueNames:1, collection:1, itemCount:1};
+		}
+		
+		/**
+		 * Implementation for IXMLWritable for XML generation. Collections place
+		 * their name properties in XML attributes.
+		 * @inheritDoc
+		 */
+		public function getPropertiesAsAttributesInXML():Object {
+			return {name:1};
+		}
+		
+		/**
+		 * Implementation for IXMLWritable for XML generation. There are no default
+		 * properties to be ignored in XML.
+		 * @inheritDoc
+		 */
+		public function getDefaultPropertiesInXML():Object {
+			return {};
+		}
+		
+		/**
+		 * Implementation for IXMLWritable for XML generation. getObjectAsXML is not
+		 * used to generate XML for Collection.
+		 * @inheritDoc
+		 */
+		public function getObjectAsXML():XML {
+			return null;
 		}
 	}
 }

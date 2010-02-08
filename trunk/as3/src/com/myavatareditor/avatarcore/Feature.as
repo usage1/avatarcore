@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -21,6 +21,7 @@ SOFTWARE.
 */
 package com.myavatareditor.avatarcore {
 	
+	import com.myavatareditor.avatarcore.events.FeatureDefinitionEvent;
 	import com.myavatareditor.avatarcore.IBehavior;
 	import com.myavatareditor.avatarcore.debug.print;
 	import com.myavatareditor.avatarcore.debug.PrintLevel;
@@ -44,17 +45,30 @@ package com.myavatareditor.avatarcore {
 	 */
 	public class Feature extends FeatureBase {
 		
+		private static const defaultSetID:String = "0"; // collection 'name' if not provided
+		
 		/**
 		 * Setting the name of Features automatically calls
 		 * updateParentHierarchy() in the associated Avatar instance
 		 * and redraws the feature.
 		 */
 		override public function set name(value:String):void {
-			super.name = value;
-			if (_avatar){
+			if (this.name == value) return;
+			
+			// redrawing will happen after updating the parent
+			// hierarchy which must be done after the value is
+			// set so suppress drawing that would occur in 
+			// super and draw after updating parents
+			suppressDraw = true;
+			try {
+				super.name = value;
+			}catch (error:*){}
+			suppressDraw = false;
+			
+			if (_avatar && autoRedraw){
 				_avatar.updateParentHierarchy();
+				redraw();
 			}
-			redraw();
 		}
 		
 		/**
@@ -65,53 +79,24 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get art():Art { return _art; }
 		public function set art(value:Art):void {
-			if (_art == value) return;
 			_art = value;
-			redraw();
+			if (autoRedraw) redraw();
 		}
 		private var _art:Art;
 		
 		/**
-		 * Shortcut to art.name.  If art or art.name does not
-		 * exist and the feature is linked to a feature definition
-		 * the value returned is the default name specified by
-		 * artSet or, if that's not available, the name of the first
-		 * item within the definition's art set collection.  Otherwise
-		 * the value is null. If artName is set when art is null,
-		 * a new Art instance will be created and its name set
-		 * to the value given to artName. When set, the feature is 
-		 * automatically updated.
+		 * The art name used by Features to associate themselves with
+		 * art in FeatureDefinition objects. This value does not have 
+		 * precedence over Feature.art.name if available, however will
+		 * be used if this Feature has no art value.
 		 */
-		public function get artName():String {
-			if (_art && _art.name) {
-				return _art.name;
-			}
-			if (_definition){
-				if (_definition.artSet.defaultName){
-					return _definition.artSet.defaultName;
-				}
-				
-				// if a feature references a definition, but does not
-				// provide specification on which art, the first is used
-				// (or whatever is specified by defaultSetID)
-				var defaultArt:Art = _definition.artSet.collection[defaultSetID] as Art;
-				if (defaultArt){
-					print("Could not resolve an art name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
-					return defaultArt.name;
-				}
-				
-				print("Could not resolve any art name for "+this, PrintLevel.WARNING, this);
-			}
-			
-			return null;
-		}
+		public function get artName():String { return _artName; }
 		public function set artName(value:String):void {
-			if (_art == null){
-				_art = new Art();
-			}
-			_art.name = value;
-			redraw();
+			if (_artName == value) return;
+			_artName = value;
+			if (autoRedraw) redraw();
 		}
+		private var _artName:String;
 			
 		/**
 		 * Style name for this feature.  When defined, art associated
@@ -125,23 +110,9 @@ package com.myavatareditor.avatarcore {
 		public function set artStyle(value:String):void {
 			if (_artStyle == value) return;
 			_artStyle = value;
-			redraw();
+			if (autoRedraw) redraw();
 		}
 		private var _artStyle:String; // defaults to not using
-		
-		/**
-		 * A specific color to be applied to an avatar. This can contain
-		 * a Color definition or, if a name property is defined, be linked
-		 * to an Color definition within a respective FeatureDefinition object.
-		 * When set, the feature is automatically updated.
-		 */
-		public function get color():Color { return _color; }
-		public function set color(value:Color):void {
-			if (_color == value) return;
-			_color = value;
-			redraw();
-		}
-		private var _color:Color;
 		
 		/**
 		 * Adjustments (position, size, and rotation) to be applied
@@ -154,96 +125,57 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get adjust():Adjust { return _adjust; }
 		public function set adjust(value:Adjust):void {
-			if (_adjust == value) return;
 			_adjust = value;
-			redraw();
+			if (autoRedraw) redraw();
 		}
 		private var _adjust:Adjust;
 		
 		/**
-		 * Shortcut to adjust.name.  If adjust or adjust.name does not
-		 * exist and the feature is linked to a feature definition
-		 * the value returned is the default name specified by
-		 * adjustSet or, if that's not available, the name of the first
-		 * item within the definition's adjust set collection.  Otherwise
-		 * the value is null. If adjustName is set when adjust is null,
-		 * a new Adjust instance will be created and its name set
-		 * to the value given to adjustName. When set, the feature is 
-		 * automatically updated.
+		 * This property is a shortcut for referencing adjusts by name in a 
+		 * referenced library. Feature.adjust.name will be used if available,
+		 * otherwise this value will be used to reference a FeatureDefinition's
+		 * Adjust in an Avatar's library. Using Feature name properties can make
+		 * Feature definitions simpler when libraries are being used.
 		 */
-		public function get adjustName():String {
-			if (_adjust && _adjust.name) {
-				return _adjust.name;
-			}
-			if (_definition){
-				if (_definition.adjustSet.defaultName){
-					return _definition.adjustSet.defaultName;
-				}
-				
-				// if a feature references a definition, but does not
-				// provide specification on which adjust, the first is used
-				// (or whatever is specified by defaultSetID)
-				var defaultAdjust:Adjust = _definition.adjustSet.collection[defaultSetID] as Adjust;
-				if (defaultAdjust){
-					print("Could not resolve an adjust name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
-					return defaultAdjust.name;
-				}
-				
-			}
-			
-			return null;
-		}
+		public function get adjustName():String { return _adjustName;  }
 		public function set adjustName(value:String):void {
-			if (_adjust == null){
-				_adjust = new Adjust();
-			}
-			_adjust.name = value;
-			redraw();
+			if (_adjustName == value) return;
+			_adjustName = value;
+			if (autoRedraw) redraw();
 		}
+		private var _adjustName:String;
 		
 		/**
-		 * Shortcut to color.name.  If color or color.name does not
-		 * exist and the feature is linked to a feature definition
-		 * the value returned is the default name specified by
-		 * colorSet or, if that's not available, the name of the first
-		 * item within the definition's color set collection.  Otherwise
-		 * the value is null. If colorName is set when color is null,
-		 * a new Color instance will be created and its name set
-		 * to the value given to colorName. When set, the feature is 
-		 * automatically updated.
+		 * A specific color to be applied to an avatar. This can contain
+		 * a Color definition or, if a name property is defined, be linked
+		 * to an Color definition within a respective FeatureDefinition object.
+		 * When set, the feature is automatically updated.
 		 */
-		public function get colorName():String {
-			if (_color && _color.name) {
-				return _color.name;
-			}
-			if (_definition){
-				if (_definition.colorSet.defaultName){
-					return _definition.colorSet.defaultName;
-				}
-				
-				// if a feature references a definition, but does not
-				// provide specification on which color, the first is used
-				// (or whatever is specified by defaultSetID)
-				var defaultColor:Color = _definition.colorSet.collection[defaultSetID] as Color;
-				if (defaultColor){
-					print("Could not resolve a color name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
-					return defaultColor.name;
-				}
-			}
-			
-			return null;
+		public function get color():Color { return _color; }
+		public function set color(value:Color):void {
+			_color = value;
+			if (autoRedraw) redraw();
 		}
+		private var _color:Color;
+		
+		/**
+		 * This property is a shortcut for referencing color by name in a 
+		 * referenced library. Feature.color.name will be used if available,
+		 * otherwise this value will be used to reference a FeatureDefinition's
+		 * Color in an Avatar's library. Using Feature name properties can make
+		 * Feature definitions simpler when libraries are being used.
+		 */
+		public function get colorName():String { return _colorName; }
 		public function set colorName(value:String):void {
-			if (_color == null){
-				_color = new Color();
-			}
-			_color.name = value;
-			redraw();
+			if (_colorName == value) return;
+			_colorName = value;
+			if (autoRedraw) redraw();
 		}
+		private var _colorName:String;
 		
 		/**
 		 * A reference to the parent feature referenced by parentName. This
-		 * is set when parentName is set, or can be set directly.
+		 * is automatically set when parentName is set.
 		 */
 		public function get parent():Feature { return _parent; }
 		public function set parent(value:Feature):void {
@@ -256,11 +188,25 @@ package com.myavatareditor.avatarcore {
 					return;
 				}
 			}
-			_parent = value;
-			super.parentName = (_parent) ? _parent.name : null; // super set to prevent re-update
-			redraw();
+			
+			setParent(value);
+			
+			if (_avatar && autoRedraw){
+				_avatar.updateParentHierarchy();
+				redraw();
+			}
 		}
 		private var _parent:Feature;
+		
+		/**
+		 * Private set parent method without public-facing validation and redraw.
+		 * This is isolated since parent assignment can happen through 
+		 * updateParentHierarchy which may cause unnecessary updates.
+		 */
+		private function setParent(feature:Feature):void {
+			_parent = feature;
+			super.parentName = (feature) ? feature.name : null; // super set to prevent re-update
+		}
 		
 		/**
 		 * Setting the parent name for Features automatically calls
@@ -268,11 +214,22 @@ package com.myavatareditor.avatarcore {
 		 * and redraws the feature.
 		 */
 		override public function set parentName(value:String):void {
-			super.parentName = value;
-			if (_avatar){
+			if (parentName == value) return;
+			
+			// redrawing will happen after updating the parent
+			// hierarchy which must be done after the value is
+			// set so suppress drawing that would occur in 
+			// super and draw after updating parents
+			suppressDraw = true;
+			try {
+				super.parentName = value;
+			}catch (error:*){}
+			suppressDraw = false;
+			
+			if (_avatar && autoRedraw){
 				_avatar.updateParentHierarchy();
+				redraw();
 			}
-			redraw();
 		}
 		
 		/**
@@ -284,13 +241,12 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * The avatar that is associated with this feature.  This is 
-		 * usually set automatically when the feature is added to an avatar
+		 * set automatically when the feature is added to an avatar
 		 * through Avatar.addItem(). This property serves as a reference
-		 * to the avatar instance in that relationship.
+		 * to the avatar instance in that relationship. Each Feature
+		 * can only exist within one Avatar at a time.
 		 */
-		public function get avatar():Avatar {
-			return _avatar;
-		}
+		public function get avatar():Avatar { return _avatar; }
 		public function set avatar(value:Avatar):void {
 			_avatar = value;
 			
@@ -303,58 +259,21 @@ package com.myavatareditor.avatarcore {
 		
 		/**
 		 * The feature definition that is to be associated with this
-		 * avatar feature.  This is usually set automatically
-		 * when the avatar is associated with a library or when a 
-		 * feature is added to an avatar that has an associated library.
-		 * These associations are made when the name of the definition
-		 * and feature matches. If a definition is assigned to a 
-		 * feature when it has no name, it automatically inherits the
-		 * name from the definition.
+		 * Feature.  This reference is obtained directly through 
+		 * the associated Avatar based on the Avatar's name and
+		 * associated Library instance.
 		 */
 		public function get definition():FeatureDefinition {
-			return _definition;
-		}
-		public function set definition(value:FeatureDefinition):void {
-			if (_definition == value) return;
+			if (_avatar == null) return null;
 			
-			_definition = value;
+			var thisName:String = this.name;
+			if (!thisName) return null;
 			
-			if (_definition){
-				
-				// inherit name of definition if not defined here
-				// usually this is a non-issue since libraries should
-				// only make the association if the names match
-				// this also works the other way around
-				if (!name){
-					name = _definition.name;
-				}else if (!_definition.name){
-					_definition.name = name;
-				}
-				
-				suppressDraw = true;
-				try {
-					// copy any defaults from definition
-					if (_art == null){
-						var defArt:Art = _definition.defaultArt;
-						if (defArt) art = defArt;
-					}
-					if (_adjust == null){
-						var defAdjust:Adjust = _definition.defaultAdjust;
-						if (defAdjust) adjust = defAdjust;
-					}
-					if (_color == null){
-						var defColor:Color = _definition.defaultColor;
-						if (defColor) color = defColor;
-					}
-				}catch (error:Error){}
-				suppressDraw = false;
-				redraw();
-			}
+			var library:Library = _avatar.library;
+			if (library == null) return null;
+			
+			return library.getItemByName(thisName);
 		}
-		private var _definition:FeatureDefinition;
-		
-		private var defaultSetID:String = "0"; // collection 'name' if not provided
-		private var suppressDraw:Boolean = false;
 		
 		/**
 		 * Constructor for creating new Feature instances.
@@ -363,13 +282,44 @@ package com.myavatareditor.avatarcore {
 			super(name);
 		}
 		
+		/**
+		 * Creates a Feature copy.  Any associated Avatar or Definition objects
+		 * are not copied. These would be reassigned when the cloned feature
+		 * is added into a separate Avatar's collection (for example if an
+		 * Avatar object containing features is cloned, the cloned features
+		 * would be associated with the new Avatar resulting from the Avatar
+		 * clone and would not be responsible for creating their own copies).
+		 * @return A copy of this Feature instance.
+		 */
+		override public function clone(copyInto:Object = null):Object {
+			var copy:Feature = (copyInto) ? copyInto as Feature : new Feature();
+			if (copy == null) return null;
+			super.clone(copy);
+			
+			copy._artStyle = _artStyle;
+			copy._artName = _artName;
+			copy._colorName = _colorName;
+			copy._adjustName = _adjustName;
+			if (_color) copy._color = _color.clone() as Color;
+			if (_adjust) copy._adjust = _adjust.clone() as Adjust;
+			if (_art) copy._art = _art.clone() as Art;
+			
+			// no avatar is copied - if an Avatar is cloned, it
+			// will add this instance to it's collection at that
+			// time which is when the avatar for this feature is set
+			// no definition is copied; this is handled by Avatar
+			// no parent information is retained; this is handled by Avatar
+			
+			return copy;
+		}
+		
+		/**
+		 * @inheritDoc
+		 */
 		public override function getPropertiesIgnoredByXML():Object {
 			var obj:Object = super.getPropertiesIgnoredByXML();
-			obj.artName = 1;
-			obj.colorName = 1;
-			obj.adjustName = 1;
-			obj.definition = 1;
 			obj.avatar = 1;
+			obj.definition = 1;
 			obj.parent = 1;
 			obj.parentCount = 1;
 			return obj;
@@ -379,12 +329,14 @@ package com.myavatareditor.avatarcore {
 		 * Indicates to Avatar stakeholders (i.e. AvatarDisplay) that this feature
 		 * has been  changed.  This only applies to features contained within
 		 * an Avatar instance since this operation causes the containing Avatar 
-		 * instance to dispatch a FEATURE_CHANGED event so objects can react to
-		 * data (feature) within the avatar being modified.
+		 * instance to dispatch a FeatureEvent.CHANGED event so objects can react to
+		 * data (feature) within the avatar being modified. Unless autoRedraw is set
+		 * to false, this will automatically get called when properties in Feature
+		 * are set.
 		 */
-		public function redraw():void {
+		override public function redraw(originalName:String = null):void {
 			if (_avatar && !suppressDraw){
-				_avatar.redrawFeature(this);
+				_avatar.redrawFeature(this, originalName);
 			}
 		}
 		
@@ -396,29 +348,31 @@ package com.myavatareditor.avatarcore {
 		 * without the library.
 		 */
 		public function consolidate():void {
-			var defArt:Art;
-			var defColor:Color;
-			var defAdjust:Adjust;
 			
-			if (_definition){
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
 				
-				name = _definition.name;
-				parentName = _definition.parentName;
+				var defArt:Art;
+				var defColor:Color;
+				var defAdjust:Adjust;
 				
-				defArt = _definition.artSet.getItemByName(artName) as Art;
-				art = (defArt) ? defArt.clone() : null;
+				name = thisDefinition.name;
+				parentName = thisDefinition.parentName;
 				
-				defColor = _definition.colorSet.getItemByName(colorName) as Color;
-				color = (defColor) ? defColor.clone() : null;
+				defArt = thisDefinition.artSet.getItemByName(artName) as Art;
+				art = (defArt) ? defArt.clone() as Art : null;
 				
-				defAdjust = _definition.adjustSet.getItemByName(adjustName) as Adjust;
-				adjust = (defAdjust) ? defAdjust.clone() : null;
+				defColor = thisDefinition.colorSet.getItemByName(colorName) as Color;
+				color = (defColor) ? defColor.clone() as Color : null;
 				
-				defAdjust = _definition.baseAdjust;
-				baseAdjust = (defAdjust) ? defAdjust.clone() : null;
+				defAdjust = thisDefinition.adjustSet.getItemByName(adjustName) as Adjust;
+				adjust = (defAdjust) ? defAdjust.clone() as Adjust : null;
+				
+				defAdjust = thisDefinition.baseAdjust;
+				baseAdjust = (defAdjust) ? defAdjust.clone() as Adjust : null;
 				
 				behaviors.clearCollection();
-				behaviors.copyCollectionFrom(_definition.behaviors);
+				behaviors.copyCollectionFrom(thisDefinition.behaviors);
 			}else{
 				print("Cannot consolidate Feature [name:" + name + "] because it is not linked to a library definition", PrintLevel.WARNING, this);
 			}
@@ -492,7 +446,8 @@ package com.myavatareditor.avatarcore {
 			
 			// call getArtSprites for behaviors
 			var behavior:IBehavior;
-			collection = _definition ? _definition.behaviors.collection : behaviors.collection;
+			var thisDefinition:FeatureDefinition = this.definition;
+			collection = thisDefinition ? thisDefinition.behaviors.collection : behaviors.collection;
 			i = collection.length;
 			while (i--){
 				behavior = collection[i] as IBehavior;
@@ -515,14 +470,46 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function getRenderedArt():Art {
 			var featureArt:Art;
-			if (_definition){
-				// art from definition
-				featureArt = _definition.artSet.getItemByName(artName) as Art;
+			// find the rendered art name to use
+			// to get an art from the linked definition
+			var renderedArtName:String = null;
+			
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
+				
+				// from assigned instance
+				if (_art){
+					renderedArtName = _art.name;
+				}
+				// explicitly provided name
+				if (!renderedArtName){
+					renderedArtName = _artName;
+				}
+				// default from definition
+				if (!renderedArtName){
+					renderedArtName = thisDefinition.artSet.defaultName;
+				}
+				
+				// grab art from definition by discovered name
+				if (renderedArtName){
+					featureArt = thisDefinition.artSet.getItemByName(renderedArtName) as Art;
+				}
 			}
+			
+			// art in avatar if not found in definition
 			if (featureArt == null) {
-				// art in avatar if not found in definition
 				featureArt = _art;
 			}
+			
+			// last resort: get first item in definition
+			if (featureArt == null && thisDefinition){
+				var defaultArt:Art = thisDefinition.artSet.getItemByName(defaultSetID) as Art;
+				if (defaultArt){
+					print("Could not resolve an art name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
+					featureArt = defaultArt;
+				}
+			}
+			
 			// return featureArt whether or not its defined
 			// unlike with adjust and color, art here can be null
 			return featureArt;
@@ -543,9 +530,10 @@ package com.myavatareditor.avatarcore {
 			}
 			
 			// if no explicit style, look to definition
-			if (_definition){
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
 				// art from definition
-				return _definition.artSet.defaultStyleName;
+				return thisDefinition.artSet.defaultStyleName;
 			}
 			
 			return null;
@@ -567,34 +555,68 @@ package com.myavatareditor.avatarcore {
 			var featureBaseAdjust:Adjust;
 			var featureAdjust:Adjust;
 			
-			if (_definition){ 
-				// adjust from definition
-				if (_definition.baseAdjust){
-					featureBaseAdjust = _definition.baseAdjust;
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
+				
+				// base adjust from definition
+				featureBaseAdjust = thisDefinition.baseAdjust;
+				
+				// find the rendered adjust name to use
+				// to get an art from the linked definition
+				var renderedAdjustName:String;
+				
+				// from assigned instance
+				if (_adjust){
+					renderedAdjustName = _adjust.name;
+				}
+				// explicitly provided name
+				if (!renderedAdjustName){
+					renderedAdjustName = _adjustName;
+				}
+				// default from definition
+				if (!renderedAdjustName){
+					renderedAdjustName = thisDefinition.adjustSet.defaultName;
 				}
 				
-				// linked adjust
-				featureAdjust = _definition.adjustSet.getItemByName(adjustName) as Adjust;
+				// grab art from definition by discovered name
+				if (renderedAdjustName){
+					featureAdjust = thisDefinition.adjustSet.getItemByName(renderedAdjustName) as Adjust;
+				}
 			}
+			
+			// baseAdjust in avatar if not found in definition
 			if (featureBaseAdjust == null) {
-				// baseAdjust in avatar if not found in definition
 				featureBaseAdjust = baseAdjust;
 			}
+			
+			// transform in avatar if not found in definition
 			if (featureAdjust == null) {
-				// transform in avatar if not found in definition
 				featureAdjust = _adjust;
+			}
+			
+			// last resort: get first item in definition
+			if (featureAdjust == null && thisDefinition){
+				var defaultAdjust:Adjust = thisDefinition.adjustSet.getItemByName(defaultSetID) as Adjust;
+				if (defaultAdjust){
+					print("Could not resolve an adjust name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
+					featureAdjust = defaultAdjust;
+				}
 			}
 			
 			// resolve final adjust from found and base
 			// only return clones, not original adjusts
 			if (featureAdjust){
-				featureAdjust = featureAdjust.clone();
-				featureAdjust.add(featureBaseAdjust);
+				featureAdjust = featureAdjust.clone() as Adjust;
+				if (featureBaseAdjust) {
+					featureAdjust.add(featureBaseAdjust);
+				}
 				return featureAdjust;
 			}
 			
+			// no feature adjust found, but base adjust
+			// exists so just return that
 			if (featureBaseAdjust){
-				return featureBaseAdjust.clone();
+				return featureBaseAdjust.clone() as Adjust;
 			}
 			
 			// none found; return new
@@ -612,13 +634,45 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function getRenderedColor():Color {
 			var featureColor:Color;
-			if (_definition){
-				// color from definition
-				featureColor = _definition.colorSet.getItemByName(colorName) as Color;
+			
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
+				
+				// find the rendered adjust name to use
+				// to get an art from the linked definition
+				var renderedColorName:String;
+				
+				// from assigned instance
+				if (_color){
+					renderedColorName = _color.name;
+				}
+				// explicitly provided name
+				if (!renderedColorName){
+					renderedColorName = _colorName;
+				}
+				// default from definition
+				if (!renderedColorName){
+					renderedColorName = thisDefinition.colorSet.defaultName;
+				}
+				
+				// grab art from definition by discovered name
+				if (renderedColorName){
+					featureColor = thisDefinition.colorSet.getItemByName(renderedColorName) as Color;
+				}
 			}
+			
+			// color in avatar if not found in definition
 			if (featureColor == null) {
-				// color in avatar if not found in definition
 				featureColor = _color;
+			}
+			
+			// last resort: get first item in definition
+			if (featureColor == null && thisDefinition){
+				var defaultColor:Color = thisDefinition.colorSet.getItemByName(defaultSetID) as Color;
+				if (defaultColor){
+					print("Could not resolve a color name for "+this+"; using the first in the definition set as a default", PrintLevel.NORMAL, this);
+					featureColor = defaultColor;
+				}
 			}
 			
 			// return featureColor if defined, otherwise 
@@ -634,7 +688,8 @@ package com.myavatareditor.avatarcore {
 		 * @return An ICollection representative of the Feature's behaviors.
 		 */
 		public function getRenderedBehaviors():ICollection {
-			return _definition ? _definition.behaviors : behaviors;
+			var thisDefinition:FeatureDefinition = this.definition;
+			return thisDefinition ? thisDefinition.behaviors : behaviors;
 		}
 		
 		/**
@@ -648,14 +703,16 @@ package com.myavatareditor.avatarcore {
 			if (artSprite == null) return;
 			
 			// apply transformation matrix
-			artSprite.transform.matrix = getRenderedAdjust().getMatrix();
-	
+			setArtSpriteMatrix(artSprite, getRenderedAdjust().getMatrix())
+			
 			// apply color
 			// 0 colorize -> no color; NaN/other colorize -> color
 			var spriteArt:Art = artSprite.art;
-			artSprite.transform.colorTransform = (spriteArt && spriteArt.colorize !== 0)
+			var colorSetting:ColorTransform = (spriteArt && spriteArt.colorize !== 0)
 					? getRenderedColor()
 					: new ColorTransform();
+			setArtSpriteColor(artSprite, colorSetting);
+			
 			
 			// call drawArtSprite for behaviors
 			var behavior:IBehavior;
@@ -664,14 +721,71 @@ package com.myavatareditor.avatarcore {
 			for (i=0; i<n; i++){
 				behavior = collection[i] as IBehavior;
 				if (behavior){
-					behavior.drawArtSprite(artSprite);
+					applyArtSpriteBehavior(artSprite, behavior);
 				}
 			}
 			
 			// apply parent adjustments
 			if (_parent){
-				parentTransformArtSprite(artSprite);
+				applyArtSpriteParentTransform(artSprite, getConcatenatedParentMatrix());
 			}
+		}
+		
+		/**
+		 * Sets the matrix (visual transform including position, rotation and size) 
+		 * to an ArtSprite when it's being drawn.
+		 * @param	artSprite The ArtSprite being drawn.
+		 * @param	matrix The transform information for the ArtSprite. The standard
+		 * behavior sets this matrix to ArtSprite.transform.matrix.
+		 */
+		protected function setArtSpriteMatrix(artSprite:ArtSprite, matrix:Matrix):void {
+			artSprite.transform.matrix = matrix;
+		}
+		
+		/**
+		 * Sets the color to an ArtSprite when it's being drawn.
+		 * @param	artSprite The ArtSprite being drawn.
+		 * @param	color The color information for the ArtSprite. The standard
+		 * behavior sets this color to ArtSprite.transform.colorTransform.
+		 */
+		protected function setArtSpriteColor(artSprite:ArtSprite, color:ColorTransform):void {
+			artSprite.transform.colorTransform = color;
+		}
+		
+		/**
+		 * Applies a behavior to an ArtSprite.  For each behavior being applied,
+		 * this function is called.
+		 * @param	artSprite The ArtSprite being drawn.
+		 * @param	behavior The behavior being applied to the ArtSprite.
+		 */
+		protected function applyArtSpriteBehavior(artSprite:ArtSprite, behavior:IBehavior):void {
+			behavior.drawArtSprite(artSprite);
+		}
+		
+		/**
+		 * Applies the inherited transforms from the parent hierarchy
+		 * of an art sprite to an art sprite. Transforms inherited include
+		 * position and rotation. Scale or visibility is not inherited but
+		 * position is affected by parent scaling.
+		 * @param	artSprite The ArtSprite being drawn.
+		 * @param	parentMatrix A matrix representative of the compound
+		 * matrices of the feature's parents.
+		 */
+		protected function applyArtSpriteParentTransform(artSprite:ArtSprite, parentMatrix:Matrix):void {
+			
+			// NOTE: this approach (after v0.1.5) does not hide a sprite if its
+			// parent is not correctly found
+			
+			// position
+			var position:Point = new Point(artSprite.x, artSprite.y);
+			position = parentMatrix.transformPoint(position);
+			artSprite.x = position.x;
+			artSprite.y = position.y;
+			
+			// rotation
+			artSprite.rotation += Math.atan2(parentMatrix.b, parentMatrix.a) * 180/Math.PI;
+			
+			// scale is not inherited
 		}
 		
 		/**
@@ -679,7 +793,8 @@ package com.myavatareditor.avatarcore {
 		 * of the feature as determined by the adjust transforms of all parent
 		 * features.  This method is used by drawArtSprite to correctly render
 		 * a feature's art within it's parent.
-		 * @return
+		 * @return A matrix representing the combined matrices of all the
+		 * parent objects.
 		 */
 		public function getConcatenatedParentMatrix():Matrix {
 			var concatenatedMatrix:Matrix = new Matrix();
@@ -700,8 +815,10 @@ package com.myavatareditor.avatarcore {
 		 */
 		internal function updateParent():void {
 			var parentFeatureName:String;
-			if (_definition){
-				parentFeatureName = _definition.parentName;
+			
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
+				parentFeatureName = thisDefinition.parentName;
 			}
 			if (parentFeatureName == null){
 				parentFeatureName = parentName;
@@ -710,7 +827,7 @@ package com.myavatareditor.avatarcore {
 			if (parentFeatureName && _avatar){
 				var foundParent:Feature = _avatar.getItemByName(parentFeatureName) as Feature;
 				if (foundParent){
-					parent = foundParent;
+					setParent(foundParent);
 				}else{ 
 				
 					// if a parent is not found yet a name is given, keep the name
@@ -745,28 +862,40 @@ package com.myavatareditor.avatarcore {
 				if (parentFeature && recursionLookup[parentFeature]) {
 					// recursion occured
 					print("Recursion in feature parent references", PrintLevel.ERROR, this);
-					return;
+					break;
 				}
 				_parentCount++;
 			}
 		}
 		
-		private function parentTransformArtSprite(artSprite:ArtSprite):void {
-			var parentMatrix:Matrix = getConcatenatedParentMatrix();
+		/**
+		 * Copies defaults from a linked FeatureDefinition into this instance.
+		 * @private
+		 */
+		internal function assignDefaults():void {
 			
-			// NOTE: this approach (after v0.1.5) does not hide a sprite if its
-			// parent is not correctly found
-			
-			// position
-			var position:Point = new Point(artSprite.x, artSprite.y);
-			position = parentMatrix.transformPoint(position);
-			artSprite.x = position.x;
-			artSprite.y = position.y;
-			
-			// rotation
-			artSprite.rotation += Math.atan2(parentMatrix.b, parentMatrix.a) * 180/Math.PI;
-			
-			// scale is not inherited
+			var thisDefinition:FeatureDefinition = this.definition;
+			if (thisDefinition){
+				suppressDraw = true;
+				try {
+					// copy any defaults from definition
+					if (_art == null){
+						var defArt:Art = thisDefinition.defaultArt;
+						if (defArt) art = defArt.clone() as Art;
+					}
+					if (_adjust == null){
+						var defAdjust:Adjust = thisDefinition.defaultAdjust;
+						if (defAdjust) adjust = defAdjust.clone() as Adjust;
+					}
+					if (_color == null){
+						var defColor:Color = thisDefinition.defaultColor;
+						if (defColor) color = defColor.clone() as Color;
+					}
+				}catch (error:*){
+					print("Assigning Feature defaults: " + error.message, PrintLevel.ERROR, this);
+				}
+				suppressDraw = false;
+			}
 		}
 	}
 }

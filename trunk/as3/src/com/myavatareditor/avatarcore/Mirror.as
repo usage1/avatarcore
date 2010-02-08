@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -37,23 +37,37 @@ package com.myavatareditor.avatarcore {
 	 */
 	public class Mirror implements IBehavior {
 		
+		public static const X_AXIS:String = "x";
+		public static const Y_AXIS:String = "y";
+		
+		/**
+		 * The name of the Mirror instance so that it can be easily
+		 * referenced in a behaviors collection.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
+		
 		/**
 		 * Specifies which axis to be used when mirroring. By default
-		 * this is the y axis.  The possible values are "x" and "y".
+		 * this is the y axis.  The possible values are Mirror.X_AXIS
+		 * ("x") and Mirror.Y_AXIS ("y").
 		 */
 		public function get axis():String {
 			return _axis;
 		}
 		public function set axis(value:String):void {
-			_axis = (value == null || value.toLowerCase() == "x") ? "x" : "y";
+			_axis = (value == null || value.toLowerCase() == Y_AXIS) ? Y_AXIS : X_AXIS;
 		}
-		private var _axis:String = "y";
+		private var _axis:String = Y_AXIS;
 		
 		/**
 		 * Constructor for creating new Mirror instances.
 		 */
-		public function Mirror() {
-			
+		public function Mirror(axis:String = Y_AXIS) {
+			this.axis = axis;
 		}
 		
 		public function getArtSprites(feature:Feature, sprites:Array):Array {
@@ -73,7 +87,7 @@ package com.myavatareditor.avatarcore {
 		public function drawArtSprite(artSprite:ArtSprite):void {
 			var mirrorArt:MirroredArtSprite = artSprite as MirroredArtSprite;
 			if (mirrorArt){
-				if (_axis == "y"){
+				if (_axis == Y_AXIS){
 					mirrorArt.x = -mirrorArt.x;
 					mirrorArt.scaleX = -mirrorArt.scaleX;
 				}else{
@@ -84,8 +98,17 @@ package com.myavatareditor.avatarcore {
 			}
 		}
 		
-		public function clone():IBehavior {
-			return new Mirror();
+		/**
+		 * Creates and returns a copy of the Mirror object.
+		 * @return A copy of this Mirror object.
+		 */
+		public function clone(copyInto:Object = null):Object {
+			var copy:Mirror = (copyInto) ? copyInto as Mirror : new Mirror();
+			if (copy == null) return null;
+			
+			copy._axis = _axis
+			copy._name = _name;
+			return copy;
 		}
 	}
 }

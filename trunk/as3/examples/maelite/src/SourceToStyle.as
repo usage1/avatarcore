@@ -67,8 +67,10 @@ package {
 		 * the same properties as the current.
 		 * @return A new SourceToStyle instance.
 		 */
-		public function clone():IBehavior {
-			return new SourceToStyle(targetFeatureName);
+		public function clone(copyInto:Object = null):Object {
+			var copy:SourceToStyle = (copyInto) ? copyInto as SourceToStyle : new SourceToStyle();
+			copy.targetFeatureName = targetFeatureName;
+			return copy;
 		}
 	}
 }
