@@ -58,7 +58,7 @@
 					// assign color. a clone is used to ensure nothing
 					// changed in the feature's color modifies the original
 					// in the library which should remain unchanged
-					thumbFeature.color = Color(colors[index]).clone();
+					thumbFeature.color = Color(colors[index]).clone() as Color;
 				}
 				
 				

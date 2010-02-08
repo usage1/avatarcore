@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -50,7 +50,7 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get x():Range { return _x; }
 		public function set x(value:Range):void {
-			_x = value ? value.clone() : null;
+			_x = value ? value.clone() as Range : null;
 		}
 		private var _x:Range;
 		
@@ -60,7 +60,7 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get y():Range { return _y; }
 		public function set y(value:Range):void {
-			_y = value ? value.clone() : null;
+			_y = value ? value.clone() as Range : null;
 		}
 		private var _y:Range;
 		
@@ -78,7 +78,7 @@ package com.myavatareditor.avatarcore {
 		}
 		public function set scaleX(value:Range):void {
 			if (_scale != null) _scale = null;
-			_scaleX = value ? value.clone() : null;
+			_scaleX = value ? value.clone() as Range : null;
 		}
 		private var _scaleX:Range;
 		
@@ -96,7 +96,7 @@ package com.myavatareditor.avatarcore {
 		}
 		public function set scaleY(value:Range):void {
 			if (_scale != null) _scale = null;
-			_scaleY = value ? value.clone() : null;
+			_scaleY = value ? value.clone() as Range : null;
 		}
 		private var _scaleY:Range;
 		
@@ -122,16 +122,16 @@ package com.myavatareditor.avatarcore {
 							int((_scaleX.steps + _scaleY.steps)/2)
 						);
 					}else{
-						_scale = _scaleX.clone();
+						_scale = _scaleX.clone() as Range;
 					}
 				}else if (_scaleY){
-					_scale = _scaleY.clone();
+					_scale = _scaleY.clone() as Range;
 				}
 			}
 			return _scale;
 		}
 		public function set scale(value:Range):void {
-			_scale = value ? value.clone() : null;
+			_scale = value ? value.clone() as Range : null;
 		}
 		private var _scale:Range;
 		
@@ -141,7 +141,7 @@ package com.myavatareditor.avatarcore {
 		 */
 		public function get rotation():Range { return _rotation; }
 		public function set rotation(value:Range):void {
-			_rotation = value ? value.clone() : null;
+			_rotation = value ? value.clone() as Range : null;
 		}
 		private var _rotation:Range;
 		
@@ -261,8 +261,20 @@ package com.myavatareditor.avatarcore {
 			artSprite.transform.matrix = feature.getRenderedAdjust().getMatrix();
 		}
 		
-		public function clone():IBehavior {
-			var copy:Constrain = new Constrain(_x, _y, _scaleX, _scaleY, _rotation);
+		/**
+		 * Creates and returns a copy of the Constrain object.
+		 * @return A copy of this Constrain object.
+		 */
+		public function clone(copyInto:Object = null):Object {
+			var copy:Constrain = (copyInto) ? copyInto as Constrain : new Constrain();
+			if (copy == null) return null;
+			
+			if (_x) copy._x = _x.clone() as Range;
+			if (_y) copy._y = _y.clone() as Range;
+			if (_scaleX) copy._scaleX = _scaleX.clone() as Range;
+			if (_scaleY) copy._scaleY = _scaleY.clone() as Range;
+			if (_scale) copy._scale = _scale.clone() as Range;
+			if (_rotation) copy._rotation = _rotation.clone() as Range;
 			return copy;
 		}
 	}

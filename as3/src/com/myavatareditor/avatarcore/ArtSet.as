@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -77,9 +77,25 @@ package com.myavatareditor.avatarcore {
 		 * Constructor for new ArtSet instances.
 		 */
 		public function ArtSet() {
-			
+			super();
 		}
 		
+		/**
+		 * Creates and returns a copy of the ArtSet object.
+		 * @return A copy of this ArtSet object.
+		 */
+		override public function clone(copyInto:Object = null):Object {
+			var copy:ArtSet = (copyInto) ? copyInto as ArtSet : new ArtSet();
+			if (copy == null) return null;
+			super.clone(copy);
+			
+			copy._colorize = _colorize;
+			copy._defaultStyleName = _defaultStyleName;
+			copy._smoothing = _smoothing;
+			copy._zIndex = _zIndex;
+			return copy;
+		}
+		 
 		/**
 		 * Custom addItem that assigns default colorize and
 		 * zIndex values to added Art objects when their values are

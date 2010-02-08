@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -40,14 +40,33 @@ package com.myavatareditor.avatarcore {
 		}
 		private var _defaultName:String;
 		
+		/**
+		 * @inheritDoc
+		 */
 		public override function getPropertiesAsAttributesInXML():Object {
 			var obj:Object = super.getPropertiesAsAttributesInXML();
 			obj.defaultName = true;
 			return obj;
 		}
 		
+		/**
+		 * Constructor for creating new SetCollection instances.
+		 */
 		public function SetCollection() {
+			super();
+		}
+		
+		/**
+		 * Creates and returns a copy of the SetCollection object.
+		 * @return A copy of this SetCollection object.
+		 */
+		override public function clone(copyInto:Object = null):Object {
+			var copy:SetCollection = (copyInto) ? copyInto as SetCollection : new SetCollection();
+			if (copy == null) return null;
+			super.clone(copy);
 			
+			copy._defaultName = _defaultName;
+			return copy;
 		}
 	}
 }

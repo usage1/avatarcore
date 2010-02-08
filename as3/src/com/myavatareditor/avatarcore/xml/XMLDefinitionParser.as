@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -56,7 +56,7 @@ package com.myavatareditor.avatarcore.xml {
 		private var memberCache:Object;
 		
 		public function XMLDefinitionParser() {
-			
+			super();
 		}
 		
 		/**

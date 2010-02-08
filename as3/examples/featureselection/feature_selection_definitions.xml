@@ -87,28 +87,11 @@
 	</Library>
 	
 	<Avatar name="myAvatar" libraryName="default">
-		
-		<Feature name="Head">
-			<art name="Normal" />
-		</Feature>
-		
-		<Feature name="Hair">
-			<art name="Braids" />
-		</Feature>
-		
-		<Feature name="Eyes">
-			<art name="With Eye Shadow" />
-			<color name="Green" />
-		</Feature>
-		
-		<Feature name="Nose">
-			<art name="Round" />
-		</Feature>
-		
-		<Feature name="Mouth">
-			<art name="Kissy" />
-		</Feature>
-		
+		<Feature name="Head" artName="Normal" />
+		<Feature name="Hair" artName="Braids" />
+		<Feature name="Eyes" artName="With Eye Shadow"  colorName="Green" />\
+		<Feature name="Nose" artName="Round" />
+		<Feature name="Mouth" artName="Kissy" />
 	</Avatar>
 	
 </Definitions>

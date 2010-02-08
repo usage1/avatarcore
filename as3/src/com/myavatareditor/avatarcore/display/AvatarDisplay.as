@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -37,31 +37,24 @@ package com.myavatareditor.avatarcore.display {
 	 * Dispatched when the AvatarDisplay redraws itself.  This usually occurs
 	 * after receiving events, such as an Avatar.REBUILD or
 	 * FeatureEvent.CHANGED from a referenced Avatar object.
+	 * @see AvatarDisplay#draw()
 	 */
-	[Event(name="draw", type="flash.events.Event")]
+	[Event(name="avatarDisplayDraw", type="flash.events.Event")]
 	
 	/**
-	 * A controller and container display object for all art used in an avatar. 
-	 * All avatar art exists as child sprite of this container, irrespective
-	 * of their feature parent hierarchies.  Layering of art is based 
-	 * solely on the defined zIndex values within the features' definitions.
-	 * Without a zIndex, their ordering is up to chance.  Art for avatars is
-	 * created in ArtSprite instances and added to the AvatarDisplay automatically
-	 * as the avatar being referenced is updated.  Most of the API is not needed
-	 * for normal use.
+	 * A visual container for Avatar instances.  AvatarDisplay instances
+	 * take an Avatar and generate the necessary ArtSprite instances
+	 * (added to the AvatarDisplay display list) needed to visually 
+	 * display an Avatar on the screen.
 	 * @author Trevor McCauley; www.senocular.com
 	 */
 	public class AvatarDisplay extends Sprite {
 		
 		/**
 		 * Constant for draw event type.
+		 * @see AvatarDisplay#avatarDisplayDraw
 		 */
-		public static const DRAW:String = "draw";
-		
-		/**
-		 * Constant for artComplete event type.
-		 */
-		public static const ART_COMPLETE:String = "artComplete";
+		public static const DRAW:String = "avatarDisplayDraw";
 		
 		/**
 		 * The avatar associated with the avatar art. The avatar
@@ -125,23 +118,24 @@ package com.myavatareditor.avatarcore.display {
 					}
 				}
 				
-			}catch (error:Error){
-				print("Avatar Rebuild; unknown error: " + error.message, PrintLevel.ERROR, this);
+			}catch (error:*){
+				print("Avatar Rebuild: " + error.message, PrintLevel.ERROR, this);
 			}
 			suppressDraw = false;
 			
-			draw();
+			redraw();
 		}
 		
 		/**
 		 * Draws the art sprites in the avatar art updating their
 		 * transformations as defined in their respective features.
 		 * If a feature's art definition has changed, you should use
-		 * updateFeatureArt method to update that feature.  draw()
+		 * updateFeatureArt method to update that feature.  redraw()
 		 * will automatically be called during those updates.
 		 */
-		public function draw():void {
+		public function redraw():void {
 			if (suppressDraw) return;
+			
 			var artSprite:ArtSprite;
 			var i:int;
 			
@@ -160,7 +154,7 @@ package com.myavatareditor.avatarcore.display {
 			i = displayList.length;
 			while (i--){
 				artSprite = displayList[i] as ArtSprite;
-				artSprite.draw();
+				artSprite.redraw();
 			}
 			
 			dispatchEvent(new Event(DRAW));
@@ -208,12 +202,12 @@ package com.myavatareditor.avatarcore.display {
 				
 				addFeatureArtSprites(feature);
 				
-			}catch (error:Error){
-				print("Avatar drawing; unknown error: " + error.message, PrintLevel.ERROR, this);
+			}catch (error:*){
+				print("Avatar drawing: " + error.message, PrintLevel.ERROR, this);
 			}
 			suppressDraw = false;
 			
-			draw();
+			redraw();
 		}
 		
 		private function addFeatureArtSprites(feature:Feature):void {
@@ -249,6 +243,20 @@ package com.myavatareditor.avatarcore.display {
 		}
 		
 		/**
+		 * Validates a feature by a specified name exists within the referenced
+		 * avatar and updates it on the screen.
+		 * @param	featureName The name of the feature having been modified. If the
+		 * feature does not exist within the avatar, no action is taken.
+		 */
+		public function updateFeatureArtByName(featureName:String):void {
+			if (_avatar == null) return;
+			var feature:Feature = _avatar.getItemByName(featureName) as Feature;
+			if (feature){
+				addFeatureArt(feature);
+			}
+		}
+		
+		/**
 		 * Removes art for the feature passed from the avatar art.
 		 * @param	feature The feature to match in art sprites
 		 * that need to be removed.
@@ -266,7 +274,7 @@ package com.myavatareditor.avatarcore.display {
 				}
 			}
 			
-			draw();
+			redraw();
 		}
 		
 		/**
@@ -289,7 +297,7 @@ package com.myavatareditor.avatarcore.display {
 				}
 			}
 			
-			draw();
+			redraw();
 		}
 		
 		/**
@@ -389,6 +397,7 @@ package com.myavatareditor.avatarcore.display {
 		}
 		private function featureChangedHandler(featureEvent:FeatureEvent):void {
 			updateFeatureArt(featureEvent.feature);
+			updateFeatureArtByName(featureEvent.originalName);
 		}
 		private function featureRemovedHandler(featureEvent:FeatureEvent):void {
 			removeFeatureArt(featureEvent.feature);

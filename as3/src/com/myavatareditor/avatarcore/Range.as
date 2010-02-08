@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2009 Trevor McCauley
+Copyright (c) 2010 Trevor McCauley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -30,11 +30,18 @@ package com.myavatareditor.avatarcore {
 	public class Range implements IXMLWritable {
 		
 		/**
+		 * The name of the Range instance.
+		 */
+		public function get name():String { return _name; }
+		public function set name(value:String):void {
+			_name = value;
+		}
+		private var _name:String;
+		
+		/**
 		 * Minimum value in the range.
 		 */
-		public function get min():Number {
-			return _min;
-		}
+		public function get min():Number { return _min; }
 		public function set min(value:Number):void {
 			_min = value;
 			updateSpan();
@@ -44,9 +51,7 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * Maximum value in the range.
 		 */
-		public function get max():Number {
-			return _max;
-		}
+		public function get max():Number { return _max; }
 		public function set max(value:Number):void {
 			_max = value;
 			updateSpan();
@@ -56,9 +61,7 @@ package com.myavatareditor.avatarcore {
 		/**
 		 * The difference between min and max
 		 */
-		public function get span():Number {
-			return _span;
-		}
+		public function get span():Number { return _span; }
 		private var _span:Number;
 		
 		/**
@@ -92,6 +95,9 @@ package com.myavatareditor.avatarcore {
 		}
 		private var _stepSpan:Number = 0;
 		
+		/**
+		 * Constructor for creating new Range instances.
+		 */
 		public function Range(min:Number = 0, max:Number = 0, steps:int = 0) {
 			_min = min;
 			_max = max;
@@ -99,27 +105,53 @@ package com.myavatareditor.avatarcore {
 			updateSpan();
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function toString():String {
 			return "[Range "+_min+", "+_max+"]";
 		}
 		
-		public function clone():Range {
-			var copy:Range = new Range(_min, _max);
+		/**
+		 * Creates and returns a copy of the Range object.
+		 * @return A copy of this Range object.
+		 */
+		public function clone(copyInto:Object = null):Object {
+			var copy:Range = (copyInto) ? copyInto as Range : new Range();
+			if (copy == null) return null;
+			
+			copy._min = _min;
+			copy._max = _max;
+			copy._steps = _steps;
+			copy._name = _name;
+			copy.updateSpan();
 			return copy;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getObjectAsXML():XML {
 			return null;
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesIgnoredByXML():Object {
 			return {span:1, stepSpan:1};
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getPropertiesAsAttributesInXML():Object {
 			return {min:1, max:1, steps:1};
 		}
 		
+		/**
+		 * @inheritDoc
+		 */
 		public function getDefaultPropertiesInXML():Object {
 			return {min:0, max:1, steps:0}; 
 		}
