@@ -11,6 +11,7 @@ Avatar Core, at this time, is not available as a SWC.
 To download the Avatar Core, classes you have two options:
   * Sync with the svn repository
   * Download the sample application with the framework included
+  * Download the framework SWC from the repository
   
 ==== Via SVN ====
 
@@ -20,10 +21,19 @@ To obtain the framework through SVN, you will need an SVN client (program).  Onc
 
 In the [http://code.google.com/p/avatarcore/downloads/list Downloads section], you will find a zip file containing a simple sample application that includes the full framework source.  This file gives you a direct means by which you can download the entire framework at once. However, this file is not guaranteed to be as up to date as the SVN repository.
 
+==== Via SWC ====
+
+SWCs are pre-compiled, self-contained libraries. With one file, you'll have the entire framework to use.  The SWC is available in the SVN repository but can be acquired without a SVN client. To do so:
+  # Go to the [http://code.google.com/p/avatarcore/source/checkout Source section]
+  # Click on the "Browse" link
+  # Navigate to: svn > trunk > as3 > lib
+  # Click on the avatarcore.swc file name
+  # On the right, select "View raw file"
+You should be prompted to download the SWC file.
 
 == Requirements ==
 
-The only requirement for the Avatar Core framework is the ability to compile ActionScript 3.0 and run Adobe Flash Player SWFs in your destination environment using Flash Player 9 or greater.
+The only requirement for the Avatar Core framework is the ability to compile ActionScript 3.0 and run Adobe Flash Player SWFs in your destination environment using Flash Player 9 or greater.  Depending on your compiler or authoring tool, there may be some additional setup needed to allow your tool to find and use the Avatar Core framework.  Note: some tools make distinctions between source code and library SWCs, so if given the option of selecting a "source" path or "library" path, you would set the source path for source code and library path for a SWC if you are using one.  
 
 ==== Setting up Flash CS4 ====
 
