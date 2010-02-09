@@ -1,5 +1,6 @@
 #summary Examples of practical applications of the Avatar Core framework.
 #labels Phase-Implementation
+_(Last updated for ver 0.5.5)_
 
 The following examples show uses of the Avatar Core framework. They demonstrate features and provide solutions to common (or uncommon) problems.
 
@@ -14,12 +15,12 @@ All of these demos were built with [http://www.adobe.com/products/flash/ Flash P
 === Simple Feature Selection ===
 This demo covers the most common use case for Avatar Core.  You have an avatar character on the left and a set of options listed out on the left for changing the features of the character.  The interface consists of a group of standard Flash controls used to select the different features available to the avatar as defined in an external XML definition.
 
-<wiki:gadget url="http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionGadget.xml" width="600" height="300" border="1" />
+<wiki:gadget url="http://www.myavatareditor.com/avatarcore/demo/FeatureSelectionGadget.xml" width="600" height="300" border="1" />
 
-Demo source files (ver 0.2.0):
-  * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelection.xml SimpleFeatureSelection.xml]
-  * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionAvatar.as SimpleFeatureSelectionAvatar.as]
-  * [http://www.myavatareditor.com/avatarcore/demo/SimpleFeatureSelectionEditor.as SimpleFeatureSelectionEditor.as]
+Source at a glance:
+  * [http://www.myavatareditor.com/avatarcore/demo/feature_selection_definitions.xml feature_selection_definitions.xml]
+  * [http://www.myavatareditor.com/avatarcore/demo/FeatureSelectionAvatar.as FeatureSelectionAvatar.as]
+  * [http://www.myavatareditor.com/avatarcore/demo/FeatureSelectionEditor.as FeatureSelectionEditor.as]
 Find the full demo download (including FLA and complete Avatar Core framework) in the [http://code.google.com/p/avatarcore/downloads/list Downloads section].
 
 === Adjust Features ===
@@ -253,11 +254,12 @@ avatarDisplay.x = 100;
 avatarDisplay.y = 100;
 addChild(avatarDisplay);
 
-addEventListener(Event.ENTER_FRAME, scaleHead);
-function scaleHead(event:Event):void {
+addEventListener(Event.ENTER_FRAME, scaleAndRotateHead);
+function scaleAndRotateHead(event:Event):void {
 	var head:Feature = avatar.getItemByName("head") as Feature;
-	head.adjust.scaleX = 2 + Math.sin( getTimer()/1000 );
-	head.adjust.rotation++;
-	head.redraw();
+	var adjust:Adjust = head.adjust;
+	adjust.scaleX = 2 + Math.sin( getTimer()/1000 );
+	adjust.rotation++;
+	head.adjust = adjust;
 }
 }}}
