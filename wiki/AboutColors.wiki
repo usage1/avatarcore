@@ -1,6 +1,6 @@
 #summary Learn more about using Colors in Avatar Core.
 #labels Phase-Implementation
-_(Last updated for ver 0.2.0)_
+_(Last updated for ver 0.5.5)_
 
 Colors in Avatar Core are used to change the color of Feature Art.  They are based off of flash.geom.ColorTransform and can add to or multiply any red, green, blue, or alpha channel within Art graphics.
 
