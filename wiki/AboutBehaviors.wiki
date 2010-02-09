@@ -1,6 +1,6 @@
 #summary Learn more about using Behaviors in Avatar Core.
 #labels Phase-Implementation
-_(Last updated for ver 0.2.1)_
+_(Last updated for ver 0.5.5)_
 
 Behaviors are used to affect how a Feature is drawn.  Their capabilities go beyond the simple transforming and coloring handled by Adjust and Color objects. They perform logic which is executed every time an AvatarDisplay draws a Feature.
 
@@ -16,13 +16,13 @@ Behaviors are objects which extend the IBehavior interface.  It includes 2 metho
   * getArtSprites - Returns a list of ArtSprites used to draw the Feature
   * drawArtSprite - Used to draw each ArtSprite defined by getArtSprites
 
-Every time a draw operation is handled by an AvatarDisplay object, it will run through the standard drawing procedures for each Feature, as well as each behavior assigned to that Feature.
+Every time a redraw operation is handled by an AvatarDisplay object, it will run through the standard drawing procedures for each Feature, as well as each behavior assigned to that Feature.
 
 The order of operations followed when drawing a Feature is:
   # Apply Feature's Adjust
   # Apply Feature's Color
   # Run each behavior
-  # Apply parent Feature's Adjust
+  # Apply inherited adjustments from parent
 
 
 == Core Behaviors ==
@@ -45,11 +45,11 @@ Each Feature can support any number of behaviors.  To facilitate this, they're s
 {{{
 <Feature>
 	<behaviors>
-		<Mirror />
 		<Constrain>
 			<x min="0" max="100" />
 			<y min="-50" max="50" />
 		</Constrain>
+		<Mirror />
 	</behaviors>
 </Feature>
 }}}
