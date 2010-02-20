@@ -7,7 +7,6 @@
     * [AboutArt]
     * [AboutXMLParsing]
     * [AboutLibraries]
-    * [AboutFeatureDefinitions]
     * [AboutColors]
     * [AboutAdjusts]
     * [AboutBehaviors] 
