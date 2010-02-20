@@ -1,6 +1,6 @@
 #summary Table of contents
   * [http://code.google.com/p/avatarcore Project Home]
-----
+
   * [Introduction]
   * [Installation]
   * [GettingStarted]
@@ -14,5 +14,5 @@
     * [AboutAdjusts]
     * [AboutBehaviors] 
   * [Demos]
-----
+
   * [http://www.myavatareditor.com/avatarcore/docs/ API Documentation]
