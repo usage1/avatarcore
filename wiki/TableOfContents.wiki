@@ -4,6 +4,7 @@
   * [Introduction]
   * [Installation]
   * [GettingStarted]
+  * Exploring the Framework
     * [AboutFeatures]
     * [AboutArt]
     * [AboutXMLParsing]
