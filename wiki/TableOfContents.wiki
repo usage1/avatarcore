@@ -1,8 +1,8 @@
   * [http://code.google.com/p/avatarcore Project Home]
+----
   * [Introduction]
   * [Installation]
   * [GettingStarted]
-  * Exploring the Framework
     * [AboutFeatures]
     * [AboutArt]
     * [AboutXMLParsing]
@@ -11,4 +11,5 @@
     * [AboutAdjusts]
     * [AboutBehaviors] 
   * [Demos]
+----
   * [http://www.myavatareditor.com/avatarcore/docs/ API Documentation]
